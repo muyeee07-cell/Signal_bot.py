@@ -8,10 +8,10 @@ from time import sleep
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-TIMEFRAME = "60"          # 1 jam di Bybit
+TIMEFRAME = "60"
 LIMIT = 100
-TOP_PAIRS = 35
-MIN_VOLUME_USDT = 5_000_000
+TOP_PAIRS = 30
+MIN_VOLUME_USDT = 3_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
 
@@ -35,26 +35,34 @@ def send_telegram(text: str):
 def get_top_pairs(limit=TOP_PAIRS):
     url = f"{BASE_URL}/v5/market/tickers"
     params = {"category": "linear"}
+    
     try:
         response = requests.get(url, params=params, timeout=15)
-        data = response.json()
+        
+        # Cek status code
+        print(f"Status Code: {response.status_code}")
+        
+        # Coba parse JSON
+        try:
+            data = response.json()
+        except Exception as e:
+            print("Gagal parse JSON. Isi response:")
+            print(response.text[:500])
+            return []
 
         if data.get("retCode") != 0:
-            print("Bybit error:", data.get("retMsg"))
+            print("Bybit retMsg:", data.get("retMsg"))
             return []
 
         tickers = data.get("result", {}).get("list", [])
         if not tickers:
+            print("Tidak ada data ticker")
             return []
-
-        EXCLUDE = ["USDCUSDT", "USDTUSDT"]  # filter stabil
 
         usdt = []
         for item in tickers:
             symbol = item.get("symbol", "")
             if not symbol.endswith("USDT"):
-                continue
-            if symbol in EXCLUDE:
                 continue
             try:
                 volume = float(item.get("turnover24h", 0))
@@ -64,10 +72,12 @@ def get_top_pairs(limit=TOP_PAIRS):
                 continue
 
         usdt.sort(key=lambda x: x[1], reverse=True)
-        return [x[0] for x in usdt[:limit]]
+        pairs = [x[0] for x in usdt[:limit]]
+        print(f"Berhasil dapat {len(pairs)} pair")
+        return pairs
 
     except Exception as e:
-        print("Gagal ambil pair Bybit:", e)
+        print("Error get_top_pairs:", str(e))
         return []
 
 def get_klines(symbol, interval="60", limit=100):
@@ -89,7 +99,6 @@ def get_klines(symbol, interval="60", limit=100):
         if not klines or len(klines) < 50:
             return None
 
-        # Bybit mengembalikan data dari baru ke lama, kita balik
         klines = list(reversed(klines))
 
         df = pd.DataFrame(klines, columns=[
@@ -101,13 +110,11 @@ def get_klines(symbol, interval="60", limit=100):
         df["close"] = pd.to_numeric(df["close"], errors="coerce")
         df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
         return df.dropna()
-    except Exception as e:
-        print(f"Gagal ambil klines {symbol}: {e}")
+    except:
         return None
 
 def calculate_indicators(df):
     df = df.copy()
-
     df["ema_fast"] = df["close"].ewm(span=21, adjust=False).mean()
     df["ema_slow"] = df["close"].ewm(span=55, adjust=False).mean()
 
@@ -152,14 +159,10 @@ def check_signal(df, symbol):
     reason = ""
 
     if adx > 23:
-        if (prev["ema_fast"] > prev["ema_slow"] and
-            last["close"] > last["ema_fast"] and
-            52 < rsi < 68):
+        if (prev["ema_fast"] > prev["ema_slow"] and last["close"] > last["ema_fast"] and 52 < rsi < 68):
             signal = "LONG"
             reason = "Trend Following"
-        elif (prev["ema_fast"] < prev["ema_slow"] and
-              last["close"] < last["ema_fast"] and
-              32 < rsi < 48):
+        elif (prev["ema_fast"] < prev["ema_slow"] and last["close"] < last["ema_fast"] and 32 < rsi < 48):
             signal = "SHORT"
             reason = "Trend Following"
     else:
@@ -205,7 +208,7 @@ def main():
 
     for i, symbol in enumerate(pairs):
         try:
-            df = get_klines(symbol, interval=TIMEFRAME, limit=LIMIT)
+            df = get_klines(symbol)
             if df is None or len(df) < 60:
                 continue
 
@@ -216,8 +219,8 @@ def main():
                 signals.append(sig)
                 print(f"Signal: {symbol} {sig['side']}")
 
-            if i % 8 == 0:
-                sleep(0.3)
+            if i % 7 == 0:
+                sleep(0.35)
 
         except Exception as e:
             print(f"Error {symbol}: {e}")
@@ -227,9 +230,9 @@ def main():
         print("Tidak ada signal saat ini")
         return
 
-    message = f"🚨 *SIGNAL 1H BYBIT FUTURES* 🚨\n"
+    message = f"🚨 *SIGNAL 1H BYBIT* 🚨\n"
     message += f"Waktu: `{datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC`\n"
-    message += f"Total signal: *{len(signals)}*\n\n"
+    message += f"Total: *{len(signals)}*\n\n"
 
     for s in signals:
         message += f"*{s['side']}* `{s['symbol']}`\n"
@@ -239,8 +242,7 @@ def main():
         message += f"_{s['reason']}_\n"
         message += "----------------\n"
 
-    message += "\n⚠️ Risk kecil | RR 1:2\n"
-    message += "_Educational only_"
+    message += "\n_Educational only_"
 
     send_telegram(message)
     print(f"Berhasil kirim {len(signals)} signal")
