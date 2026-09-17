@@ -8,14 +8,14 @@ from time import sleep
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-TIMEFRAME = "1h"
+TIMEFRAME = "60"          # 1 jam di Bybit
 LIMIT = 100
 TOP_PAIRS = 35
-MIN_VOLUME_USDT = 8_000_000
+MIN_VOLUME_USDT = 5_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
 
-BASE_URL = "https://fapi.binance.com"
+BASE_URL = "https://api.bybit.com"
 
 def send_telegram(text: str):
     if not TELEGRAM_TOKEN or not CHAT_ID:
@@ -33,44 +33,47 @@ def send_telegram(text: str):
         print("Gagal kirim Telegram:", e)
 
 def get_top_pairs(limit=TOP_PAIRS):
-    url = f"{BASE_URL}/fapi/v1/ticker/24hr"
+    url = f"{BASE_URL}/v5/market/tickers"
+    params = {"category": "linear"}
     try:
-        response = requests.get(url, timeout=15)
+        response = requests.get(url, params=params, timeout=15)
         data = response.json()
 
-        if not isinstance(data, list):
-            print("Response Binance tidak valid:", str(data)[:200])
+        if data.get("retCode") != 0:
+            print("Bybit error:", data.get("retMsg"))
             return []
 
-        EXCLUDE = [
-            "USDCUSDT", "FDUSDUSDT", "TUSDUSDT", "USDPUSDT",
-            "DAIUSDT", "EURUSDT", "GBPUSDT", "USDEUSDT",
-            "BFUSDUSDT", "XUSDUSDT", "TUSDUSDT"
-        ]
+        tickers = data.get("result", {}).get("list", [])
+        if not tickers:
+            return []
+
+        EXCLUDE = ["USDCUSDT", "USDTUSDT"]  # filter stabil
 
         usdt = []
-        for item in data:
-            if not isinstance(item, dict):
-                continue
+        for item in tickers:
             symbol = item.get("symbol", "")
-            if symbol.endswith("USDT") and symbol not in EXCLUDE:
-                try:
-                    volume = float(item.get("quoteVolume", 0))
-                    if volume >= MIN_VOLUME_USDT:
-                        usdt.append((symbol, volume))
-                except:
-                    continue
+            if not symbol.endswith("USDT"):
+                continue
+            if symbol in EXCLUDE:
+                continue
+            try:
+                volume = float(item.get("turnover24h", 0))
+                if volume >= MIN_VOLUME_USDT:
+                    usdt.append((symbol, volume))
+            except:
+                continue
 
         usdt.sort(key=lambda x: x[1], reverse=True)
         return [x[0] for x in usdt[:limit]]
 
     except Exception as e:
-        print("Gagal ambil daftar pair:", e)
+        print("Gagal ambil pair Bybit:", e)
         return []
 
-def get_klines(symbol, interval="1h", limit=100):
-    url = f"{BASE_URL}/fapi/v1/klines"
+def get_klines(symbol, interval="60", limit=100):
+    url = f"{BASE_URL}/v5/market/kline"
     params = {
+        "category": "linear",
         "symbol": symbol,
         "interval": interval,
         "limit": limit
@@ -79,13 +82,18 @@ def get_klines(symbol, interval="1h", limit=100):
         response = requests.get(url, params=params, timeout=10)
         data = response.json()
 
-        if not isinstance(data, list) or len(data) < 50:
+        if data.get("retCode") != 0:
             return None
 
-        df = pd.DataFrame(data, columns=[
-            "time", "open", "high", "low", "close", "volume",
-            "close_time", "quote_volume", "trades", "taker_buy_base",
-            "taker_buy_quote", "ignore"
+        klines = data.get("result", {}).get("list", [])
+        if not klines or len(klines) < 50:
+            return None
+
+        # Bybit mengembalikan data dari baru ke lama, kita balik
+        klines = list(reversed(klines))
+
+        df = pd.DataFrame(klines, columns=[
+            "time", "open", "high", "low", "close", "volume", "turnover"
         ])
         df["open"] = pd.to_numeric(df["open"], errors="coerce")
         df["high"] = pd.to_numeric(df["high"], errors="coerce")
@@ -143,7 +151,6 @@ def check_signal(df, symbol):
     signal = None
     reason = ""
 
-    # Trend mode
     if adx > 23:
         if (prev["ema_fast"] > prev["ema_slow"] and
             last["close"] > last["ema_fast"] and
@@ -155,8 +162,6 @@ def check_signal(df, symbol):
               32 < rsi < 48):
             signal = "SHORT"
             reason = "Trend Following"
-
-    # Range mode
     else:
         if rsi < 30:
             signal = "LONG"
@@ -187,7 +192,7 @@ def check_signal(df, symbol):
     }
 
 def main():
-    print(f"Mulai scan | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    print(f"Mulai scan Bybit | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
     pairs = get_top_pairs()
     print(f"Total pair di-scan: {len(pairs)}")
@@ -212,7 +217,7 @@ def main():
                 print(f"Signal: {symbol} {sig['side']}")
 
             if i % 8 == 0:
-                sleep(0.4)
+                sleep(0.3)
 
         except Exception as e:
             print(f"Error {symbol}: {e}")
@@ -222,7 +227,7 @@ def main():
         print("Tidak ada signal saat ini")
         return
 
-    message = f"🚨 *SIGNAL 1H BINANCE FUTURES* 🚨\n"
+    message = f"🚨 *SIGNAL 1H BYBIT FUTURES* 🚨\n"
     message += f"Waktu: `{datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC`\n"
     message += f"Total signal: *{len(signals)}*\n\n"
 
