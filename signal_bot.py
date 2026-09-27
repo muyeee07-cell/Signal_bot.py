@@ -480,7 +480,7 @@ def main():
     # 3. Kirim laporan winrate & total R dari semua signal yang sudah closed
     send_stats_report(history)
 
-    # 4. Scan pair & cari signal baru seperti biasa
+    # 4. Scan pair & cari signal baru (skip pair yang masih punya sinyal open)
     pairs = get_top_pairs()
     print(f"Total pair di-scan: {len(pairs)}")
 
@@ -488,10 +488,17 @@ def main():
         print("Tidak ada pair yang bisa di-scan")
         return
 
+    # Pair yang sudah punya sinyal berstatus 'open' tidak akan dibuka lagi
+    # sampai sinyal lamanya closed (kena TP/SL) dulu.
+    already_open_symbols = {s["symbol"] for s in history if s["status"] == "open"}
+
     new_signals = []
 
     for i, symbol in enumerate(pairs):
         try:
+            if symbol in already_open_symbols:
+                continue
+
             df = get_klines(symbol, bar=TIMEFRAME, limit=LIMIT)
             if df is None or len(df) < 60:
                 continue
@@ -505,6 +512,7 @@ def main():
                 sig["closed_time"] = None
                 sig["r_result"] = None
                 new_signals.append(sig)
+                already_open_symbols.add(symbol)
                 print(f"Signal: {symbol} {sig['side']}")
 
             if i % 7 == 0:
@@ -541,3 +549,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
