@@ -2546,5 +2546,33 @@
     "opened_time": "2026-09-27 21:15:30",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "FLOKI-USDT-SWAP",
+    "side": "LONG",
+    "entry": 2.8e-05,
+    "sl": 2.8e-05,
+    "tp": 2.9e-05,
+    "adx": 11.5,
+    "rsi": 22.4,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-27 21:44:11",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "NEIRO-USDT-SWAP",
+    "side": "LONG",
+    "entry": 9.1e-05,
+    "sl": 9e-05,
+    "tp": 9.5e-05,
+    "adx": 17.0,
+    "rsi": 26.6,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-27 21:44:11",
+    "closed_time": null,
+    "r_result": null
   }
 ]
