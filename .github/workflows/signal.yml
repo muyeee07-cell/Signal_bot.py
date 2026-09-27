@@ -27,7 +27,7 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python okx_signal_bot.py
+        run: python signal_bot.py
 
       - name: Commit signal history
         run: |
