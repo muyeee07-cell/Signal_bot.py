@@ -2602,5 +2602,19 @@
     "opened_time": "2026-09-27 22:15:22",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "AZTEC-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.01794,
+    "sl": 0.016709142857142856,
+    "tp": 0.02040171428571429,
+    "adx": 34.9,
+    "rsi": 58.2,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 23:41:38",
+    "closed_time": null,
+    "r_result": null
   }
 ]
