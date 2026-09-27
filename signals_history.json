@@ -274,10 +274,10 @@
     "adx": 27.5,
     "rsi": 57.7,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 16:09:45",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:21",
+    "r_result": -1.0
   },
   {
     "symbol": "TRIA-USDT-SWAP",
@@ -414,10 +414,10 @@
     "adx": 27.5,
     "rsi": 57.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 16:15:02",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:22",
+    "r_result": -1.0
   },
   {
     "symbol": "TRIA-USDT-SWAP",
@@ -554,10 +554,10 @@
     "adx": 27.5,
     "rsi": 57.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 16:18:21",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:23",
+    "r_result": -1.0
   },
   {
     "symbol": "TRIA-USDT-SWAP",
@@ -1912,10 +1912,10 @@
     "adx": 27.1,
     "rsi": 62.5,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 19:13:29",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:41",
+    "r_result": -1.0
   },
   {
     "symbol": "XPL-USDT-SWAP",
@@ -2066,10 +2066,10 @@
     "adx": 27.1,
     "rsi": 63.0,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 19:42:03",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:43",
+    "r_result": -1.0
   },
   {
     "symbol": "AKE-USDT-SWAP",
@@ -2430,10 +2430,10 @@
     "adx": 33.7,
     "rsi": 66.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 20:43:09",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:48",
+    "r_result": -1.0
   },
   {
     "symbol": "PEOPLE-USDT-SWAP",
@@ -2528,10 +2528,10 @@
     "adx": 35.8,
     "rsi": 66.4,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 21:15:29",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 22:14:50",
+    "r_result": -1.0
   },
   {
     "symbol": "PEOPLE-USDT-SWAP",
@@ -2570,8 +2570,36 @@
     "adx": 17.0,
     "rsi": 26.6,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 21:44:11",
+    "closed_time": "2026-09-27 22:14:50",
+    "r_result": -1.0
+  },
+  {
+    "symbol": "SHIB-USDT-SWAP",
+    "side": "LONG",
+    "entry": 5.84e-06,
+    "sl": 5.7501714285714285e-06,
+    "tp": 6.019657142857143e-06,
+    "adx": 13.6,
+    "rsi": 29.3,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-27 22:15:22",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "NEIRO-USDT-SWAP",
+    "side": "LONG",
+    "entry": 9.003e-05,
+    "sl": 8.831342857142858e-05,
+    "tp": 9.346314285714285e-05,
+    "adx": 18.7,
+    "rsi": 25.3,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-27 22:15:22",
     "closed_time": null,
     "r_result": null
   }
