@@ -2,7 +2,7 @@ name: scan
 
 on:
   schedule:
-    - cron: "*30 * * * *"   # tiap jam, sesuaikan sendiri
+    - cron: "*/30 * * * *"   # tiap jam, sesuaikan sendiri
   workflow_dispatch: {}     # supaya bisa di-trigger manual dari tab Actions
 
 permissions:
