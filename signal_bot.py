@@ -1,8 +1,9 @@
 import os
+import json
 import requests
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timezone
 from time import sleep
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
@@ -15,7 +16,14 @@ MIN_VOLUME_USDT = 3_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
 
+MONITOR_TF = "15"       # timeframe untuk cek TP/SL
+MONITOR_CANDLES = 10    # jumlah candle terakhir yang dicek (termasuk wick)
+
 BASE_URL = "https://api.bybit.com"
+HISTORY_FILE = "signals_history.json"
+
+
+# ==================== TELEGRAM ====================
 
 def send_telegram(text: str):
     if not TELEGRAM_TOKEN or not CHAT_ID:
@@ -32,20 +40,40 @@ def send_telegram(text: str):
     except Exception as e:
         print("Gagal kirim Telegram:", e)
 
+
+# ==================== HISTORY SIGNAL (persist ke file) ====================
+
+def load_history():
+    if not os.path.exists(HISTORY_FILE):
+        return []
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def save_history(history):
+    try:
+        with open(HISTORY_FILE, "w") as f:
+            json.dump(history, f, indent=2)
+    except Exception as e:
+        print("Gagal simpan history:", e)
+
+
+# ==================== DATA BYBIT ====================
+
 def get_top_pairs(limit=TOP_PAIRS):
     url = f"{BASE_URL}/v5/market/tickers"
     params = {"category": "linear"}
-    
+
     try:
         response = requests.get(url, params=params, timeout=15)
-        
-        # Cek status code
         print(f"Status Code: {response.status_code}")
-        
-        # Coba parse JSON
+
         try:
             data = response.json()
-        except Exception as e:
+        except Exception:
             print("Gagal parse JSON. Isi response:")
             print(response.text[:500])
             return []
@@ -68,7 +96,7 @@ def get_top_pairs(limit=TOP_PAIRS):
                 volume = float(item.get("turnover24h", 0))
                 if volume >= MIN_VOLUME_USDT:
                     usdt.append((symbol, volume))
-            except:
+            except Exception:
                 continue
 
         usdt.sort(key=lambda x: x[1], reverse=True)
@@ -79,6 +107,7 @@ def get_top_pairs(limit=TOP_PAIRS):
     except Exception as e:
         print("Error get_top_pairs:", str(e))
         return []
+
 
 def get_klines(symbol, interval="60", limit=100):
     url = f"{BASE_URL}/v5/market/kline"
@@ -96,7 +125,7 @@ def get_klines(symbol, interval="60", limit=100):
             return None
 
         klines = data.get("result", {}).get("list", [])
-        if not klines or len(klines) < 50:
+        if not klines or len(klines) < 5:
             return None
 
         klines = list(reversed(klines))
@@ -104,14 +133,16 @@ def get_klines(symbol, interval="60", limit=100):
         df = pd.DataFrame(klines, columns=[
             "time", "open", "high", "low", "close", "volume", "turnover"
         ])
+        df["time"] = pd.to_numeric(df["time"], errors="coerce")
         df["open"] = pd.to_numeric(df["open"], errors="coerce")
         df["high"] = pd.to_numeric(df["high"], errors="coerce")
         df["low"] = pd.to_numeric(df["low"], errors="coerce")
         df["close"] = pd.to_numeric(df["close"], errors="coerce")
         df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
         return df.dropna()
-    except:
+    except Exception:
         return None
+
 
 def calculate_indicators(df):
     df = df.copy()
@@ -142,6 +173,7 @@ def calculate_indicators(df):
     df["rsi"] = 100 - (100 / (1 + rs))
 
     return df.dropna()
+
 
 def check_signal(df, symbol):
     if len(df) < 60:
@@ -194,9 +226,131 @@ def check_signal(df, symbol):
         "reason": reason
     }
 
+
+# ==================== CEK TP/SL REALTIME (TF15, 10 candle terakhir, wick termasuk) ====================
+
+def check_open_signals():
+    history = load_history()
+    open_signals = [s for s in history if s["status"] == "open"]
+
+    if not open_signals:
+        return history
+
+    closed_messages = []
+
+    for sig in open_signals:
+        symbol = sig["symbol"]
+        df = get_klines(symbol, interval=MONITOR_TF, limit=MONITOR_CANDLES + 5)
+        if df is None or len(df) == 0:
+            continue
+
+        recent = df.tail(MONITOR_CANDLES)
+
+        hit = None
+        hit_price = None
+
+        # Cek candle dari yang paling lama ke paling baru di window ini,
+        # supaya urutan hit lebih mendekati kronologis.
+        for _, candle in recent.iterrows():
+            high = float(candle["high"])
+            low = float(candle["low"])
+
+            if sig["side"] == "LONG":
+                tp_touched = high >= sig["tp"]
+                sl_touched = low <= sig["sl"]
+            else:
+                tp_touched = low <= sig["tp"]
+                sl_touched = high >= sig["sl"]
+
+            if tp_touched and sl_touched:
+                # TP dan SL sama-sama kena wick-nya di candle yang sama.
+                # Dari data OHLC saja urutan pastinya tidak bisa dipastikan,
+                # jadi diasumsikan konservatif: SL duluan.
+                hit, hit_price = "SL", sig["sl"]
+                break
+            elif tp_touched:
+                hit, hit_price = "TP", sig["tp"]
+                break
+            elif sl_touched:
+                hit, hit_price = "SL", sig["sl"]
+                break
+
+        if hit:
+            sig["status"] = hit
+            sig["closed_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+            sig["r_result"] = RR if hit == "TP" else -1.0
+
+            emoji = "✅" if hit == "TP" else "❌"
+            closed_messages.append(
+                f"{emoji} *{hit}* `{sig['symbol']}` ({sig['side']}) | "
+                f"Entry `{sig['entry']}` -> `{hit_price}` | R: `{sig['r_result']}`"
+            )
+
+    if closed_messages:
+        msg = "📊 *UPDATE HASIL SIGNAL*\n\n" + "\n".join(closed_messages)
+        send_telegram(msg)
+        print("\n".join(closed_messages))
+
+    save_history(history)
+    return history
+
+
+# ==================== STATISTIK WINRATE & R ====================
+
+def compute_stats(history):
+    closed = [s for s in history if s["status"] in ("TP", "SL")]
+    if not closed:
+        return None
+
+    wins = [s for s in closed if s["status"] == "TP"]
+    losses = [s for s in closed if s["status"] == "SL"]
+
+    total = len(closed)
+    win_rate = len(wins) / total * 100
+    total_r = sum(s["r_result"] for s in closed)
+    avg_r = total_r / total
+
+    return {
+        "total": total,
+        "wins": len(wins),
+        "losses": len(losses),
+        "win_rate": round(win_rate, 1),
+        "total_r": round(total_r, 2),
+        "avg_r": round(avg_r, 2),
+    }
+
+
+def send_stats_report(history):
+    stats = compute_stats(history)
+    if not stats:
+        print("Belum ada signal yang closed untuk dihitung statistiknya")
+        return
+
+    msg = (
+        "📈 *TRADING RESULT SUMMARY*\n\n"
+        f"Total Signal Selesai: `{stats['total']}`\n"
+        f"Win: `{stats['wins']}` | Loss: `{stats['losses']}`\n"
+        f"Winrate: `{stats['win_rate']}%`\n"
+        f"Total R: `{stats['total_r']}R`\n"
+        f"Rata-rata R/trade: `{stats['avg_r']}R`"
+    )
+    send_telegram(msg)
+    print(msg)
+
+
+# ==================== MAIN ====================
+
 def main():
     print(f"Mulai scan Bybit | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
+    # 1. Cek signal lama yang masih 'open', lihat apakah sudah kena TP/SL
+    #    dengan mengecek wick 10 candle terakhir di TF15
+    history = check_open_signals()
+
+    # 2. Kirim laporan winrate & total R dari semua signal yang sudah closed
+    send_stats_report(history)
+
+    # 3. Scan pair & cari signal baru seperti biasa
     pairs = get_top_pairs()
     print(f"Total pair di-scan: {len(pairs)}")
 
@@ -204,11 +358,11 @@ def main():
         print("Tidak ada pair yang bisa di-scan")
         return
 
-    signals = []
+    new_signals = []
 
     for i, symbol in enumerate(pairs):
         try:
-            df = get_klines(symbol)
+            df = get_klines(symbol, interval=TIMEFRAME, limit=LIMIT)
             if df is None or len(df) < 60:
                 continue
 
@@ -216,7 +370,11 @@ def main():
             sig = check_signal(df, symbol)
 
             if sig:
-                signals.append(sig)
+                sig["status"] = "open"
+                sig["opened_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+                sig["closed_time"] = None
+                sig["r_result"] = None
+                new_signals.append(sig)
                 print(f"Signal: {symbol} {sig['side']}")
 
             if i % 7 == 0:
@@ -226,15 +384,18 @@ def main():
             print(f"Error {symbol}: {e}")
             continue
 
-    if not signals:
-        print("Tidak ada signal saat ini")
+    if not new_signals:
+        print("Tidak ada signal baru saat ini")
         return
+
+    history.extend(new_signals)
+    save_history(history)
 
     message = f"🚨 *SIGNAL 1H BYBIT* 🚨\n"
     message += f"Waktu: `{datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC`\n"
-    message += f"Total: *{len(signals)}*\n\n"
+    message += f"Total: *{len(new_signals)}*\n\n"
 
-    for s in signals:
+    for s in new_signals:
         message += f"*{s['side']}* `{s['symbol']}`\n"
         message += f"Entry: `{s['entry']}`\n"
         message += f"SL: `{s['sl']}` | TP: `{s['tp']}`\n"
@@ -245,7 +406,9 @@ def main():
     message += "\n_Educational only_"
 
     send_telegram(message)
-    print(f"Berhasil kirim {len(signals)} signal")
+    print(f"Berhasil kirim {len(new_signals)} signal")
+
 
 if __name__ == "__main__":
     main()
+
