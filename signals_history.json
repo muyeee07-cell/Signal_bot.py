@@ -820,10 +820,10 @@
     "adx": 35.4,
     "rsi": 57.8,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 16:29:23",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 16:49:36",
+    "r_result": -1.0
   },
   {
     "symbol": "NOT-USDT-SWAP",
@@ -834,10 +834,10 @@
     "adx": 34.0,
     "rsi": 57.3,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 16:29:25",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 16:49:36",
+    "r_result": -1.0
   },
   {
     "symbol": "TRIA-USDT-SWAP",
@@ -948,6 +948,90 @@
     "reason": "Trend Following",
     "status": "open",
     "opened_time": "2026-09-27 16:29:30",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "NOT-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.000524,
+    "sl": 0.00051,
+    "tp": 0.000551,
+    "adx": 34.0,
+    "rsi": 57.9,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:42",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "AKE-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.03263,
+    "sl": 0.031417,
+    "tp": 0.035055,
+    "adx": 15.4,
+    "rsi": 27.5,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:44",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "XPL-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.10587,
+    "sl": 0.11054,
+    "tp": 0.096531,
+    "adx": 31.7,
+    "rsi": 40.1,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:44",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "WLD-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.5638,
+    "sl": 0.53588,
+    "tp": 0.61964,
+    "adx": 33.6,
+    "rsi": 67.3,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:46",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "PEOPLE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.009199,
+    "sl": 0.009339,
+    "tp": 0.008919,
+    "adx": 34.9,
+    "rsi": 38.8,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:46",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "FOGO-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.005856,
+    "sl": 0.006007,
+    "tp": 0.005554,
+    "adx": 31.1,
+    "rsi": 34.0,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-27 16:49:47",
     "closed_time": null,
     "r_result": null
   }
