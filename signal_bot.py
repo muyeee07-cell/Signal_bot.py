@@ -11,13 +11,14 @@ CHAT_ID = os.getenv("CHAT_ID")
 
 TIMEFRAME = "1H"        # bar OKX untuk sinyal utama (setara TF60 di Bybit)
 LIMIT = 100
-TOP_PAIRS = 30
+TOP_PAIRS = 50
 MIN_VOLUME_USDT = 3_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
 
-MONITOR_TF = "15m"       # bar OKX untuk cek TP/SL
-MONITOR_CANDLES = 10     # jumlah candle terakhir yang dicek (termasuk wick)
+MONITOR_TF = "5m"        # bar OKX untuk cek TP/SL
+MONITOR_TF_MINUTES = 5   # durasi 1 candle MONITOR_TF, dalam menit
+MONITOR_MAX_CANDLES = 300  # batas maksimum candle per request ke OKX
 
 BASE_URL = "https://www.okx.com"
 HISTORY_FILE = "signals_history.json"
@@ -116,13 +117,27 @@ def get_top_pairs(limit=TOP_PAIRS):
         return []
 
 
-def get_klines(inst_id, bar="1H", limit=100):
+def get_klines(inst_id, bar="1H", limit=100, before=None, after=None, min_rows=5):
+    """
+    before: timestamp ms. Kalau diisi, OKX hanya balikin candle yang lebih
+    baru dari timestamp ini.
+    after: timestamp ms. Kalau diisi, OKX hanya balikin candle yang lebih
+    lama dari timestamp ini (dipakai untuk pagination mundur, ambil batch
+    yang lebih tua dari batch sebelumnya).
+    min_rows: jumlah baris minimum supaya dianggap valid (dibuat kecil untuk
+    monitoring TP/SL, karena sinyal yang baru dibuka wajar cuma punya
+    sedikit candle).
+    """
     url = f"{BASE_URL}/api/v5/market/candles"
     params = {
         "instId": inst_id,
         "bar": bar,
         "limit": limit
     }
+    if before is not None:
+        params["before"] = str(before)
+    if after is not None:
+        params["after"] = str(after)
     try:
         response = requests.get(url, params=params, timeout=10)
         data = response.json()
@@ -131,7 +146,7 @@ def get_klines(inst_id, bar="1H", limit=100):
             return None
 
         klines = data.get("data", [])
-        if not klines or len(klines) < 5:
+        if not klines or len(klines) < min_rows:
             return None
 
         # OKX mengembalikan data dari yang terbaru ke terlama -> balik urutannya
@@ -150,6 +165,51 @@ def get_klines(inst_id, bar="1H", limit=100):
         return df.dropna()
     except Exception:
         return None
+
+
+def get_klines_since(inst_id, bar, since_ms, page_limit=300, max_pages=10):
+    """
+    Ambil SEMUA candle sejak since_ms (ms) sampai candle terbaru,
+    walaupun jumlahnya lebih dari 300 (limit maksimum 1x request OKX).
+
+    Caranya: ambil batch candle terbaru dulu, lalu kalau candle paling
+    lama di batch itu masih lebih baru dari since_ms (artinya rentang
+    waktunya lebih dari 1 batch), minta batch berikutnya yang lebih tua
+    pakai parameter 'after', lalu digabung terus sampai:
+    - sudah mencapai/melewati since_ms, atau
+    - sudah tidak ada data lagi, atau
+    - sudah mencapai batas max_pages (jaga-jaga supaya tidak infinite loop
+      kalau sinyalnya sangat lama sekali terbuka).
+    """
+    all_chunks = []
+    after_ts = None
+
+    for _ in range(max_pages):
+        chunk = get_klines(inst_id, bar=bar, limit=page_limit, after=after_ts, min_rows=1)
+        if chunk is None or len(chunk) == 0:
+            break
+
+        all_chunks.append(chunk)
+        earliest_ts = int(chunk["time"].min())
+
+        if earliest_ts <= since_ms:
+            break  # sudah mencakup sampai waktu posisi dibuka
+
+        after_ts = earliest_ts - 1  # lanjut ambil batch yang lebih tua lagi
+
+        if len(chunk) < page_limit:
+            break  # data historisnya memang sudah habis
+
+    if not all_chunks:
+        return None
+
+    combined = pd.concat(all_chunks).drop_duplicates(subset="time")
+    combined = combined[combined["time"] > since_ms].sort_values("time")
+
+    if len(combined) == 0:
+        return None
+
+    return combined.reset_index(drop=True)
 
 
 def calculate_indicators(df):
@@ -235,7 +295,7 @@ def check_signal(df, symbol):
     }
 
 
-# ==================== CEK TP/SL REALTIME (TF15, 10 candle terakhir, wick termasuk) ====================
+# ==================== CEK TP/SL REALTIME (TF5, sejak posisi dibuka, wick termasuk) ====================
 
 def check_open_signals():
     history = load_history()
@@ -248,16 +308,32 @@ def check_open_signals():
 
     for sig in open_signals:
         symbol = sig["symbol"]
-        df = get_klines(symbol, bar=MONITOR_TF, limit=MONITOR_CANDLES + 5)
+
+        # Hitung timestamp (ms) saat posisi dibuka, lalu minta candle
+        # yang lebih baru dari waktu itu saja (bukan N candle terakhir).
+        try:
+            opened_dt = datetime.strptime(
+                sig["opened_time"], "%Y-%m-%d %H:%M:%S"
+            ).replace(tzinfo=timezone.utc)
+            opened_ms = int(opened_dt.timestamp() * 1000)
+        except Exception:
+            opened_ms = None
+
+        df = get_klines_since(
+            symbol,
+            bar=MONITOR_TF,
+            since_ms=opened_ms if opened_ms is not None else 0,
+            page_limit=MONITOR_MAX_CANDLES,
+        )
         if df is None or len(df) == 0:
             continue
-
-        recent = df.tail(MONITOR_CANDLES)
 
         hit = None
         hit_price = None
 
-        for _, candle in recent.iterrows():
+        # df dari get_klines_since sudah terurut dari candle paling lama
+        # ke paling baru sejak posisi dibuka.
+        for _, candle in df.iterrows():
             high = float(candle["high"])
             low = float(candle["low"])
 
@@ -350,7 +426,7 @@ def main():
     print(f"Mulai scan OKX | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
     # 1. Cek signal lama yang masih 'open', lihat apakah sudah kena TP/SL
-    #    dengan mengecek wick 10 candle terakhir di TF15
+    #    dengan mengecek wick candle TF5 sejak posisi itu dibuka (opened_time)
     history = check_open_signals()
 
     # 2. Kirim laporan winrate & total R dari semua signal yang sudah closed
@@ -417,6 +493,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
     
