@@ -11,7 +11,7 @@ CHAT_ID = os.getenv("CHAT_ID")
 
 TIMEFRAME = "1H"        # bar OKX untuk sinyal utama (setara TF60 di Bybit)
 LIMIT = 100
-TOP_PAIRS = 50
+TOP_PAIRS = 30
 MIN_VOLUME_USDT = 3_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
@@ -420,6 +420,51 @@ def send_stats_report(history):
     print(msg)
 
 
+# ==================== LAPORAN SINYAL YANG MASIH OPEN ====================
+
+def send_open_signals_report(history):
+    """Kirim status semua sinyal yang masih 'open' setiap kali scan jalan,
+    lengkap dengan harga sekarang dan floating R (belum realized)."""
+    open_signals = [s for s in history if s["status"] == "open"]
+
+    if not open_signals:
+        print("Tidak ada sinyal open saat ini")
+        return
+
+    lines = []
+    for sig in open_signals:
+        symbol = sig["symbol"]
+        entry = sig["entry"]
+        sl = sig["sl"]
+        tp = sig["tp"]
+
+        # Ambil harga close candle MONITOR_TF paling baru sebagai harga acuan
+        df = get_klines(symbol, bar=MONITOR_TF, limit=1, min_rows=1)
+        if df is None or len(df) == 0:
+            lines.append(f"⏳ `{symbol}` ({sig['side']}) | Entry `{entry}` | harga sekarang: gagal diambil")
+            continue
+
+        current_price = float(df.iloc[-1]["close"])
+        risk = abs(entry - sl)
+
+        if risk == 0:
+            floating_r = 0.0
+        elif sig["side"] == "LONG":
+            floating_r = (current_price - entry) / risk
+        else:
+            floating_r = (entry - current_price) / risk
+
+        arrow = "🟢" if floating_r >= 0 else "🔴"
+        lines.append(
+            f"{arrow} `{symbol}` ({sig['side']}) | Entry `{entry}` -> Now `{round(current_price, 6)}` | "
+            f"SL `{sl}` TP `{tp}` | Floating: `{round(floating_r, 2)}R`"
+        )
+
+    msg = "🕒 *SINYAL MASIH OPEN*\n\n" + "\n".join(lines)
+    send_telegram(msg)
+    print(msg)
+
+
 # ==================== MAIN ====================
 
 def main():
@@ -429,10 +474,13 @@ def main():
     #    dengan mengecek wick candle TF5 sejak posisi itu dibuka (opened_time)
     history = check_open_signals()
 
-    # 2. Kirim laporan winrate & total R dari semua signal yang sudah closed
+    # 2. Kirim status semua sinyal yang masih open (floating, belum closed)
+    send_open_signals_report(history)
+
+    # 3. Kirim laporan winrate & total R dari semua signal yang sudah closed
     send_stats_report(history)
 
-    # 3. Scan pair & cari signal baru seperti biasa
+    # 4. Scan pair & cari signal baru seperti biasa
     pairs = get_top_pairs()
     print(f"Total pair di-scan: {len(pairs)}")
 
@@ -493,9 +541,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-    
-
-
