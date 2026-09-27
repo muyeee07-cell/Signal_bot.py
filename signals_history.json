@@ -1296,10 +1296,10 @@
     "adx": 29.0,
     "rsi": 56.5,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-27 17:17:10",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 23:13:59",
+    "r_result": 2.0
   },
   {
     "symbol": "MAGIC-USDT-SWAP",
@@ -2080,10 +2080,10 @@
     "adx": 19.0,
     "rsi": 27.3,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 19:42:03",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 23:14:08",
+    "r_result": -1.0
   },
   {
     "symbol": "XPL-USDT-SWAP",
@@ -2248,10 +2248,10 @@
     "adx": 21.6,
     "rsi": 28.9,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 20:15:38",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 23:14:10",
+    "r_result": -1.0
   },
   {
     "symbol": "XPL-USDT-SWAP",
@@ -2374,10 +2374,10 @@
     "adx": 21.6,
     "rsi": 27.0,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-27 20:43:07",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-27 23:14:11",
+    "r_result": -1.0
   },
   {
     "symbol": "XPL-USDT-SWAP",
