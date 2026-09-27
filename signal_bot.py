@@ -9,17 +9,17 @@ from time import sleep
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-TIMEFRAME = "60"
+TIMEFRAME = "1H"        # bar OKX untuk sinyal utama (setara TF60 di Bybit)
 LIMIT = 100
 TOP_PAIRS = 30
 MIN_VOLUME_USDT = 3_000_000
 ATR_MULTIPLIER = 1.6
 RR = 2.0
 
-MONITOR_TF = "15"       # timeframe untuk cek TP/SL
-MONITOR_CANDLES = 10    # jumlah candle terakhir yang dicek (termasuk wick)
+MONITOR_TF = "15m"       # bar OKX untuk cek TP/SL
+MONITOR_CANDLES = 10     # jumlah candle terakhir yang dicek (termasuk wick)
 
-BASE_URL = "https://api.bybit.com"
+BASE_URL = "https://www.okx.com"
 HISTORY_FILE = "signals_history.json"
 
 
@@ -61,11 +61,12 @@ def save_history(history):
         print("Gagal simpan history:", e)
 
 
-# ==================== DATA BYBIT ====================
+# ==================== DATA OKX ====================
 
 def get_top_pairs(limit=TOP_PAIRS):
-    url = f"{BASE_URL}/v5/market/tickers"
-    params = {"category": "linear"}
+    """Ambil pair USDT-SWAP (perpetual) dengan volume 24h tertinggi dari OKX."""
+    url = f"{BASE_URL}/api/v5/market/tickers"
+    params = {"instType": "SWAP"}
 
     try:
         response = requests.get(url, params=params, timeout=15)
@@ -78,24 +79,25 @@ def get_top_pairs(limit=TOP_PAIRS):
             print(response.text[:500])
             return []
 
-        if data.get("retCode") != 0:
-            print("Bybit retMsg:", data.get("retMsg"))
+        if data.get("code") != "0":
+            print("OKX msg:", data.get("msg"))
             return []
 
-        tickers = data.get("result", {}).get("list", [])
+        tickers = data.get("data", [])
         if not tickers:
             print("Tidak ada data ticker")
             return []
 
         usdt = []
         for item in tickers:
-            symbol = item.get("symbol", "")
-            if not symbol.endswith("USDT"):
+            inst_id = item.get("instId", "")
+            if not inst_id.endswith("-USDT-SWAP"):
                 continue
             try:
-                volume = float(item.get("turnover24h", 0))
+                # volCcy24h = volume 24h dalam mata uang quote (USDT)
+                volume = float(item.get("volCcy24h", 0))
                 if volume >= MIN_VOLUME_USDT:
-                    usdt.append((symbol, volume))
+                    usdt.append((inst_id, volume))
             except Exception:
                 continue
 
@@ -109,29 +111,30 @@ def get_top_pairs(limit=TOP_PAIRS):
         return []
 
 
-def get_klines(symbol, interval="60", limit=100):
-    url = f"{BASE_URL}/v5/market/kline"
+def get_klines(inst_id, bar="1H", limit=100):
+    url = f"{BASE_URL}/api/v5/market/candles"
     params = {
-        "category": "linear",
-        "symbol": symbol,
-        "interval": interval,
+        "instId": inst_id,
+        "bar": bar,
         "limit": limit
     }
     try:
         response = requests.get(url, params=params, timeout=10)
         data = response.json()
 
-        if data.get("retCode") != 0:
+        if data.get("code") != "0":
             return None
 
-        klines = data.get("result", {}).get("list", [])
+        klines = data.get("data", [])
         if not klines or len(klines) < 5:
             return None
 
+        # OKX mengembalikan data dari yang terbaru ke terlama -> balik urutannya
         klines = list(reversed(klines))
 
         df = pd.DataFrame(klines, columns=[
-            "time", "open", "high", "low", "close", "volume", "turnover"
+            "time", "open", "high", "low", "close",
+            "volume", "volCcy", "volCcyQuote", "confirm"
         ])
         df["time"] = pd.to_numeric(df["time"], errors="coerce")
         df["open"] = pd.to_numeric(df["open"], errors="coerce")
@@ -240,7 +243,7 @@ def check_open_signals():
 
     for sig in open_signals:
         symbol = sig["symbol"]
-        df = get_klines(symbol, interval=MONITOR_TF, limit=MONITOR_CANDLES + 5)
+        df = get_klines(symbol, bar=MONITOR_TF, limit=MONITOR_CANDLES + 5)
         if df is None or len(df) == 0:
             continue
 
@@ -249,8 +252,6 @@ def check_open_signals():
         hit = None
         hit_price = None
 
-        # Cek candle dari yang paling lama ke paling baru di window ini,
-        # supaya urutan hit lebih mendekati kronologis.
         for _, candle in recent.iterrows():
             high = float(candle["high"])
             low = float(candle["low"])
@@ -341,7 +342,7 @@ def send_stats_report(history):
 # ==================== MAIN ====================
 
 def main():
-    print(f"Mulai scan Bybit | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+    print(f"Mulai scan OKX | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
     # 1. Cek signal lama yang masih 'open', lihat apakah sudah kena TP/SL
     #    dengan mengecek wick 10 candle terakhir di TF15
@@ -362,7 +363,7 @@ def main():
 
     for i, symbol in enumerate(pairs):
         try:
-            df = get_klines(symbol, interval=TIMEFRAME, limit=LIMIT)
+            df = get_klines(symbol, bar=TIMEFRAME, limit=LIMIT)
             if df is None or len(df) < 60:
                 continue
 
@@ -391,7 +392,7 @@ def main():
     history.extend(new_signals)
     save_history(history)
 
-    message = f"🚨 *SIGNAL 1H BYBIT* 🚨\n"
+    message = f"🚨 *SIGNAL 1H OKX* 🚨\n"
     message += f"Waktu: `{datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC`\n"
     message += f"Total: *{len(new_signals)}*\n\n"
 
@@ -411,4 +412,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
