@@ -1,5 +1,6 @@
 import os
 import json
+import math
 import requests
 import pandas as pd
 import numpy as np
@@ -22,6 +23,30 @@ MONITOR_MAX_CANDLES = 300  # batas maksimum candle per request ke OKX
 
 BASE_URL = "https://www.okx.com"
 HISTORY_FILE = "signals_history.json"
+
+
+def fmt_price(x, sig_figs=5):
+    """
+    Format harga dengan ~sig_figs angka penting, TANPA notasi ilmiah,
+    supaya harga koin kecil (mis. 0.0000281234) tetap kelihatan presisinya
+    dan tidak kebulat jadi sama dengan angka lain yang berdekatan.
+    """
+    try:
+        x = float(x)
+    except (TypeError, ValueError):
+        return str(x)
+
+    if x == 0:
+        return "0"
+
+    exponent = math.floor(math.log10(abs(x)))
+    decimals = max(0, sig_figs - exponent - 1)
+    decimals = min(decimals, 12)
+
+    s = f"{x:.{decimals}f}"
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    return s
 
 
 # ==================== TELEGRAM ====================
@@ -286,9 +311,9 @@ def check_signal(df, symbol):
     return {
         "symbol": symbol,
         "side": signal,
-        "entry": round(close, 6),
-        "sl": round(sl, 6),
-        "tp": round(tp, 6),
+        "entry": close,
+        "sl": sl,
+        "tp": tp,
         "adx": round(adx, 1),
         "rsi": round(rsi, 1),
         "reason": reason
@@ -365,7 +390,7 @@ def check_open_signals():
             emoji = "✅" if hit == "TP" else "❌"
             closed_messages.append(
                 f"{emoji} *{hit}* `{sig['symbol']}` ({sig['side']}) | "
-                f"Entry `{sig['entry']}` -> `{hit_price}` | R: `{sig['r_result']}`"
+                f"Entry `{fmt_price(sig['entry'])}` -> `{fmt_price(hit_price)}` | R: `{sig['r_result']}`"
             )
 
     if closed_messages:
@@ -441,7 +466,7 @@ def send_open_signals_report(history):
         # Ambil harga close candle MONITOR_TF paling baru sebagai harga acuan
         df = get_klines(symbol, bar=MONITOR_TF, limit=1, min_rows=1)
         if df is None or len(df) == 0:
-            lines.append(f"⏳ `{symbol}` ({sig['side']}) | Entry `{entry}` | harga sekarang: gagal diambil")
+            lines.append(f"⏳ `{symbol}` ({sig['side']}) | Entry `{fmt_price(entry)}` | harga sekarang: gagal diambil")
             continue
 
         current_price = float(df.iloc[-1]["close"])
@@ -456,8 +481,8 @@ def send_open_signals_report(history):
 
         arrow = "🟢" if floating_r >= 0 else "🔴"
         lines.append(
-            f"{arrow} `{symbol}` ({sig['side']}) | Entry `{entry}` -> Now `{round(current_price, 6)}` | "
-            f"SL `{sl}` TP `{tp}` | Floating: `{round(floating_r, 2)}R`"
+            f"{arrow} `{symbol}` ({sig['side']}) | Entry `{fmt_price(entry)}` -> Now `{fmt_price(current_price)}` | "
+            f"SL `{fmt_price(sl)}` TP `{fmt_price(tp)}` | Floating: `{round(floating_r, 2)}R`"
         )
 
     msg = "🕒 *SINYAL MASIH OPEN*\n\n" + "\n".join(lines)
@@ -535,8 +560,8 @@ def main():
 
     for s in new_signals:
         message += f"*{s['side']}* `{s['symbol']}`\n"
-        message += f"Entry: `{s['entry']}`\n"
-        message += f"SL: `{s['sl']}` | TP: `{s['tp']}`\n"
+        message += f"Entry: `{fmt_price(s['entry'])}`\n"
+        message += f"SL: `{fmt_price(s['sl'])}` | TP: `{fmt_price(s['tp'])}`\n"
         message += f"ADX: `{s['adx']}` | RSI: `{s['rsi']}`\n"
         message += f"_{s['reason']}_\n"
         message += "----------------\n"
@@ -549,4 +574,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
