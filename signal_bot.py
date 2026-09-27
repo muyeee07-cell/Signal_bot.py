@@ -36,7 +36,12 @@ def send_telegram(text: str):
         "parse_mode": "Markdown"
     }
     try:
-        requests.post(url, json=payload, timeout=10)
+        resp = requests.post(url, json=payload, timeout=10)
+        print(f"Telegram status: {resp.status_code}")
+        if resp.status_code != 200:
+            # Cetak isi respons asli dari Telegram supaya penyebabnya kelihatan
+            # (mis. "chat not found", "not enough rights to send messages", dll)
+            print("Telegram response:", resp.text[:500])
     except Exception as e:
         print("Gagal kirim Telegram:", e)
 
@@ -412,6 +417,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
     
 
