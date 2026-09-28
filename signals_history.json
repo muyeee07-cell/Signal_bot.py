@@ -2826,5 +2826,33 @@
     "opened_time": "2026-09-28 05:16:39",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "HMSTR-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.0001717,
+    "sl": 0.00016819142857142858,
+    "tp": 0.00017871714285714284,
+    "adx": 22.0,
+    "rsi": 24.5,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-28 06:22:41",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "GALA-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.002174,
+    "sl": 0.0020994857142857142,
+    "tp": 0.002323028571428572,
+    "adx": 17.8,
+    "rsi": 28.9,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-28 06:22:42",
+    "closed_time": null,
+    "r_result": null
   }
 ]
