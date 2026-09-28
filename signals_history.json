@@ -390,5 +390,33 @@
     "opened_time": "2026-09-28 16:18:34",
     "closed_time": "2026-09-28 17:15:36",
     "r_result": -1.0
+  },
+  {
+    "symbol": "AZTEC-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.02007,
+    "sl": 0.018542,
+    "tp": 0.023126000000000004,
+    "adx": 26.0,
+    "rsi": 67.7,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 18:18:47",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "LINEA-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.003079,
+    "sl": 0.002975,
+    "tp": 0.003287,
+    "adx": 27.6,
+    "rsi": 66.9,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 18:18:47",
+    "closed_time": null,
+    "r_result": null
   }
 ]
