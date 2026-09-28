@@ -162,10 +162,10 @@
     "adx": 55.1,
     "rsi": 34.7,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 09:46:38",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 12:21:08",
+    "r_result": -1.0
   },
   {
     "symbol": "PEPE-USDT-SWAP",
@@ -220,6 +220,62 @@
     "reason": "Trend Following",
     "status": "open",
     "opened_time": "2026-09-28 10:45:43",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "BONK-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 3.541e-06,
+    "sl": 3.6784857142857145e-06,
+    "tp": 3.2660285714285713e-06,
+    "adx": 42.5,
+    "rsi": 36.2,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 12:21:16",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "NEIRO-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 8.842e-05,
+    "sl": 9.093657142857142e-05,
+    "tp": 8.338685714285714e-05,
+    "adx": 51.6,
+    "rsi": 41.4,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 12:21:16",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "DOGE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.09437,
+    "sl": 0.09647857142857141,
+    "tp": 0.09015285714285716,
+    "adx": 47.2,
+    "rsi": 42.5,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 12:21:17",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "HMSTR-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0001723,
+    "sl": 0.00017648285714285712,
+    "tp": 0.00016393428571428572,
+    "adx": 47.4,
+    "rsi": 34.0,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 12:21:17",
     "closed_time": null,
     "r_result": null
   }
