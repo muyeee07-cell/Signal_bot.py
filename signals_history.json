@@ -92,10 +92,10 @@
     "adx": 46.7,
     "rsi": 65.0,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 06:51:43",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 08:19:05",
+    "r_result": -1.0
   },
   {
     "symbol": "MON-USDT-SWAP",
@@ -136,6 +136,20 @@
     "reason": "Mean Reversion Oversold",
     "status": "open",
     "opened_time": "2026-09-28 07:17:59",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "SEI-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.08111,
+    "sl": 0.07634542857142858,
+    "tp": 0.09063914285714285,
+    "adx": 57.1,
+    "rsi": 66.6,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 08:19:17",
     "closed_time": null,
     "r_result": null
   }
