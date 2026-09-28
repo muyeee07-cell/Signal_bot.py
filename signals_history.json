@@ -1688,10 +1688,10 @@
     "adx": 25.1,
     "rsi": 63.1,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-27 18:17:39",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 00:49:24",
+    "r_result": 2.0
   },
   {
     "symbol": "BILL-USDT-SWAP",
@@ -1954,10 +1954,10 @@
     "adx": 24.4,
     "rsi": 56.3,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-27 19:13:30",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 00:49:28",
+    "r_result": 2.0
   },
   {
     "symbol": "BILL-USDT-SWAP",
@@ -2122,10 +2122,10 @@
     "adx": 24.4,
     "rsi": 56.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-27 19:42:04",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 00:49:30",
+    "r_result": 2.0
   },
   {
     "symbol": "WLD-USDT-SWAP",
@@ -2628,6 +2628,20 @@
     "reason": "Trend Following",
     "status": "open",
     "opened_time": "2026-09-28 00:23:54",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "MON-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.02854,
+    "sl": 0.027364,
+    "tp": 0.030892,
+    "adx": 28.2,
+    "rsi": 62.9,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 00:50:09",
     "closed_time": null,
     "r_result": null
   }
