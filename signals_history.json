@@ -2770,5 +2770,61 @@
     "opened_time": "2026-09-28 04:17:39",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "PUMP-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.00517,
+    "sl": 0.004901771428571428,
+    "tp": 0.0057064571428571435,
+    "adx": 75.4,
+    "rsi": 64.5,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 05:16:36",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "FLOKI-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 2.756e-05,
+    "sl": 2.818285714285714e-05,
+    "tp": 2.631428571428572e-05,
+    "adx": 23.3,
+    "rsi": 34.0,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 05:16:36",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "DOGE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.09378,
+    "sl": 0.09573085714285715,
+    "tp": 0.08987828571428572,
+    "adx": 24.5,
+    "rsi": 32.7,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 05:16:36",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "MEW-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0004861,
+    "sl": 0.0004965799999999999,
+    "tp": 0.0004651400000000001,
+    "adx": 25.4,
+    "rsi": 32.8,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 05:16:39",
+    "closed_time": null,
+    "r_result": null
   }
 ]
