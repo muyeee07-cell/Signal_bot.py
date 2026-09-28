@@ -110,5 +110,33 @@
     "opened_time": "2026-09-28 06:51:44",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "PENGU-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.00963,
+    "sl": 0.009998114285714286,
+    "tp": 0.008893771428571427,
+    "adx": 32.3,
+    "rsi": 34.3,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 07:17:55",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "ARB-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.21104,
+    "sl": 0.2022457142857143,
+    "tp": 0.2286285714285714,
+    "adx": 9.5,
+    "rsi": 29.8,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-28 07:17:59",
+    "closed_time": null,
+    "r_result": null
   }
 ]
