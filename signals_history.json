@@ -2616,5 +2616,19 @@
     "opened_time": "2026-09-27 23:41:38",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "BONK-USDT-SWAP",
+    "side": "LONG",
+    "entry": 3.768e-06,
+    "sl": 3.664914285714286e-06,
+    "tp": 3.974171428571429e-06,
+    "adx": 34.1,
+    "rsi": 57.2,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 00:23:54",
+    "closed_time": null,
+    "r_result": null
   }
 ]
