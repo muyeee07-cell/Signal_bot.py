@@ -386,9 +386,9 @@
     "adx": 18.0,
     "rsi": 72.5,
     "reason": "Mean Reversion Overbought",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 16:18:34",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 17:15:36",
+    "r_result": -1.0
   }
 ]
