@@ -1,591 +1,1308 @@
 import os
 import json
 import math
+import time
 import requests
 import pandas as pd
 import numpy as np
 from datetime import datetime, timezone
-from time import sleep
-
+# ============================================================
+# OKX TELEGRAM SIGNAL ENGINE V2
+# Closed-Candle | Wilder Indicators | Regime | Volume
+# Structure | Cooldown | RR 1:2 | Signal Only
+# ============================================================
+# =========================
+# CONFIG
+# =========================
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
-
-TIMEFRAME = "1H"        # bar OKX untuk sinyal utama (setara TF60 di Bybit)
-LIMIT = 100
+BASE_URL = "https://www.okx.com"
+TIMEFRAME = "1H"
+MONITOR_TF = "5m"
+LIMIT = 150
 TOP_PAIRS = 30
 MIN_VOLUME_USDT = 3_000_000
+# Risk / Reward
+ATR_PERIOD = 14
 ATR_MULTIPLIER = 1.6
 RR = 2.0
-
-MONITOR_TF = "5m"        # bar OKX untuk cek TP/SL
-MONITOR_TF_MINUTES = 5   # durasi 1 candle MONITOR_TF, dalam menit
-MONITOR_MAX_CANDLES = 300  # batas maksimum candle per request ke OKX
-
-BASE_URL = "https://www.okx.com"
+# Indicators
+EMA_FAST = 21
+EMA_SLOW = 55
+RSI_PERIOD = 14
+ADX_PERIOD = 14
+# Filters
+MIN_ADX_TREND = 23
+MIN_VOLUME_RATIO = 1.15
+# Signal quality
+MIN_SCORE = 4
+# Cooldown
+COOLDOWN_HOURS = 3
+# Monitoring
+MONITOR_LIMIT = 300
+MONITOR_POLL_MINUTES = 5
+# History
 HISTORY_FILE = "signals_history.json"
-
-
-def fmt_price(x, sig_figs=5):
+# ============================================================
+# UTILITIES
+# ============================================================
+def utc_now():
+    return datetime.now(timezone.utc)
+def utc_string(dt=None):
+    if dt is None:
+        dt = utc_now()
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+def fmt_price(x, sig_figs=6):
     """
-    Format harga dengan ~sig_figs angka penting, TANPA notasi ilmiah,
-    supaya harga koin kecil (mis. 0.0000281234) tetap kelihatan presisinya
-    dan tidak kebulat jadi sama dengan angka lain yang berdekatan.
+    Format harga tanpa scientific notation.
     """
     try:
         x = float(x)
     except (TypeError, ValueError):
         return str(x)
-
     if x == 0:
         return "0"
-
     exponent = math.floor(math.log10(abs(x)))
     decimals = max(0, sig_figs - exponent - 1)
     decimals = min(decimals, 12)
-
-    s = f"{x:.{decimals}f}"
-    if "." in s:
-        s = s.rstrip("0").rstrip(".")
-    return s
-
-
-# ==================== TELEGRAM ====================
-
-def _split_message(text: str, max_len: int = 3800):
-    """Pecah pesan panjang per baris supaya tiap bagian < batas 4096 karakter Telegram."""
-    chunks, current = [], ""
+    result = f"{x:.{decimals}f}"
+    if "." in result:
+        result = result.rstrip("0").rstrip(".")
+    return result
+# ============================================================
+# TELEGRAM
+# ============================================================
+def split_message(text, max_len=3800):
+    chunks = []
+    current = ""
     for line in text.split("\n"):
-        if len(current) + len(line) + 1 > max_len and current:
-            chunks.append(current)
+        if len(current) + len(line) + 1 > max_len:
+            if current:
+                chunks.append(current)
             current = ""
         current += line + "\n"
     if current.strip():
         chunks.append(current)
     return chunks
-
-
-def send_telegram(text: str):
+def send_telegram(text):
     if not TELEGRAM_TOKEN or not CHAT_ID:
-        print("Token atau Chat ID belum di-set")
+        print("TELEGRAM_TOKEN / CHAT_ID belum tersedia.")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-
-    for chunk in _split_message(text):
+    for chunk in split_message(text):
         payload = {
             "chat_id": CHAT_ID,
             "text": chunk,
-            "parse_mode": "Markdown"
+            "parse_mode": "Markdown",
+            "disable_web_page_preview": True
         }
         try:
-            resp = requests.post(url, json=payload, timeout=10)
-            print(f"Telegram status: {resp.status_code}")
-            if resp.status_code != 200:
-                print("Telegram response:", resp.text[:500])
+            response = requests.post(
+                url,
+                json=payload,
+                timeout=15
+            )
+            print(
+                f"Telegram: {response.status_code}"
+            )
+            if response.status_code != 200:
+                print(response.text[:500])
         except Exception as e:
-            print("Gagal kirim Telegram:", e)
-        sleep(0.3)
-
-
-# ==================== HISTORY SIGNAL (persist ke file) ====================
-
+            print("Telegram error:", e)
+        time.sleep(0.3)
+# ============================================================
+# HISTORY
+# ============================================================
 def load_history():
     if not os.path.exists(HISTORY_FILE):
         return []
     try:
         with open(HISTORY_FILE, "r") as f:
-            return json.load(f)
-    except Exception:
+            data = json.load(f)
+        if isinstance(data, list):
+            return data
         return []
-
-
+    except Exception as e:
+        print("History load error:", e)
+        return []
 def save_history(history):
     try:
-        with open(HISTORY_FILE, "w") as f:
-            json.dump(history, f, indent=2)
+        temp_file = HISTORY_FILE + ".tmp"
+        with open(temp_file, "w") as f:
+            json.dump(
+                history,
+                f,
+                indent=2
+            )
+        os.replace(
+            temp_file,
+            HISTORY_FILE
+        )
     except Exception as e:
-        print("Gagal simpan history:", e)
-
-
-# ==================== DATA OKX ====================
-
+        print("History save error:", e)
+# ============================================================
+# OKX DATA
+# ============================================================
 def get_top_pairs(limit=TOP_PAIRS):
-    """Ambil pair USDT-SWAP (perpetual) dengan volume 24h tertinggi dari OKX."""
     url = f"{BASE_URL}/api/v5/market/tickers"
-    params = {"instType": "SWAP"}
-
+    params = {
+        "instType": "SWAP"
+    }
     try:
-        response = requests.get(url, params=params, timeout=15)
-        print(f"Status Code: {response.status_code}")
-
-        try:
-            data = response.json()
-        except Exception:
-            print("Gagal parse JSON. Isi response:")
-            print(response.text[:500])
-            return []
-
+        response = requests.get(
+            url,
+            params=params,
+            timeout=15
+        )
+        data = response.json()
         if data.get("code") != "0":
-            print("OKX msg:", data.get("msg"))
+            print("OKX:", data.get("msg"))
             return []
-
-        tickers = data.get("data", [])
-        if not tickers:
-            print("Tidak ada data ticker")
-            return []
-
-        usdt = []
-        for item in tickers:
-            inst_id = item.get("instId", "")
-            if not inst_id.endswith("-USDT-SWAP"):
+        pairs = []
+        for item in data.get("data", []):
+            symbol = item.get("instId", "")
+            if not symbol.endswith("-USDT-SWAP"):
                 continue
             try:
-                # volCcy24h = volume 24h dalam mata uang quote (USDT)
-                volume = float(item.get("volCcy24h", 0))
-                if volume >= MIN_VOLUME_USDT:
-                    usdt.append((inst_id, volume))
+                volume = float(
+                    item.get("volCcy24h", 0)
+                )
             except Exception:
                 continue
-
-        usdt.sort(key=lambda x: x[1], reverse=True)
-        pairs = [x[0] for x in usdt[:limit]]
-        print(f"Berhasil dapat {len(pairs)} pair")
-        return pairs
-
+            if volume >= MIN_VOLUME_USDT:
+                pairs.append(
+                    (symbol, volume)
+                )
+        pairs.sort(
+            key=lambda x: x[1],
+            reverse=True
+        )
+        return [
+            symbol
+            for symbol, _ in pairs[:limit]
+        ]
     except Exception as e:
-        print("Error get_top_pairs:", str(e))
+        print("get_top_pairs:", e)
         return []
-
-
-def get_klines(inst_id, bar="1H", limit=100, before=None, after=None, min_rows=5):
-    """
-    before: timestamp ms. Kalau diisi, OKX hanya balikin candle yang lebih
-    baru dari timestamp ini.
-    after: timestamp ms. Kalau diisi, OKX hanya balikin candle yang lebih
-    lama dari timestamp ini (dipakai untuk pagination mundur, ambil batch
-    yang lebih tua dari batch sebelumnya).
-    min_rows: jumlah baris minimum supaya dianggap valid (dibuat kecil untuk
-    monitoring TP/SL, karena sinyal yang baru dibuka wajar cuma punya
-    sedikit candle).
-    """
+def get_klines(
+    inst_id,
+    bar="1H",
+    limit=150,
+    after=None,
+    before=None
+):
     url = f"{BASE_URL}/api/v5/market/candles"
     params = {
         "instId": inst_id,
         "bar": bar,
-        "limit": limit
+        "limit": min(limit, 300)
     }
-    if before is not None:
-        params["before"] = str(before)
     if after is not None:
         params["after"] = str(after)
+    if before is not None:
+        params["before"] = str(before)
     try:
-        response = requests.get(url, params=params, timeout=10)
+        response = requests.get(
+            url,
+            params=params,
+            timeout=15
+        )
         data = response.json()
-
         if data.get("code") != "0":
             return None
-
-        klines = data.get("data", [])
-        if not klines or len(klines) < min_rows:
+        rows = data.get("data", [])
+        if not rows:
             return None
-
-        # OKX mengembalikan data dari yang terbaru ke terlama -> balik urutannya
-        klines = list(reversed(klines))
-
-        df = pd.DataFrame(klines, columns=[
-            "time", "open", "high", "low", "close",
-            "volume", "volCcy", "volCcyQuote", "confirm"
-        ])
-        df["time"] = pd.to_numeric(df["time"], errors="coerce")
-        df["open"] = pd.to_numeric(df["open"], errors="coerce")
-        df["high"] = pd.to_numeric(df["high"], errors="coerce")
-        df["low"] = pd.to_numeric(df["low"], errors="coerce")
-        df["close"] = pd.to_numeric(df["close"], errors="coerce")
-        df["volume"] = pd.to_numeric(df["volume"], errors="coerce")
-        return df.dropna()
-    except Exception:
+        df = pd.DataFrame(
+            rows,
+            columns=[
+                "time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "volCcy",
+                "volCcyQuote",
+                "confirm"
+            ]
+        )
+        numeric_columns = [
+            "time",
+            "open",
+            "high",
+            "low",
+            "close",
+            "volume",
+            "volCcy",
+            "volCcyQuote"
+        ]
+        for col in numeric_columns:
+            df[col] = pd.to_numeric(
+                df[col],
+                errors="coerce"
+            )
+        df["confirm"] = df["confirm"].astype(str)
+        df = df.dropna(
+            subset=[
+                "time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume"
+            ]
+        )
+        # OKX newest -> oldest
+        df = df.sort_values(
+            "time"
+        ).reset_index(drop=True)
+        return df
+    except Exception as e:
+        print(
+            f"Kline error {inst_id}:",
+            e
+        )
         return None
-
-
-def get_klines_since(inst_id, bar, since_ms, page_limit=300, max_pages=10):
-    """
-    Ambil SEMUA candle sejak since_ms (ms) sampai candle terbaru,
-    walaupun jumlahnya lebih dari 300 (limit maksimum 1x request OKX).
-
-    Caranya: ambil batch candle terbaru dulu, lalu kalau candle paling
-    lama di batch itu masih lebih baru dari since_ms (artinya rentang
-    waktunya lebih dari 1 batch), minta batch berikutnya yang lebih tua
-    pakai parameter 'after', lalu digabung terus sampai:
-    - sudah mencapai/melewati since_ms, atau
-    - sudah tidak ada data lagi, atau
-    - sudah mencapai batas max_pages (jaga-jaga supaya tidak infinite loop
-      kalau sinyalnya sangat lama sekali terbuka).
-    """
-    all_chunks = []
-    after_ts = None
-
-    for _ in range(max_pages):
-        chunk = get_klines(inst_id, bar=bar, limit=page_limit, after=after_ts, min_rows=1)
-        if chunk is None or len(chunk) == 0:
-            break
-
-        all_chunks.append(chunk)
-        earliest_ts = int(chunk["time"].min())
-
-        if earliest_ts <= since_ms:
-            break  # sudah mencakup sampai waktu posisi dibuka
-
-        after_ts = earliest_ts - 1  # lanjut ambil batch yang lebih tua lagi
-
-        if len(chunk) < page_limit:
-            break  # data historisnya memang sudah habis
-
-    if not all_chunks:
+# ============================================================
+# CLOSED CANDLE
+# ============================================================
+def get_closed_klines(
+    inst_id,
+    bar="1H",
+    limit=150
+):
+    df = get_klines(
+        inst_id,
+        bar,
+        limit
+    )
+    if df is None:
         return None
-
-    combined = pd.concat(all_chunks).drop_duplicates(subset="time")
-    combined = combined[combined["time"] > since_ms].sort_values("time")
-
-    if len(combined) == 0:
-        return None
-
-    return combined.reset_index(drop=True)
-
-
-def calculate_indicators(df):
-    df = df.copy()
-    df["ema_fast"] = df["close"].ewm(span=21, adjust=False).mean()
-    df["ema_slow"] = df["close"].ewm(span=55, adjust=False).mean()
-
-    high_low = df["high"] - df["low"]
-    high_close = np.abs(df["high"] - df["close"].shift())
-    low_close = np.abs(df["low"] - df["close"].shift())
-    tr = pd.concat([high_low, high_close, low_close], axis=1).max(axis=1)
-    df["atr"] = tr.rolling(14).mean()
-
-    plus_dm = df["high"].diff()
-    minus_dm = df["low"].diff() * -1
-    plus_dm[plus_dm < 0] = 0
-    minus_dm[minus_dm < 0] = 0
-
-    tr14 = tr.rolling(14).mean()
-    plus_di = 100 * (plus_dm.rolling(14).mean() / tr14)
-    minus_di = 100 * (minus_dm.rolling(14).mean() / tr14)
-    dx = 100 * np.abs(plus_di - minus_di) / (plus_di + minus_di + 1e-9)
-    df["adx"] = dx.rolling(14).mean()
-
-    delta = df["close"].diff()
-    gain = delta.where(delta > 0, 0).rolling(14).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-    rs = gain / (loss + 1e-9)
-    df["rsi"] = 100 - (100 / (1 + rs))
-
-    return df.dropna()
-
-
-def check_signal(df, symbol):
+    # confirm == 1 = candle selesai
+    df = df[
+        df["confirm"] == "1"
+    ].copy()
     if len(df) < 60:
         return None
-
+    return df.reset_index(drop=True)
+# ============================================================
+# WILDER RMA
+# ============================================================
+def wilder_rma(series, period):
+    return series.ewm(
+        alpha=1 / period,
+        adjust=False
+    ).mean()
+# ============================================================
+# INDICATORS
+# ============================================================
+def calculate_indicators(df):
+    df = df.copy()
+    # -------------------------
+    # EMA
+    # -------------------------
+    df["ema_fast"] = (
+        df["close"]
+        .ewm(
+            span=EMA_FAST,
+            adjust=False
+        )
+        .mean()
+    )
+    df["ema_slow"] = (
+        df["close"]
+        .ewm(
+            span=EMA_SLOW,
+            adjust=False
+        )
+        .mean()
+    )
+    # -------------------------
+    # TRUE RANGE
+    # -------------------------
+    previous_close = df["close"].shift(1)
+    tr1 = (
+        df["high"] -
+        df["low"]
+    )
+    tr2 = (
+        df["high"] -
+        previous_close
+    ).abs()
+    tr3 = (
+        df["low"] -
+        previous_close
+    ).abs()
+    tr = pd.concat(
+        [tr1, tr2, tr3],
+        axis=1
+    ).max(axis=1)
+    df["tr"] = tr
+    # -------------------------
+    # ATR - WILDER
+    # -------------------------
+    df["atr"] = wilder_rma(
+        tr,
+        ATR_PERIOD
+    )
+    # -------------------------
+    # DIRECTIONAL MOVEMENT
+    # -------------------------
+    up_move = (
+        df["high"]
+        .diff()
+    )
+    down_move = (
+        -df["low"]
+        .diff()
+    )
+    plus_dm = pd.Series(
+        np.where(
+            (up_move > down_move) &
+            (up_move > 0),
+            up_move,
+            0
+        ),
+        index=df.index
+    )
+    minus_dm = pd.Series(
+        np.where(
+            (down_move > up_move) &
+            (down_move > 0),
+            down_move,
+            0
+        ),
+        index=df.index
+    )
+    atr_rma = wilder_rma(
+        tr,
+        ADX_PERIOD
+    )
+    plus_dm_rma = wilder_rma(
+        plus_dm,
+        ADX_PERIOD
+    )
+    minus_dm_rma = wilder_rma(
+        minus_dm,
+        ADX_PERIOD
+    )
+    df["plus_di"] = (
+        100 *
+        plus_dm_rma /
+        (atr_rma + 1e-12)
+    )
+    df["minus_di"] = (
+        100 *
+        minus_dm_rma /
+        (atr_rma + 1e-12)
+    )
+    dx = (
+        100 *
+        (
+            (
+                df["plus_di"] -
+                df["minus_di"]
+            ).abs()
+        )
+        /
+        (
+            df["plus_di"] +
+            df["minus_di"] +
+            1e-12
+        )
+    )
+    df["adx"] = wilder_rma(
+        dx,
+        ADX_PERIOD
+    )
+    # -------------------------
+    # RSI - WILDER
+    # -------------------------
+    delta = df["close"].diff()
+    gain = delta.clip(
+        lower=0
+    )
+    loss = -delta.clip(
+        upper=0
+    )
+    avg_gain = wilder_rma(
+        gain,
+        RSI_PERIOD
+    )
+    avg_loss = wilder_rma(
+        loss,
+        RSI_PERIOD
+    )
+    rs = (
+        avg_gain /
+        (avg_loss + 1e-12)
+    )
+    df["rsi"] = (
+        100 -
+        (
+            100 /
+            (1 + rs)
+        )
+    )
+    # -------------------------
+    # VOLUME
+    # -------------------------
+    df["volume_ma20"] = (
+        df["volume"]
+        .rolling(20)
+        .mean()
+    )
+    df["volume_ratio"] = (
+        df["volume"] /
+        (df["volume_ma20"] + 1e-12)
+    )
+    # -------------------------
+    # ATR %
+    # -------------------------
+    df["atr_pct"] = (
+        df["atr"] /
+        df["close"] *
+        100
+    )
+    # -------------------------
+    # STRUCTURE
+    # -------------------------
+    df["previous_high"] = (
+        df["high"]
+        .shift(1)
+        .rolling(5)
+        .max()
+    )
+    df["previous_low"] = (
+        df["low"]
+        .shift(1)
+        .rolling(5)
+        .min()
+    )
+    return df.dropna().reset_index(
+        drop=True
+    )
+# ============================================================
+# SIGNAL ENGINE
+# ============================================================
+def check_signal(df, symbol):
+    if len(df) < 80:
+        return None
     last = df.iloc[-1]
     prev = df.iloc[-2]
-
-    atr = float(last["atr"])
     close = float(last["close"])
-    adx = float(last["adx"])
+    atr = float(last["atr"])
     rsi = float(last["rsi"])
-
-    signal = None
-    reason = ""
-
-    if adx > 23:
-        if (prev["ema_fast"] > prev["ema_slow"] and last["close"] > last["ema_fast"] and 52 < rsi < 68):
-            signal = "LONG"
-            reason = "Trend Following"
-        elif (prev["ema_fast"] < prev["ema_slow"] and last["close"] < last["ema_fast"] and 32 < rsi < 48):
-            signal = "SHORT"
-            reason = "Trend Following"
-    else:
+    adx = float(last["adx"])
+    ema_fast = float(last["ema_fast"])
+    ema_slow = float(last["ema_slow"])
+    volume_ratio = float(
+        last["volume_ratio"]
+    )
+    plus_di = float(
+        last["plus_di"]
+    )
+    minus_di = float(
+        last["minus_di"]
+    )
+    score_long = 0
+    score_short = 0
+    reasons_long = []
+    reasons_short = []
+    # ========================================================
+    # LONG TREND
+    # ========================================================
+    if ema_fast > ema_slow:
+        score_long += 1
+        reasons_long.append(
+            "EMA trend bullish"
+        )
+    if close > ema_fast:
+        score_long += 1
+        reasons_long.append(
+            "Price above EMA21"
+        )
+    if adx >= MIN_ADX_TREND:
+        if plus_di > minus_di:
+            score_long += 1
+            reasons_long.append(
+                "ADX directional bullish"
+            )
+    if 52 <= rsi <= 68:
+        score_long += 1
+        reasons_long.append(
+            "RSI bullish zone"
+        )
+    if volume_ratio >= MIN_VOLUME_RATIO:
+        score_long += 1
+        reasons_long.append(
+            "Volume confirmation"
+        )
+    # ========================================================
+    # SHORT TREND
+    # ========================================================
+    if ema_fast < ema_slow:
+        score_short += 1
+        reasons_short.append(
+            "EMA trend bearish"
+        )
+    if close < ema_fast:
+        score_short += 1
+        reasons_short.append(
+            "Price below EMA21"
+        )
+    if adx >= MIN_ADX_TREND:
+        if minus_di > plus_di:
+            score_short += 1
+            reasons_short.append(
+                "ADX directional bearish"
+            )
+    if 32 <= rsi <= 48:
+        score_short += 1
+        reasons_short.append(
+            "RSI bearish zone"
+        )
+    if volume_ratio >= MIN_VOLUME_RATIO:
+        score_short += 1
+        reasons_short.append(
+            "Volume confirmation"
+        )
+    # ========================================================
+    # RANGE / MEAN REVERSION
+    # ========================================================
+    range_long = False
+    range_short = False
+    if adx < MIN_ADX_TREND:
         if rsi < 30:
-            signal = "LONG"
-            reason = "Mean Reversion Oversold"
-        elif rsi > 70:
-            signal = "SHORT"
-            reason = "Mean Reversion Overbought"
-
-    if not signal:
+            # Need bullish reversal confirmation
+            if close > float(prev["close"]):
+                range_long = True
+        if rsi > 70:
+            # Need bearish reversal confirmation
+            if close < float(prev["close"]):
+                range_short = True
+    # ========================================================
+    # SELECT SIGNAL
+    # ========================================================
+    signal = None
+    score = 0
+    reason = ""
+    if score_long >= MIN_SCORE:
+        signal = "LONG"
+        score = score_long
+        reason = " | ".join(
+            reasons_long
+        )
+    elif score_short >= MIN_SCORE:
+        signal = "SHORT"
+        score = score_short
+        reason = " | ".join(
+            reasons_short
+        )
+    elif range_long:
+        signal = "LONG"
+        score = 4
+        reason = (
+            "Range regime | "
+            "RSI oversold | "
+            "bullish reversal"
+        )
+    elif range_short:
+        signal = "SHORT"
+        score = 4
+        reason = (
+            "Range regime | "
+            "RSI overbought | "
+            "bearish reversal"
+        )
+    if signal is None:
         return None
-
+    # ========================================================
+    # SL / TP
+    # ========================================================
+    risk_distance = (
+        ATR_MULTIPLIER *
+        atr
+    )
+    if risk_distance <= 0:
+        return None
     if signal == "LONG":
-        sl = close - ATR_MULTIPLIER * atr
-        tp = close + RR * (close - sl)
+        sl = close - risk_distance
+        tp = (
+            close +
+            risk_distance * RR
+        )
     else:
-        sl = close + ATR_MULTIPLIER * atr
-        tp = close - RR * (sl - close)
-
+        sl = close + risk_distance
+        tp = (
+            close -
+            risk_distance * RR
+        )
+    # ========================================================
+    # RESULT
+    # ========================================================
     return {
         "symbol": symbol,
         "side": signal,
-        "entry": close,
-        "sl": sl,
-        "tp": tp,
-        "adx": round(adx, 1),
-        "rsi": round(rsi, 1),
-        "reason": reason
+        "entry": float(close),
+        "sl": float(sl),
+        "tp": float(tp),
+        "rr": RR,
+        "atr": float(atr),
+        "adx": round(adx, 2),
+        "rsi": round(rsi, 2),
+        "volume_ratio": round(
+            volume_ratio,
+            2
+        ),
+        "score": score,
+        "reason": reason,
+        "signal_candle_time": int(
+            last["time"]
+        )
     }
-
-
-# ==================== CEK TP/SL REALTIME (TF5, sejak posisi dibuka, wick termasuk) ====================
-
+# ============================================================
+# COOLDOWN
+# ============================================================
+def is_in_cooldown(
+    history,
+    symbol
+):
+    now = utc_now()
+    for signal in reversed(history):
+        if signal.get("symbol") != symbol:
+            continue
+        if signal.get("status") not in (
+            "TP",
+            "SL"
+        ):
+            continue
+        closed_time = signal.get(
+            "closed_time"
+        )
+        if not closed_time:
+            continue
+        try:
+            closed_dt = datetime.strptime(
+                closed_time,
+                "%Y-%m-%d %H:%M:%S"
+            ).replace(
+                tzinfo=timezone.utc
+            )
+            elapsed_hours = (
+                now - closed_dt
+            ).total_seconds() / 3600
+            return (
+                elapsed_hours <
+                COOLDOWN_HOURS
+            )
+        except Exception:
+            return False
+    return False
+# ============================================================
+# MONITORING DATA
+# ============================================================
+def get_monitor_candles(
+    symbol,
+    opened_ms
+):
+    df = get_klines(
+        symbol,
+        bar=MONITOR_TF,
+        limit=MONITOR_LIMIT
+    )
+    if df is None:
+        return None
+    # Ambil candle yang:
+    # 1. mulai sebelum / sekitar entry
+    # 2. atau setelah entry
+    #
+    # Candle entry tidak dibuang.
+    #
+    # Ini penting agar pergerakan dalam candle
+    # tempat signal muncul tetap bisa diperiksa.
+    df = df[
+        df["time"] >= (
+            opened_ms -
+            5 * 60 * 1000
+        )
+    ].copy()
+    if len(df) == 0:
+        return None
+    return df.sort_values(
+        "time"
+    ).reset_index(drop=True)
+# ============================================================
+# CHECK TP / SL
+# ============================================================
 def check_open_signals():
     history = load_history()
-    open_signals = [s for s in history if s["status"] == "open"]
-
+    open_signals = [
+        s for s in history
+        if s.get("status") == "open"
+    ]
     if not open_signals:
         return history
-
     closed_messages = []
-
     for sig in open_signals:
         symbol = sig["symbol"]
-
-        # Hitung timestamp (ms) saat posisi dibuka, lalu minta candle
-        # yang lebih baru dari waktu itu saja (bukan N candle terakhir).
         try:
             opened_dt = datetime.strptime(
-                sig["opened_time"], "%Y-%m-%d %H:%M:%S"
-            ).replace(tzinfo=timezone.utc)
-            opened_ms = int(opened_dt.timestamp() * 1000)
+                sig["opened_time"],
+                "%Y-%m-%d %H:%M:%S"
+            ).replace(
+                tzinfo=timezone.utc
+            )
+            opened_ms = int(
+                opened_dt.timestamp()
+                * 1000
+            )
         except Exception:
-            opened_ms = None
-
-        df = get_klines_since(
+            opened_ms = 0
+        df = get_monitor_candles(
             symbol,
-            bar=MONITOR_TF,
-            since_ms=opened_ms if opened_ms is not None else 0,
-            page_limit=MONITOR_MAX_CANDLES,
+            opened_ms
         )
-        if df is None or len(df) == 0:
+        if df is None:
             continue
-
         hit = None
         hit_price = None
-
-        # df dari get_klines_since sudah terurut dari candle paling lama
-        # ke paling baru sejak posisi dibuka.
+        hit_time = None
         for _, candle in df.iterrows():
-            high = float(candle["high"])
-            low = float(candle["low"])
-
-            if sig["side"] == "LONG":
-                tp_touched = high >= sig["tp"]
-                sl_touched = low <= sig["sl"]
-            else:
-                tp_touched = low <= sig["tp"]
-                sl_touched = high >= sig["sl"]
-
-            if tp_touched and sl_touched:
-                # TP dan SL sama-sama kena wick-nya di candle yang sama.
-                # Dari data OHLC saja urutan pastinya tidak bisa dipastikan,
-                # jadi diasumsikan konservatif: SL duluan.
-                hit, hit_price = "SL", sig["sl"]
-                break
-            elif tp_touched:
-                hit, hit_price = "TP", sig["tp"]
-                break
-            elif sl_touched:
-                hit, hit_price = "SL", sig["sl"]
-                break
-
-        if hit:
-            sig["status"] = hit
-            sig["closed_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-            sig["r_result"] = RR if hit == "TP" else -1.0
-
-            emoji = "✅" if hit == "TP" else "❌"
-            closed_messages.append(
-                f"{emoji} *{hit}* `{sig['symbol']}` ({sig['side']}) | "
-                f"Entry `{fmt_price(sig['entry'])}` -> `{fmt_price(hit_price)}` | R: `{sig['r_result']}`"
+            candle_time = int(
+                candle["time"]
             )
-
-    if closed_messages:
-        msg = "📊 *UPDATE HASIL SIGNAL*\n\n" + "\n".join(closed_messages)
-        send_telegram(msg)
-        print("\n".join(closed_messages))
-
+            high = float(
+                candle["high"]
+            )
+            low = float(
+                candle["low"]
+            )
+            # Jangan menggunakan candle yang
+            # selesai sebelum signal dibuat.
+            #
+            # Candle tempat signal dibuat
+            # tetap diperiksa secara konservatif.
+            if sig["side"] == "LONG":
+                tp_hit = (
+                    high >=
+                    float(sig["tp"])
+                )
+                sl_hit = (
+                    low <=
+                    float(sig["sl"])
+                )
+            else:
+                tp_hit = (
+                    low <=
+                    float(sig["tp"])
+                )
+                sl_hit = (
+                    high >=
+                    float(sig["sl"])
+                )
+            # =================================================
+            # BOTH HIT SAME CANDLE
+            # =================================================
+            if tp_hit and sl_hit:
+                hit = "SL"
+                hit_price = float(
+                    sig["sl"]
+                )
+                hit_time = candle_time
+                break
+            elif tp_hit:
+                hit = "TP"
+                hit_price = float(
+                    sig["tp"]
+                )
+                hit_time = candle_time
+                break
+            elif sl_hit:
+                hit = "SL"
+                hit_price = float(
+                    sig["sl"]
+                )
+                hit_time = candle_time
+                break
+        if hit is None:
+            continue
+        sig["status"] = hit
+        sig["closed_time"] = utc_string()
+        sig["hit_time"] = (
+            datetime.fromtimestamp(
+                hit_time / 1000,
+                timezone.utc
+            ).strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+            if hit_time
+            else None
+        )
+        sig["hit_price"] = hit_price
+        sig["r_result"] = (
+            RR
+            if hit == "TP"
+            else -1.0
+        )
+        if hit == "TP":
+            closed_messages.append(
+                "🟢 *TP HIT*\n"
+                f"`{symbol}` · {sig['side']}\n"
+                f"Entry: `{fmt_price(sig['entry'])}`\n"
+                f"TP: `{fmt_price(sig['tp'])}`\n"
+                f"Result: `+{RR:.1f}R`"
+            )
+        else:
+            closed_messages.append(
+                "🔴 *SL HIT*\n"
+                f"`{symbol}` · {sig['side']}\n"
+                f"Entry: `{fmt_price(sig['entry'])}`\n"
+                f"SL: `{fmt_price(sig['sl'])}`\n"
+                f"Result: `-1.0R`"
+            )
     save_history(history)
+    if closed_messages:
+        send_telegram(
+            "📊 *TRADE UPDATE*\n\n"
+            +
+            "\n\n".join(
+                closed_messages
+            )
+        )
     return history
-
-
-# ==================== STATISTIK WINRATE & R ====================
-
+# ============================================================
+# CURRENT PRICE
+# ============================================================
+def get_current_price(symbol):
+    df = get_klines(
+        symbol,
+        bar=MONITOR_TF,
+        limit=2
+    )
+    if df is None or len(df) == 0:
+        return None
+    return float(
+        df.iloc[-1]["close"]
+    )
+# ============================================================
+# RUNNING POSITION
+# ============================================================
+def build_running_position(
+    sig,
+    current_price
+):
+    entry = float(
+        sig["entry"]
+    )
+    sl = float(
+        sig["sl"]
+    )
+    tp = float(
+        sig["tp"]
+    )
+    risk = abs(
+        entry - sl
+    )
+    if risk <= 0:
+        floating_r = 0
+    elif sig["side"] == "LONG":
+        floating_r = (
+            current_price -
+            entry
+        ) / risk
+    else:
+        floating_r = (
+            entry -
+            current_price
+        ) / risk
+    if sig["side"] == "LONG":
+        distance_to_sl = (
+            current_price - sl
+        )
+        distance_to_tp = (
+            tp - current_price
+        )
+    else:
+        distance_to_sl = (
+            sl - current_price
+        )
+        distance_to_tp = (
+            current_price - tp
+        )
+    if distance_to_tp > 0:
+        tp_distance_pct = (
+            distance_to_tp /
+            current_price *
+            100
+        )
+    else:
+        tp_distance_pct = 0
+    if distance_to_sl > 0:
+        sl_distance_pct = (
+            distance_to_sl /
+            current_price *
+            100
+        )
+    else:
+        sl_distance_pct = 0
+    return {
+        "floating_r": floating_r,
+        "tp_distance_pct": tp_distance_pct,
+        "sl_distance_pct": sl_distance_pct
+    }
+def send_open_signals_report(
+    history
+):
+    open_signals = [
+        s for s in history
+        if s.get("status") == "open"
+    ]
+    if not open_signals:
+        return
+    lines = []
+    for sig in open_signals:
+        symbol = sig["symbol"]
+        price = get_current_price(
+            symbol
+        )
+        if price is None:
+            lines.append(
+                f"⏳ `{symbol}` · "
+                f"{sig['side']} · "
+                f"harga tidak tersedia"
+            )
+            continue
+        position = build_running_position(
+            sig,
+            price
+        )
+        floating_r = position[
+            "floating_r"
+        ]
+        if floating_r >= 0:
+            state = "🟢"
+        else:
+            state = "🔴"
+        lines.append(
+            f"{state} *{symbol}* · "
+            f"`{sig['side']}`\n"
+            f"Entry `{fmt_price(sig['entry'])}`"
+            f" → Now `{fmt_price(price)}`\n"
+            f"SL `{fmt_price(sig['sl'])}`"
+            f" · TP `{fmt_price(sig['tp'])}`\n"
+            f"Floating `{floating_r:+.2f}R`"
+        )
+    message = (
+        "📡 *RUNNING POSITIONS*\n"
+        "━━━━━━━━━━━━━━━━━━\n\n"
+        +
+        "\n\n".join(lines)
+    )
+    send_telegram(
+        message
+    )
+# ============================================================
+# STATISTICS
+# ============================================================
 def compute_stats(history):
-    closed = [s for s in history if s["status"] in ("TP", "SL")]
+    closed = [
+        s for s in history
+        if s.get("status")
+        in ("TP", "SL")
+    ]
     if not closed:
         return None
-
-    wins = [s for s in closed if s["status"] == "TP"]
-    losses = [s for s in closed if s["status"] == "SL"]
-
+    wins = [
+        s for s in closed
+        if s["status"] == "TP"
+    ]
+    losses = [
+        s for s in closed
+        if s["status"] == "SL"
+    ]
     total = len(closed)
-    win_rate = len(wins) / total * 100
-    total_r = sum(s["r_result"] for s in closed)
-    avg_r = total_r / total
-
+    win_rate = (
+        len(wins) /
+        total *
+        100
+    )
+    total_r = sum(
+        float(
+            s.get(
+                "r_result",
+                0
+            )
+        )
+        for s in closed
+    )
+    gross_profit = sum(
+        float(
+            s.get(
+                "r_result",
+                0
+            )
+        )
+        for s in wins
+    )
+    gross_loss = abs(
+        sum(
+            float(
+                s.get(
+                    "r_result",
+                    0
+                )
+            )
+            for s in losses
+        )
+    )
+    profit_factor = (
+        gross_profit /
+        gross_loss
+        if gross_loss > 0
+        else float("inf")
+    )
+    avg_r = (
+        total_r /
+        total
+    )
     return {
         "total": total,
         "wins": len(wins),
         "losses": len(losses),
-        "win_rate": round(win_rate, 1),
-        "total_r": round(total_r, 2),
-        "avg_r": round(avg_r, 2),
+        "win_rate": win_rate,
+        "total_r": total_r,
+        "avg_r": avg_r,
+        "profit_factor":
+            profit_factor
     }
-
-
 def send_stats_report(history):
-    stats = compute_stats(history)
-    if not stats:
-        print("Belum ada signal yang closed untuk dihitung statistiknya")
-        return
-
-    msg = (
-        "📈 *TRADING RESULT SUMMARY*\n\n"
-        f"Total Signal Selesai: `{stats['total']}`\n"
-        f"Win: `{stats['wins']}` | Loss: `{stats['losses']}`\n"
-        f"Winrate: `{stats['win_rate']}%`\n"
-        f"Total R: `{stats['total_r']}R`\n"
-        f"Rata-rata R/trade: `{stats['avg_r']}R`"
+    stats = compute_stats(
+        history
     )
-    send_telegram(msg)
-    print(msg)
-
-
-# ==================== LAPORAN SINYAL YANG MASIH OPEN ====================
-
-def send_open_signals_report(history):
-    """Kirim status semua sinyal yang masih 'open' setiap kali scan jalan,
-    lengkap dengan harga sekarang dan floating R (belum realized)."""
-    open_signals = [s for s in history if s["status"] == "open"]
-
-    if not open_signals:
-        print("Tidak ada sinyal open saat ini")
+    if not stats:
         return
-
-    lines = []
-    for sig in open_signals:
-        symbol = sig["symbol"]
-        entry = sig["entry"]
-        sl = sig["sl"]
-        tp = sig["tp"]
-
-        # Ambil harga close candle MONITOR_TF paling baru sebagai harga acuan
-        df = get_klines(symbol, bar=MONITOR_TF, limit=1, min_rows=1)
-        if df is None or len(df) == 0:
-            lines.append(f"⏳ `{symbol}` ({sig['side']}) | Entry `{fmt_price(entry)}` | harga sekarang: gagal diambil")
-            continue
-
-        current_price = float(df.iloc[-1]["close"])
-        risk = abs(entry - sl)
-
-        if risk == 0:
-            floating_r = 0.0
-        elif sig["side"] == "LONG":
-            floating_r = (current_price - entry) / risk
-        else:
-            floating_r = (entry - current_price) / risk
-
-        arrow = "🟢" if floating_r >= 0 else "🔴"
-        lines.append(
-            f"{arrow} `{symbol}` ({sig['side']}) | Entry `{fmt_price(entry)}` -> Now `{fmt_price(current_price)}` | "
-            f"SL `{fmt_price(sl)}` TP `{fmt_price(tp)}` | Floating: `{round(floating_r, 2)}R`"
+    pf = stats[
+        "profit_factor"
+    ]
+    pf_text = (
+        "∞"
+        if math.isinf(pf)
+        else f"{pf:.2f}"
+    )
+    message = (
+        "📊 *SYSTEM PERFORMANCE*\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"Trades: `{stats['total']}`\n"
+        f"Wins: `{stats['wins']}`\n"
+        f"Losses: `{stats['losses']}`\n"
+        f"WR: `{stats['win_rate']:.1f}%`\n"
+        f"Total: `{stats['total_r']:+.2f}R`\n"
+        f"Avg: `{stats['avg_r']:+.2f}R`\n"
+        f"Profit Factor: `{pf_text}`"
+    )
+    send_telegram(
+        message
+    )
+# ============================================================
+# SIGNAL NOTIFICATION
+# ============================================================
+def send_new_signals(
+    signals
+):
+    if not signals:
+        return
+    blocks = []
+    for sig in signals:
+        side_emoji = (
+            "🟢"
+            if sig["side"] == "LONG"
+            else "🔴"
         )
-
-    msg = "🕒 *SINYAL MASIH OPEN*\n\n" + "\n".join(lines)
-    send_telegram(msg)
-    print(msg)
-
-
-# ==================== MAIN ====================
-
-def main():
-    print(f"Mulai scan OKX | {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
-
-    # 1. Cek signal lama yang masih 'open', lihat apakah sudah kena TP/SL
-    #    dengan mengecek wick candle TF5 sejak posisi itu dibuka (opened_time)
-    history = check_open_signals()
-
-    # 2. Kirim status semua sinyal yang masih open (floating, belum closed)
-    send_open_signals_report(history)
-
-    # 3. Kirim laporan winrate & total R dari semua signal yang sudah closed
-    send_stats_report(history)
-
-    # 4. Scan pair & cari signal baru (skip pair yang masih punya sinyal open)
+        blocks.append(
+            f"{side_emoji} *{sig['side']} "
+            f"{sig['symbol']}*\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"Entry  `{fmt_price(sig['entry'])}`\n"
+            f"SL     `{fmt_price(sig['sl'])}`\n"
+            f"TP     `{fmt_price(sig['tp'])}`\n"
+            f"RR     `1:{RR:.0f}`\n"
+            f"Score  `{sig['score']}/5`\n"
+            f"ADX    `{sig['adx']}`\n"
+            f"RSI    `{sig['rsi']}`\n"
+            f"Volume `{sig['volume_ratio']}x`\n"
+            f"Reason: {sig['reason']}"
+        )
+    message = (
+        "🚨 *NEW SIGNALS · OKX 1H*\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"Generated: `{utc_string()} UTC`\n\n"
+        +
+        "\n\n".join(blocks)
+        +
+        "\n\n_Educational only · Signal only_"
+    )
+    send_telegram(
+        message
+    )
+# ============================================================
+# MAIN SCANNER
+# ============================================================
+def scan_new_signals(
+    history
+):
     pairs = get_top_pairs()
-    print(f"Total pair di-scan: {len(pairs)}")
-
     if not pairs:
-        print("Tidak ada pair yang bisa di-scan")
-        return
-
-    # Pair yang sudah punya sinyal berstatus 'open' tidak akan dibuka lagi
-    # sampai sinyal lamanya closed (kena TP/SL) dulu.
-    already_open_symbols = {s["symbol"] for s in history if s["status"] == "open"}
-
+        print(
+            "Tidak ada pair."
+        )
+        return history
+    already_open = {
+        s["symbol"]
+        for s in history
+        if s.get("status") == "open"
+    }
     new_signals = []
-
-    for i, symbol in enumerate(pairs):
+    print(
+        f"Scanning {len(pairs)} pairs..."
+    )
+    for index, symbol in enumerate(
+        pairs
+    ):
         try:
-            if symbol in already_open_symbols:
+            # --------------------------------
+            # Existing open position
+            # --------------------------------
+            if symbol in already_open:
                 continue
-
-            df = get_klines(symbol, bar=TIMEFRAME, limit=LIMIT)
-            if df is None or len(df) < 60:
+            # --------------------------------
+            # Cooldown
+            # --------------------------------
+            if is_in_cooldown(
+                history,
+                symbol
+            ):
+                print(
+                    f"{symbol}: cooldown"
+                )
                 continue
-
-            df = calculate_indicators(df)
-            sig = check_signal(df, symbol)
-
-            if sig:
-                sig["status"] = "open"
-                sig["opened_time"] = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
-                sig["closed_time"] = None
-                sig["r_result"] = None
-                new_signals.append(sig)
-                already_open_symbols.add(symbol)
-                print(f"Signal: {symbol} {sig['side']}")
-
-            if i % 7 == 0:
-                sleep(0.35)
-
+            # --------------------------------
+            # Closed H1 candles
+            # --------------------------------
+            df = get_closed_klines(
+                symbol,
+                TIMEFRAME,
+                LIMIT
+            )
+            if df is None:
+                continue
+            # --------------------------------
+            # Indicators
+            # --------------------------------
+            df = calculate_indicators(
+                df
+            )
+            if len(df) < 80:
+                continue
+            # --------------------------------
+            # Signal
+            # --------------------------------
+            signal = check_signal(
+                df,
+                symbol
+            )
+            if signal is None:
+                continue
+            # --------------------------------
+            # Create record
+            # --------------------------------
+            signal["status"] = "open"
+            signal["opened_time"] = (
+                utc_string()
+            )
+            signal["closed_time"] = None
+            signal["r_result"] = None
+            signal["hit_price"] = None
+            signal["hit_time"] = None
+            history.append(
+                signal
+            )
+            new_signals.append(
+                signal
+            )
+            already_open.add(
+                symbol
+            )
+            print(
+                f"NEW: "
+                f"{symbol} "
+                f"{signal['side']} "
+                f"score={signal['score']}"
+            )
+            # --------------------------------
+            # Small delay
+            # --------------------------------
+            if index % 5 == 0:
+                time.sleep(0.4)
         except Exception as e:
-            print(f"Error {symbol}: {e}")
-            continue
-
-    if not new_signals:
-        print("Tidak ada signal baru saat ini")
-        return
-
-    history.extend(new_signals)
-    save_history(history)
-
-    message = f"🚨 *SIGNAL 1H OKX* 🚨\n"
-    message += f"Waktu: `{datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC`\n"
-    message += f"Total: *{len(new_signals)}*\n\n"
-
-    for s in new_signals:
-        message += f"*{s['side']}* `{s['symbol']}`\n"
-        message += f"Entry: `{fmt_price(s['entry'])}`\n"
-        message += f"SL: `{fmt_price(s['sl'])}` | TP: `{fmt_price(s['tp'])}`\n"
-        message += f"ADX: `{s['adx']}` | RSI: `{s['rsi']}`\n"
-        message += f"_{s['reason']}_\n"
-        message += "----------------\n"
-
-    message += "\n_Educational only_"
-
-    send_telegram(message)
-    print(f"Berhasil kirim {len(new_signals)} signal")
-
-
+            print(
+                f"{symbol}: {e}"
+            )
+    if new_signals:
+        save_history(
+            history
+        )
+        send_new_signals(
+            new_signals
+        )
+    else:
+        print(
+            "Tidak ada signal baru."
+        )
+    return history
+# ============================================================
+# MAIN
+# ============================================================
+def main():
+    print(
+        "===================================="
+    )
+    print(
+        "OKX SIGNAL ENGINE V2"
+    )
+    print(
+        utc_string(),
+        "UTC"
+    )
+    print(
+        "===================================="
+    )
+    # ========================================================
+    # 1. UPDATE POSITIONS
+    # ========================================================
+    history = check_open_signals()
+    # ========================================================
+    # 2. RUNNING POSITIONS
+    # ========================================================
+    send_open_signals_report(
+        history
+    )
+    # ========================================================
+    # 3. PERFORMANCE
+    # ========================================================
+    send_stats_report(
+        history
+    )
+    # ========================================================
+    # 4. SCAN NEW SIGNALS
+    # ========================================================
+    history = scan_new_signals(
+        history
+    )
+    print(
+        "Scan selesai."
+    )
 if __name__ == "__main__":
     main()
 
