@@ -152,5 +152,19 @@
     "opened_time": "2026-09-28 08:19:17",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "AKE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.03027,
+    "sl": 0.032085999999999996,
+    "tp": 0.026638000000000002,
+    "adx": 55.1,
+    "rsi": 34.7,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 09:46:38",
+    "closed_time": null,
+    "r_result": null
   }
 ]
