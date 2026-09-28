@@ -334,5 +334,19 @@
     "opened_time": "2026-09-28 14:18:06",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "NOT-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.000489,
+    "sl": 0.0005051714285714286,
+    "tp": 0.00045665714285714274,
+    "adx": 44.7,
+    "rsi": 34.2,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 15:18:39",
+    "closed_time": null,
+    "r_result": null
   }
 ]
