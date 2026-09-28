@@ -22,10 +22,10 @@
     "adx": 51.1,
     "rsi": 58.1,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 06:51:38",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 16:46:07",
+    "r_result": -1.0
   },
   {
     "symbol": "HMSTR-USDT-SWAP",
