@@ -120,10 +120,10 @@
     "adx": 32.3,
     "rsi": 34.3,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 07:17:55",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 12:50:19",
+    "r_result": -1.0
   },
   {
     "symbol": "ARB-USDT-SWAP",
@@ -276,6 +276,20 @@
     "reason": "Trend Following",
     "status": "open",
     "opened_time": "2026-09-28 12:21:17",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "SHIB-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 5.737e-06,
+    "sl": 5.8765428571428575e-06,
+    "tp": 5.457914285714286e-06,
+    "adx": 49.0,
+    "rsi": 39.6,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 12:50:27",
     "closed_time": null,
     "r_result": null
   }
