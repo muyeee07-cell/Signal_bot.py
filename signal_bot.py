@@ -51,25 +51,39 @@ def fmt_price(x, sig_figs=5):
 
 # ==================== TELEGRAM ====================
 
+def _split_message(text: str, max_len: int = 3800):
+    """Pecah pesan panjang per baris supaya tiap bagian < batas 4096 karakter Telegram."""
+    chunks, current = [], ""
+    for line in text.split("\n"):
+        if len(current) + len(line) + 1 > max_len and current:
+            chunks.append(current)
+            current = ""
+        current += line + "\n"
+    if current.strip():
+        chunks.append(current)
+    return chunks
+
+
 def send_telegram(text: str):
     if not TELEGRAM_TOKEN or not CHAT_ID:
         print("Token atau Chat ID belum di-set")
         return
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": text,
-        "parse_mode": "Markdown"
-    }
-    try:
-        resp = requests.post(url, json=payload, timeout=10)
-        print(f"Telegram status: {resp.status_code}")
-        if resp.status_code != 200:
-            # Cetak isi respons asli dari Telegram supaya penyebabnya kelihatan
-            # (mis. "chat not found", "not enough rights to send messages", dll)
-            print("Telegram response:", resp.text[:500])
-    except Exception as e:
-        print("Gagal kirim Telegram:", e)
+
+    for chunk in _split_message(text):
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": chunk,
+            "parse_mode": "Markdown"
+        }
+        try:
+            resp = requests.post(url, json=payload, timeout=10)
+            print(f"Telegram status: {resp.status_code}")
+            if resp.status_code != 200:
+                print("Telegram response:", resp.text[:500])
+        except Exception as e:
+            print("Gagal kirim Telegram:", e)
+        sleep(0.3)
 
 
 # ==================== HISTORY SIGNAL (persist ke file) ====================
@@ -574,5 +588,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
