@@ -106,10 +106,10 @@
     "adx": 35.2,
     "rsi": 58.4,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-28 06:51:44",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 16:18:23",
+    "r_result": 2.0
   },
   {
     "symbol": "PENGU-USDT-SWAP",
@@ -346,6 +346,48 @@
     "reason": "Trend Following",
     "status": "open",
     "opened_time": "2026-09-28 15:18:39",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "IOST-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0009143,
+    "sl": 0.0009376028571428572,
+    "tp": 0.0008676942857142858,
+    "adx": 63.9,
+    "rsi": 37.0,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 16:18:33",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "MEW-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0004743,
+    "sl": 0.0004869971428571428,
+    "tp": 0.00044890571428571433,
+    "adx": 57.8,
+    "rsi": 33.5,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 16:18:33",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "AZTEC-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0195,
+    "sl": 0.02085542857142857,
+    "tp": 0.01678914285714286,
+    "adx": 18.0,
+    "rsi": 72.5,
+    "reason": "Mean Reversion Overbought",
+    "status": "open",
+    "opened_time": "2026-09-28 16:18:34",
     "closed_time": null,
     "r_result": null
   }
