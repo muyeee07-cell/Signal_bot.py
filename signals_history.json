@@ -432,5 +432,26 @@
     "opened_time": "2026-09-28 19:44:44",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "SATS-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 1.2051e-08,
+    "sl": 1.2426998202412716e-08,
+    "tp": 1.129900359517457e-08,
+    "rr": 2.0,
+    "atr": 2.349988765079471e-10,
+    "adx": 26.96,
+    "rsi": 39.83,
+    "volume_ratio": 0.59,
+    "score": 4,
+    "reason": "EMA trend bearish | Price below EMA21 | ADX directional bearish | RSI bearish zone",
+    "signal_candle_time": 1790625600000,
+    "status": "open",
+    "opened_time": "2026-09-28 21:34:25",
+    "closed_time": null,
+    "r_result": null,
+    "hit_price": null,
+    "hit_time": null
   }
 ]
