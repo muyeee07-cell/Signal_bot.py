@@ -292,5 +292,47 @@
     "opened_time": "2026-09-28 12:50:27",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "PENGU-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.009796,
+    "sl": 0.010173257142857143,
+    "tp": 0.009041485714285712,
+    "adx": 29.6,
+    "rsi": 36.9,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 14:18:04",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "TURBO-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.0010077,
+    "sl": 0.0009663742857142858,
+    "tp": 0.0010903514285714286,
+    "adx": 19.8,
+    "rsi": 29.9,
+    "reason": "Mean Reversion Oversold",
+    "status": "open",
+    "opened_time": "2026-09-28 14:18:05",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "DOOD-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.001796,
+    "sl": 0.0018859428571428572,
+    "tp": 0.0016161142857142859,
+    "adx": 24.0,
+    "rsi": 37.9,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 14:18:06",
+    "closed_time": null,
+    "r_result": null
   }
 ]
