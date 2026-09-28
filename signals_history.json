@@ -134,10 +134,10 @@
     "adx": 9.5,
     "rsi": 29.8,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 07:17:59",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 14:48:10",
+    "r_result": -1.0
   },
   {
     "symbol": "SEI-USDT-SWAP",
@@ -148,10 +148,10 @@
     "adx": 57.1,
     "rsi": 66.6,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 08:19:17",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 14:48:10",
+    "r_result": -1.0
   },
   {
     "symbol": "AKE-USDT-SWAP",
