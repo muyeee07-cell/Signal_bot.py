@@ -36,10 +36,10 @@
     "adx": 22.0,
     "rsi": 23.7,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 06:51:40",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 09:18:42",
+    "r_result": -1.0
   },
   {
     "symbol": "GALA-USDT-SWAP",
