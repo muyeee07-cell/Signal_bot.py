@@ -166,5 +166,61 @@
     "opened_time": "2026-09-28 09:46:38",
     "closed_time": null,
     "r_result": null
+  },
+  {
+    "symbol": "PEPE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 4.194e-06,
+    "sl": 4.318342857142857e-06,
+    "tp": 3.945314285714286e-06,
+    "adx": 44.8,
+    "rsi": 32.5,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 10:45:38",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "FLOKI-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 2.722e-05,
+    "sl": 2.799942857142857e-05,
+    "tp": 2.566114285714286e-05,
+    "adx": 42.7,
+    "rsi": 32.1,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 10:45:39",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "MEME-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.0006041,
+    "sl": 0.0006218371428571429,
+    "tp": 0.0005686257142857142,
+    "adx": 42.6,
+    "rsi": 32.3,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 10:45:42",
+    "closed_time": null,
+    "r_result": null
+  },
+  {
+    "symbol": "MUBARAK-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.058541,
+    "sl": 0.05408168571428572,
+    "tp": 0.06745962857142856,
+    "adx": 34.9,
+    "rsi": 67.1,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 10:45:43",
+    "closed_time": null,
+    "r_result": null
   }
 ]
