@@ -430,10 +430,12 @@
     "adx": 29.1,
     "rsi": 57.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 19:44:44",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-28 22:42:47",
+    "r_result": -1.0,
+    "hit_time": "2026-09-28 22:20:00",
+    "hit_price": 0.0028477142857142855
   },
   {
     "symbol": "SATS-USDT-SWAP",
