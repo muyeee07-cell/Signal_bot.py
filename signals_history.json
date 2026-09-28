@@ -414,8 +414,22 @@
     "adx": 27.6,
     "rsi": 66.9,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 18:18:47",
+    "closed_time": "2026-09-28 19:44:34",
+    "r_result": -1.0
+  },
+  {
+    "symbol": "LINEA-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.002962,
+    "sl": 0.0028477142857142855,
+    "tp": 0.0031905714285714285,
+    "adx": 29.1,
+    "rsi": 57.2,
+    "reason": "Trend Following",
+    "status": "open",
+    "opened_time": "2026-09-28 19:44:44",
     "closed_time": null,
     "r_result": null
   }
