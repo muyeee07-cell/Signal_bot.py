@@ -478,5 +478,26 @@
     "r_result": null,
     "hit_price": null,
     "hit_time": null
+  },
+  {
+    "symbol": "PEOPLE-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.009435,
+    "sl": 0.009144125382807863,
+    "tp": 0.010016749234384278,
+    "rr": 2.0,
+    "atr": 0.00018179663574508653,
+    "adx": 24.61,
+    "rsi": 63.57,
+    "volume_ratio": 1.32,
+    "score": 4,
+    "reason": "Price > EMA21 | Directional strength | RSI bullish zone | Volume confirmed",
+    "signal_candle_time": 1790636400000,
+    "status": "open",
+    "opened_time": "2026-09-29 00:49:41",
+    "closed_time": null,
+    "r_result": null,
+    "hit_price": null,
+    "hit_time": null
   }
 ]
