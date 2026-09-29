@@ -78,10 +78,12 @@
     "adx": 28.0,
     "rsi": 42.2,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-28 06:51:43",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-29 01:43:33",
+    "r_result": 2.0,
+    "hit_time": "2026-09-29 01:25:00",
+    "hit_price": 0.09537942857142859
   },
   {
     "symbol": "IRYS-USDT-SWAP",
@@ -302,10 +304,12 @@
     "adx": 29.6,
     "rsi": 36.9,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-28 14:18:04",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-29 01:43:35",
+    "r_result": 2.0,
+    "hit_time": "2026-09-29 01:30:00",
+    "hit_price": 0.009041485714285712
   },
   {
     "symbol": "TURBO-USDT-SWAP",
@@ -358,10 +362,12 @@
     "adx": 63.9,
     "rsi": 37.0,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "TP",
     "opened_time": "2026-09-28 16:18:33",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-29 01:43:36",
+    "r_result": 2.0,
+    "hit_time": "2026-09-29 01:30:00",
+    "hit_price": 0.0008676942857142858
   },
   {
     "symbol": "MEW-USDT-SWAP",
