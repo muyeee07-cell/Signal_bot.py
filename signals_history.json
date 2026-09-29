@@ -250,10 +250,12 @@
     "adx": 51.6,
     "rsi": 41.4,
     "reason": "Trend Following",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 12:21:16",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-29 08:18:40",
+    "r_result": -1.0,
+    "hit_time": "2026-09-29 07:45:00",
+    "hit_price": 9.093657142857142e-05
   },
   {
     "symbol": "DOGE-USDT-SWAP",
@@ -629,12 +631,12 @@
     "score": 4,
     "reason": "EMA bearish | Price < EMA21 | Directional strength | RSI bearish zone",
     "signal_candle_time": 1790650800000,
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-29 04:45:35",
-    "closed_time": null,
-    "r_result": null,
-    "hit_price": null,
-    "hit_time": null
+    "closed_time": "2026-09-29 08:18:42",
+    "r_result": -1.0,
+    "hit_price": 0.0009019488114206963,
+    "hit_time": "2026-09-29 08:15:00"
   },
   {
     "symbol": "XPL-USDT-SWAP",
