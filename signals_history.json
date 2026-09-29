@@ -461,12 +461,12 @@
     "score": 4,
     "reason": "EMA trend bearish | Price below EMA21 | ADX directional bearish | RSI bearish zone",
     "signal_candle_time": 1790625600000,
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 21:34:25",
-    "closed_time": null,
-    "r_result": null,
-    "hit_price": null,
-    "hit_time": null
+    "closed_time": "2026-09-29 06:49:51",
+    "r_result": -1.0,
+    "hit_price": 1.2426998202412716e-08,
+    "hit_time": "2026-09-29 06:30:00"
   },
   {
     "symbol": "HBAR-USDT-SWAP",
@@ -650,11 +650,11 @@
     "score": 4,
     "reason": "EMA bearish | Price < EMA21 | Directional strength | RSI bearish zone",
     "signal_candle_time": 1790650800000,
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-29 04:45:36",
-    "closed_time": null,
-    "r_result": null,
-    "hit_price": null,
-    "hit_time": null
+    "closed_time": "2026-09-29 06:49:52",
+    "r_result": -1.0,
+    "hit_price": 0.10005778768840871,
+    "hit_time": "2026-09-29 06:25:00"
   }
 ]
