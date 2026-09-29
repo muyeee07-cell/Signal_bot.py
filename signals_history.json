@@ -679,5 +679,26 @@
     "r_result": null,
     "hit_price": null,
     "hit_time": null
+  },
+  {
+    "symbol": "W-USDT-SWAP",
+    "side": "LONG",
+    "entry": 0.01434,
+    "sl": 0.01371644009857622,
+    "tp": 0.01558711980284756,
+    "rr": 2.0,
+    "atr": 0.00038972493838986244,
+    "adx": 16.78,
+    "rsi": 56.55,
+    "volume_ratio": 1.2,
+    "score": 4,
+    "reason": "EMA bullish | Price > EMA21 | RSI bullish zone | Volume confirmed",
+    "signal_candle_time": 1790665200000,
+    "status": "open",
+    "opened_time": "2026-09-29 08:46:47",
+    "closed_time": null,
+    "r_result": null,
+    "hit_price": null,
+    "hit_time": null
   }
 ]
