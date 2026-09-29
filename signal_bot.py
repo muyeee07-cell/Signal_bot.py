@@ -1,2246 +1,899 @@
 """
-===============================================================
-ALPHAQUANT V3
-QUANT MOMENTUM–STRUCTURE SIGNAL ENGINE
-===============================================================
-Purpose:
-- 1H quantitative crypto futures signal engine
-- Signal only — NO live trading
-- Market Structure + EMA Regime + Momentum + Volume
-- Structural ATR Stop Loss
-- Fixed RR 1:2
-- Deterministic scoring
-- Telegram notifications
-- Persistent trade history
-- 5m TP/SL monitoring
-- Position sizing based on fixed account risk
-Architecture:
-1H MARKET DATA
-      ↓
-EMA 50 / EMA 200
-      ↓
-MARKET REGIME
-      ↓
-SWING STRUCTURE
-      ↓
-BOS
-      ↓
-MOMENTUM
-      ↓
-VOLUME
-      ↓
-PULLBACK
-      ↓
-CONFIRMATION
-      ↓
-QUALITY SCORE
-      ↓
-SL / TP
-      ↓
-POSITION SIZE
-      ↓
-TELEGRAM SIGNAL
-      ↓
-5M MONITOR
-      ↓
-TRADE LOG / STATS
-IMPORTANT:
-This is a research/forward-testing engine.
-It does NOT guarantee profitability.
+ALPHAQUANT V3.1
+1H Quant Momentum-Structure Telegram Signal Engine
+Signal-only / OKX USDT perpetuals / RR 1:2
+
+V3.1 fixes:
+- Paginated OKX 1H candles (EMA200 gets enough history)
+- Paginated 5m monitoring
+- Real-time OKX ticker price for running reports
+- Telegram credentials checked at startup
+- Instrument tick-size rounding
+- Signal ID deduplication
+- Monitoring starts from signal candle
+- Atomic history writes
+- No automatic trading
 """
+
 from __future__ import annotations
-import os
-import json
-import time
-import math
-import logging
+
+import os, json, time, math, logging
 from datetime import datetime, timezone
-from typing import Optional, Dict, List, Tuple
+from typing import Optional
 import requests
-# ============================================================
-# CONFIGURATION
-# ============================================================
-OKX_BASE_URL = "https://www.okx.com"
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
-# ------------------------------------------------------------
-# Market
-# ------------------------------------------------------------
+
+# ================= CONFIG =================
+
+OKX = "https://www.okx.com"
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+
 TIMEFRAME = "1H"
 MONITOR_TF = "5m"
+
 TOP_PAIRS = 30
 MIN_VOLUME_USDT = 3_000_000
-KLINE_LIMIT = 300
-MONITOR_LIMIT = 300
-# ------------------------------------------------------------
-# Indicators
-# ------------------------------------------------------------
+
+HISTORY_BARS = 350
+MONITOR_BARS = 500
+
 EMA_FAST = 50
 EMA_SLOW = 200
 RSI_PERIOD = 14
 ADX_PERIOD = 14
 ATR_PERIOD = 14
-VOLUME_PERIOD = 20
-# Swing detection
-SWING_LEFT = 2
-SWING_RIGHT = 2
-# ------------------------------------------------------------
-# Structure
-# ------------------------------------------------------------
+VOL_PERIOD = 20
+
+SWING = 2
 BOS_ATR_BUFFER = 0.10
-# ------------------------------------------------------------
-# Risk
-# ------------------------------------------------------------
-ACCOUNT_EQUITY = float(os.getenv("ACCOUNT_EQUITY", "1000"))
-RISK_PER_TRADE = float(os.getenv("RISK_PER_TRADE", "0.004"))
-RR = 2.0
 SL_ATR_BUFFER = 0.20
-MIN_SL_ATR = 0.30
-MAX_SL_ATR = 2.50
-# ------------------------------------------------------------
-# Filters
-# ------------------------------------------------------------
+
 ADX_MIN = 20.0
 ADX_STRONG = 25.0
-VOLUME_HARD_MIN = 0.80
-VOLUME_NORMAL = 1.00
-VOLUME_STRONG = 1.30
+VOL_MIN = 0.80
+
 MIN_SCORE = 75
-# ------------------------------------------------------------
-# Pullback
-# ------------------------------------------------------------
-PULLBACK_MIN = 0.30
-PULLBACK_MAX = 0.70
-MAX_DISTANCE_EMA50_ATR = 0.75
-# ------------------------------------------------------------
-# Confirmation
-# ------------------------------------------------------------
-MIN_BODY_RATIO = 0.50
-# ------------------------------------------------------------
-# Risk / Portfolio
-# ------------------------------------------------------------
-MAX_OPEN_POSITIONS = 12
+MIN_SL_ATR = 0.30
+MAX_SL_ATR = 2.50
+
+RR = 2.0
+RISK_PER_TRADE = float(os.getenv("RISK_PER_TRADE", "0.004"))
+ACCOUNT_EQUITY = float(os.getenv("ACCOUNT_EQUITY", "1000"))
+
+MAX_OPEN = 12
 COOLDOWN_HOURS = 3
-# Prevent duplicate signal on same symbol/candle
-SIGNAL_DEDUPE_HOURS = 24
-# ------------------------------------------------------------
-# Runtime
-# ------------------------------------------------------------
-SCAN_INTERVAL_SECONDS = 300
+SCAN_INTERVAL = 300
+
 HISTORY_FILE = "v3_history.json"
-REQUEST_TIMEOUT = 15
-LOG_LEVEL = logging.INFO
-# ============================================================
-# LOGGING
-# ============================================================
+TIMEOUT = 15
+RETRIES = 3
+
 logging.basicConfig(
-    level=LOG_LEVEL,
+    level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-logger = logging.getLogger("ALPHAQUANT_V3")
-# ============================================================
-# HTTP SESSION
-# ============================================================
-SESSION = requests.Session()
-SESSION.headers.update({
-    "User-Agent": "ALPHAQUANT-V3/1.0"
-})
-# ============================================================
-# TIME HELPERS
-# ============================================================
-def now_ms() -> int:
-    return int(time.time() * 1000)
-def now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
-def ms_to_iso(ms: int) -> str:
+log = logging.getLogger("V3.1")
+
+S = requests.Session()
+S.headers.update({"User-Agent": "ALPHAQUANT-V3.1"})
+
+TELEGRAM = bool(TOKEN and CHAT_ID)
+
+# ================= HELPERS =================
+
+def iso(ms):
     return datetime.fromtimestamp(
-        ms / 1000,
-        tz=timezone.utc
+        ms / 1000, tz=timezone.utc
     ).isoformat()
-# ============================================================
-# JSON HISTORY
-# ============================================================
-def load_history() -> Dict:
-    if not os.path.exists(HISTORY_FILE):
-        return {
-            "closed": [],
-            "open": []
-        }
-    try:
-        with open(
-            HISTORY_FILE,
-            "r",
-            encoding="utf-8"
-        ) as f:
-            data = json.load(f)
-        if not isinstance(data, dict):
-            raise ValueError("Invalid history format")
-        data.setdefault("closed", [])
-        data.setdefault("open", [])
-        return data
-    except Exception as e:
-        logger.exception(
-            "History load failed: %s",
-            e
-        )
-        return {
-            "closed": [],
-            "open": []
-        }
-def save_history(history: Dict):
-    temp_file = HISTORY_FILE + ".tmp"
-    with open(
-        temp_file,
-        "w",
-        encoding="utf-8"
-    ) as f:
-        json.dump(
-            history,
-            f,
-            indent=2,
-            ensure_ascii=False
-        )
-    os.replace(
-        temp_file,
-        HISTORY_FILE
-    )
-# ============================================================
-# TELEGRAM
-# ============================================================
-def telegram_send(text: str):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        logger.warning(
-            "Telegram credentials missing."
-        )
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+def api(path, params=None):
+    for attempt in range(RETRIES):
+        try:
+            r = S.get(
+                OKX + path,
+                params=params,
+                timeout=TIMEOUT
+            )
+            r.raise_for_status()
+            d = r.json()
+            if d.get("code") == "0":
+                return d
+            log.warning("OKX error: %s", d)
+        except Exception as e:
+            log.warning(
+                "Request failed %s/%s: %s",
+                attempt + 1, RETRIES, e
+            )
+        if attempt + 1 < RETRIES:
+            time.sleep(1.5)
+    return None
+
+def tg(text):
+    if not TELEGRAM:
         return False
-    url = (
-        f"https://api.telegram.org/"
-        f"bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    )
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": text,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
     try:
-        response = SESSION.post(
-            url,
-            json=payload,
-            timeout=REQUEST_TIMEOUT
+        r = S.post(
+            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+            json={
+                "chat_id": CHAT_ID,
+                "text": text,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True
+            },
+            timeout=TIMEOUT
         )
-        response.raise_for_status()
+        r.raise_for_status()
         return True
     except Exception as e:
-        logger.error(
-            "Telegram error: %s",
-            e
-        )
+        log.error("Telegram error: %s", e)
         return False
-# ============================================================
-# OKX API
-# ============================================================
-def okx_get(
-    endpoint: str,
-    params: Optional[Dict] = None
-) -> Optional[Dict]:
-    url = OKX_BASE_URL + endpoint
+
+def load_history():
+    if not os.path.exists(HISTORY_FILE):
+        return {"open": [], "closed": []}
     try:
-        response = SESSION.get(
-            url,
-            params=params,
-            timeout=REQUEST_TIMEOUT
-        )
-        response.raise_for_status()
-        data = response.json()
-        if data.get("code") != "0":
-            logger.warning(
-                "OKX API error: %s",
-                data
-            )
-            return None
-        return data
+        with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+            d = json.load(f)
+        d.setdefault("open", [])
+        d.setdefault("closed", [])
+        return d
     except Exception as e:
-        logger.error(
-            "OKX request failed: %s",
-            e
-        )
-        return None
-# ============================================================
-# INSTRUMENTS
-# ============================================================
-def get_instruments() -> Dict[str, Dict]:
-    data = okx_get(
-        "/api/v5/public/instruments",
-        {
-            "instType": "SWAP"
-        }
-    )
-    if not data:
-        return {}
-    result = {}
-    for item in data.get("data", []):
-        inst_id = item.get("instId", "")
-        if not inst_id.endswith("-USDT-SWAP"):
-            continue
-        result[inst_id] = {
-            "tickSz": float(item.get("tickSz", "0.00000001")),
-            "lotSz": float(item.get("lotSz", "1")),
-            "minSz": float(item.get("minSz", "1"))
-        }
-    return result
-# ============================================================
-# TICKER / UNIVERSE
-# ============================================================
-def get_top_pairs() -> List[str]:
-    data = okx_get(
-        "/api/v5/market/tickers",
-        {
-            "instType": "SWAP"
-        }
-    )
-    if not data:
+        log.error("History load failed: %s", e)
+        return {"open": [], "closed": []}
+
+def save_history(h):
+    tmp = HISTORY_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(h, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, HISTORY_FILE)
+
+# ================= MARKET DATA =================
+
+def top_pairs():
+    d = api("/api/v5/market/tickers", {"instType": "SWAP"})
+    if not d:
         return []
-    candidates = []
-    for item in data.get("data", []):
-        inst_id = item.get("instId", "")
-        if not inst_id.endswith("-USDT-SWAP"):
+    a = []
+    for x in d.get("data", []):
+        inst = x.get("instId", "")
+        if not inst.endswith("-USDT-SWAP"):
             continue
         try:
-            volume = float(
-                item.get("volCcy24h", "0")
-            )
-        except Exception:
+            v = float(x.get("volCcy24h", 0))
+        except:
             continue
-        if volume < MIN_VOLUME_USDT:
-            continue
-        candidates.append(
-            (
-                inst_id,
-                volume
-            )
-        )
-    candidates.sort(
-        key=lambda x: x[1],
-        reverse=True
-    )
-    return [
-        x[0]
-        for x in candidates[:TOP_PAIRS]
-    ]
-def get_current_price(inst_id: str) -> Optional[float]:
-    data = okx_get(
-        "/api/v5/market/ticker",
-        {
-            "instId": inst_id
-        }
-    )
-    if not data:
-        return None
+        if v >= MIN_VOLUME_USDT:
+            a.append((inst, v))
+    a.sort(key=lambda x: x[1], reverse=True)
+    return [x[0] for x in a[:TOP_PAIRS]]
+
+def instruments():
+    d = api("/api/v5/public/instruments", {"instType": "SWAP"})
+    out = {}
+    if not d:
+        return out
+    for x in d.get("data", []):
+        inst = x.get("instId", "")
+        if inst.endswith("-USDT-SWAP"):
+            try:
+                out[inst] = {
+                    "tick": float(x.get("tickSz", "0.00000001"))
+                }
+            except:
+                pass
+    return out
+
+def price(inst):
+    d = api("/api/v5/market/ticker", {"instId": inst})
     try:
-        return float(
-            data["data"][0]["last"]
-        )
-    except Exception:
+        return float(d["data"][0]["last"])
+    except:
         return None
-# ============================================================
-# KLINES
-# ============================================================
-def get_klines(
-    inst_id: str,
-    bar: str = TIMEFRAME,
-    limit: int = KLINE_LIMIT
-) -> List[List]:
-    data = okx_get(
-        "/api/v5/market/candles",
-        {
-            "instId": inst_id,
+
+def candles(inst, bar, needed):
+    """
+    OKX pagination using `after`.
+    Returns confirmed candles oldest -> newest.
+    """
+    found = {}
+    cursor = None
+    max_requests = math.ceil(needed / 100) + 6
+
+    for _ in range(max_requests):
+        p = {
+            "instId": inst,
             "bar": bar,
-            "limit": str(limit)
+            "limit": "100"
         }
-    )
-    if not data:
-        return []
-    candles = []
-    for row in data.get("data", []):
-        try:
-            candles.append([
-                int(row[0]),      # timestamp
-                float(row[1]),    # open
-                float(row[2]),    # high
-                float(row[3]),    # low
-                float(row[4]),    # close
-                float(row[5]),    # volume
-                int(row[8])       # confirm
-            ])
-        except Exception:
-            continue
-    candles.sort(
-        key=lambda x: x[0]
-    )
-    # ONLY CLOSED CANDLES
-    candles = [
-        c for c in candles
-        if c[6] == 1
-    ]
-    return candles
-# ============================================================
-# INDICATORS
-# ============================================================
-def ema(
-    values: List[float],
-    period: int
-) -> List[Optional[float]]:
-    result = [None] * len(values)
-    if len(values) < period:
-        return result
-    multiplier = 2 / (period + 1)
-    initial = sum(
-        values[:period]
-    ) / period
-    result[period - 1] = initial
-    previous = initial
-    for i in range(
-        period,
-        len(values)
-    ):
-        current = (
-            values[i] * multiplier
-            + previous * (1 - multiplier)
-        )
-        result[i] = current
-        previous = current
-    return result
-def true_ranges(
-    candles: List[List]
-) -> List[float]:
+        if cursor is not None:
+            p["after"] = str(cursor)
+
+        d = api("/api/v5/market/candles", p)
+        if not d:
+            break
+
+        rows = d.get("data", [])
+        if not rows:
+            break
+
+        oldest = None
+
+        for x in rows:
+            try:
+                ts = int(x[0])
+                oldest = ts if oldest is None else min(oldest, ts)
+
+                # x[8] == 1 means confirmed candle.
+                if int(x[8]) != 1:
+                    continue
+
+                found[ts] = [
+                    ts,
+                    float(x[1]),  # open
+                    float(x[2]),  # high
+                    float(x[3]),  # low
+                    float(x[4]),  # close
+                    float(x[5])   # volume
+                ]
+            except:
+                continue
+
+        if len(found) >= needed:
+            break
+
+        if oldest is None or oldest == cursor:
+            break
+
+        cursor = oldest
+        time.sleep(0.12)
+
+    out = sorted(found.values(), key=lambda x: x[0])
+    return out[-needed:]
+
+# ================= INDICATORS =================
+
+def rma(v, n):
+    out = [None] * len(v)
+    if len(v) < n:
+        return out
+    x = sum(v[:n]) / n
+    out[n - 1] = x
+    for i in range(n, len(v)):
+        x = ((x * (n - 1)) + v[i]) / n
+        out[i] = x
+    return out
+
+def ema(v, n):
+    out = [None] * len(v)
+    if len(v) < n:
+        return out
+    k = 2 / (n + 1)
+    x = sum(v[:n]) / n
+    out[n - 1] = x
+    for i in range(n, len(v)):
+        x = v[i] * k + x * (1 - k)
+        out[i] = x
+    return out
+
+def atr(cs, n=14):
     tr = []
-    for i, candle in enumerate(candles):
-        high = candle[2]
-        low = candle[3]
+    for i, c in enumerate(cs):
         if i == 0:
-            tr.append(
-                high - low
-            )
-            continue
-        previous_close = candles[i - 1][4]
-        value = max(
-            high - low,
-            abs(high - previous_close),
-            abs(low - previous_close)
-        )
-        tr.append(value)
-    return tr
-def rma(
-    values: List[float],
-    period: int
-) -> List[Optional[float]]:
-    result = [None] * len(values)
-    if len(values) < period:
-        return result
-    initial = sum(
-        values[:period]
-    ) / period
-    result[period - 1] = initial
-    previous = initial
-    for i in range(
-        period,
-        len(values)
-    ):
-        previous = (
-            (previous * (period - 1))
-            + values[i]
-        ) / period
-        result[i] = previous
-    return result
-def calculate_atr(
-    candles: List[List],
-    period: int = ATR_PERIOD
-) -> List[Optional[float]]:
-    return rma(
-        true_ranges(candles),
-        period
-    )
-def calculate_rsi(
-    candles: List[List],
-    period: int = RSI_PERIOD
-) -> List[Optional[float]]:
-    closes = [
-        c[4]
-        for c in candles
-    ]
+            tr.append(c[2] - c[3])
+        else:
+            pc = cs[i-1][4]
+            tr.append(max(
+                c[2] - c[3],
+                abs(c[2] - pc),
+                abs(c[3] - pc)
+            ))
+    return rma(tr, n)
+
+def rsi(cs, n=14):
+    closes = [x[4] for x in cs]
     gains = [0.0]
     losses = [0.0]
-    for i in range(
-        1,
-        len(closes)
-    ):
-        change = (
-            closes[i] -
-            closes[i - 1]
-        )
-        gains.append(
-            max(change, 0)
-        )
-        losses.append(
-            max(-change, 0)
-        )
-    avg_gain = rma(
-        gains,
-        period
-    )
-    avg_loss = rma(
-        losses,
-        period
-    )
-    result = [None] * len(candles)
-    for i in range(
-        len(candles)
-    ):
-        if (
-            avg_gain[i] is None
-            or avg_loss[i] is None
-        ):
+    for i in range(1, len(closes)):
+        ch = closes[i] - closes[i-1]
+        gains.append(max(ch, 0))
+        losses.append(max(-ch, 0))
+    ag, al = rma(gains, n), rma(losses, n)
+    out = [None] * len(cs)
+    for i in range(len(cs)):
+        if ag[i] is None or al[i] is None:
             continue
-        if avg_loss[i] == 0:
-            result[i] = 100.0
+        if al[i] == 0:
+            out[i] = 100.0
         else:
-            rs = (
-                avg_gain[i] /
-                avg_loss[i]
-            )
-            result[i] = (
-                100 -
-                (100 / (1 + rs))
-            )
-    return result
-def calculate_adx(
-    candles: List[List],
-    period: int = ADX_PERIOD
-) -> Tuple[
-    List[Optional[float]],
-    List[Optional[float]],
-    List[Optional[float]]
-]:
-    trs = true_ranges(candles)
-    plus_dm = [0.0]
-    minus_dm = [0.0]
-    for i in range(
-        1,
-        len(candles)
-    ):
-        high = candles[i][2]
-        low = candles[i][3]
-        prev_high = candles[i - 1][2]
-        prev_low = candles[i - 1][3]
-        up_move = (
-            high - prev_high
-        )
-        down_move = (
-            prev_low - low
-        )
-        if (
-            up_move > down_move
-            and up_move > 0
-        ):
-            plus_dm.append(
-                up_move
-            )
-        else:
-            plus_dm.append(0.0)
-        if (
-            down_move > up_move
-            and down_move > 0
-        ):
-            minus_dm.append(
-                down_move
-            )
-        else:
-            minus_dm.append(0.0)
-    atr = rma(
-        trs,
-        period
-    )
-    plus_smoothed = rma(
-        plus_dm,
-        period
-    )
-    minus_smoothed = rma(
-        minus_dm,
-        period
-    )
-    plus_di = [None] * len(candles)
-    minus_di = [None] * len(candles)
-    dx = [None] * len(candles)
-    for i in range(
-        len(candles)
-    ):
-        if (
-            atr[i] is None
-            or plus_smoothed[i] is None
-            or minus_smoothed[i] is None
-        ):
+            rs = ag[i] / al[i]
+            out[i] = 100 - 100 / (1 + rs)
+    return out
+
+def adx(cs, n=14):
+    tr = []
+    plus = [0.0]
+    minus = [0.0]
+
+    for i, c in enumerate(cs):
+        if i == 0:
+            tr.append(c[2] - c[3])
             continue
-        if atr[i] == 0:
+        pc = cs[i-1]
+        tr.append(max(
+            c[2]-c[3],
+            abs(c[2]-pc[4]),
+            abs(c[3]-pc[4])
+        ))
+        up = c[2] - pc[2]
+        dn = pc[3] - c[3]
+        plus.append(up if up > dn and up > 0 else 0)
+        minus.append(dn if dn > up and dn > 0 else 0)
+
+    atrv = rma(tr, n)
+    ps = rma(plus, n)
+    ms = rma(minus, n)
+
+    pdi = [None]*len(cs)
+    mdi = [None]*len(cs)
+    dx = [0.0]*len(cs)
+
+    for i in range(len(cs)):
+        if atrv[i] is None or atrv[i] == 0:
             continue
-        plus_di[i] = (
-            100 *
-            plus_smoothed[i] /
-            atr[i]
-        )
-        minus_di[i] = (
-            100 *
-            minus_smoothed[i] /
-            atr[i]
-        )
-        denominator = (
-            plus_di[i] +
-            minus_di[i]
-        )
-        if denominator != 0:
-            dx[i] = (
-                100 *
-                abs(
-                    plus_di[i] -
-                    minus_di[i]
-                ) /
-                denominator
-            )
-    valid_dx = [
-        x if x is not None else 0
-        for x in dx
-    ]
-    adx = rma(
-        valid_dx,
-        period
-    )
-    return (
-        adx,
-        plus_di,
-        minus_di
-    )
-# ============================================================
-# SWING DETECTION
-# ============================================================
-def detect_swings(
-    candles: List[List]
-) -> Tuple[List[Dict], List[Dict]]:
-    highs = []
-    lows = []
-    n = len(candles)
-    for i in range(
-        SWING_LEFT,
-        n - SWING_RIGHT
-    ):
-        high = candles[i][2]
-        low = candles[i][3]
-        is_high = True
-        is_low = True
-        for j in range(
-            1,
-            SWING_LEFT + 1
-        ):
-            if high <= candles[i - j][2]:
-                is_high = False
-            if low >= candles[i - j][3]:
-                is_low = False
-        for j in range(
-            1,
-            SWING_RIGHT + 1
-        ):
-            if high <= candles[i + j][2]:
-                is_high = False
-            if low >= candles[i + j][3]:
-                is_low = False
-        if is_high:
-            highs.append({
-                "index": i,
-                "time": candles[i][0],
-                "price": high
-            })
-        if is_low:
-            lows.append({
-                "index": i,
-                "time": candles[i][0],
-                "price": low
-            })
+        pdi[i] = 100 * ps[i] / atrv[i]
+        mdi[i] = 100 * ms[i] / atrv[i]
+        den = pdi[i] + mdi[i]
+        if den:
+            dx[i] = 100 * abs(pdi[i]-mdi[i]) / den
+
+    return rma(dx, n), pdi, mdi
+
+def volume_ratio(cs, n=20):
+    if len(cs) < n:
+        return None
+    avg = sum(x[5] for x in cs[-n:]) / n
+    return cs[-1][5] / avg if avg else None
+
+# ================= STRUCTURE =================
+
+def swings(cs):
+    highs, lows = [], []
+    for i in range(SWING, len(cs)-SWING):
+        h, l = cs[i][2], cs[i][3]
+        if all(h > cs[i-j][2] for j in range(1, SWING+1)) and \
+           all(h > cs[i+j][2] for j in range(1, SWING+1)):
+            highs.append((i, h))
+        if all(l < cs[i-j][3] for j in range(1, SWING+1)) and \
+           all(l < cs[i+j][3] for j in range(1, SWING+1)):
+            lows.append((i, l))
     return highs, lows
-# ============================================================
-# STRUCTURE
-# ============================================================
-def get_structure(
-    highs: List[Dict],
-    lows: List[Dict]
-) -> Dict:
-    structure = {
-        "bullish": False,
-        "bearish": False,
-        "hh_hl": False,
-        "lh_ll": False,
-        "latest_high": None,
-        "previous_high": None,
-        "latest_low": None,
-        "previous_low": None
-    }
-    if len(highs) >= 2:
-        latest_high = highs[-1]
-        previous_high = highs[-2]
-        structure["latest_high"] = latest_high
-        structure["previous_high"] = previous_high
-    if len(lows) >= 2:
-        latest_low = lows[-1]
-        previous_low = lows[-2]
-        structure["latest_low"] = latest_low
-        structure["previous_low"] = previous_low
-    if (
-        structure["latest_high"]
-        and structure["previous_high"]
-        and structure["latest_low"]
-        and structure["previous_low"]
-    ):
-        h1 = structure["latest_high"]["price"]
-        h2 = structure["previous_high"]["price"]
-        l1 = structure["latest_low"]["price"]
-        l2 = structure["previous_low"]["price"]
-        if h1 > h2 and l1 > l2:
-            structure["hh_hl"] = True
-            structure["bullish"] = True
-        elif h1 < h2 and l1 < l2:
-            structure["lh_ll"] = True
-            structure["bearish"] = True
-    return structure
-# ============================================================
-# BOS
-# ============================================================
-def detect_bos(
-    candles: List[List],
-    atr: List[Optional[float]],
-    highs: List[Dict],
-    lows: List[Dict]
-) -> Dict:
-    result = {
-        "bullish": False,
-        "bearish": False,
-        "price": None,
-        "time": None
-    }
-    if not candles:
-        return result
-    current_index = len(candles) - 1
-    current_close = candles[-1][4]
-    current_atr = atr[-1]
-    if current_atr is None:
-        return result
-    buffer = (
-        current_atr *
-        BOS_ATR_BUFFER
-    )
-    # Most recent confirmed swing high
-    if highs:
-        latest_high = highs[-1]
-        # Swing must occur before current candle
-        if latest_high["index"] < current_index:
-            if (
-                current_close >
-                latest_high["price"] + buffer
-            ):
-                result.update({
-                    "bullish": True,
-                    "price": current_close,
-                    "time": candles[-1][0]
-                })
-                return result
-    # Most recent confirmed swing low
-    if lows:
-        latest_low = lows[-1]
-        if latest_low["index"] < current_index:
-            if (
-                current_close <
-                latest_low["price"] - buffer
-            ):
-                result.update({
-                    "bearish": True,
-                    "price": current_close,
-                    "time": candles[-1][0]
-                })
-    return result
-# ============================================================
-# EMA SLOPE
-# ============================================================
-def get_ema_slope(
-    values: List[Optional[float]],
-    lookback: int = 5
-) -> Optional[float]:
-    if len(values) <= lookback:
-        return None
-    current = values[-1]
-    previous = values[-1 - lookback]
-    if (
-        current is None
-        or previous is None
-    ):
-        return None
-    return current - previous
-# ============================================================
-# REGIME
-# ============================================================
-def determine_regime(
-    close: float,
-    ema50: float,
-    ema200: float,
-    ema50_slope: float
-) -> str:
-    if (
-        close > ema200
-        and ema50 > ema200
-        and ema50_slope > 0
-    ):
-        return "BULL"
-    if (
-        close < ema200
-        and ema50 < ema200
-        and ema50_slope < 0
-    ):
-        return "BEAR"
-    return "NEUTRAL"
-# ============================================================
-# VOLUME
-# ============================================================
-def calculate_volume_ratio(
-    candles: List[List]
-) -> Optional[float]:
-    if len(candles) < VOLUME_PERIOD:
-        return None
-    volumes = [
-        c[5]
-        for c in candles
-    ]
-    average = sum(
-        volumes[-VOLUME_PERIOD:]
-    ) / VOLUME_PERIOD
-    if average <= 0:
-        return None
-    return (
-        volumes[-1] /
-        average
-    )
-# ============================================================
-# PULLBACK
-# ============================================================
-def detect_pullback(
-    candles: List[List],
-    atr: List[Optional[float]],
-    ema50: List[Optional[float]],
-    bos: Dict,
-    direction: str
-) -> Dict:
-    result = {
-        "valid": False,
-        "retracement": None,
-        "distance_atr": None
-    }
-    if len(candles) < 10:
-        return result
-    if not bos.get("bullish") and not bos.get("bearish"):
-        return result
-    current_atr = atr[-1]
-    current_ema50 = ema50[-1]
-    if (
-        current_atr is None
-        or current_ema50 is None
-    ):
-        return result
-    # --------------------------------------------------------
-    # Find impulse before BOS
-    # --------------------------------------------------------
-    bos_index = len(candles) - 1
-    lookback_start = max(
-        0,
-        bos_index - 30
-    )
-    window = candles[
-        lookback_start:
-        bos_index + 1
-    ]
-    if not window:
-        return result
-    if direction == "LONG":
-        impulse_low = min(
-            c[3]
-            for c in window
-        )
-        impulse_high = candles[-1][2]
-        impulse_range = (
-            impulse_high -
-            impulse_low
-        )
-        if impulse_range <= 0:
-            return result
-        current_low = candles[-1][3]
-        retracement = (
-            impulse_high -
-            current_low
-        ) / impulse_range
-        distance = abs(
-            candles[-1][4] -
-            current_ema50
-        )
-        distance_atr = (
-            distance /
-            current_atr
-        )
-    else:
-        impulse_high = max(
-            c[2]
-            for c in window
-        )
-        impulse_low = candles[-1][3]
-        impulse_range = (
-            impulse_high -
-            impulse_low
-        )
-        if impulse_range <= 0:
-            return result
-        current_high = candles[-1][2]
-        retracement = (
-            current_high -
-            impulse_low
-        ) / impulse_range
-        distance = abs(
-            candles[-1][4] -
-            current_ema50
-        )
-        distance_atr = (
-            distance /
-            current_atr
-        )
-    valid_retracement = (
-        PULLBACK_MIN <=
-        retracement <=
-        PULLBACK_MAX
-    )
-    near_ema = (
-        distance_atr <=
-        MAX_DISTANCE_EMA50_ATR
-    )
-    result.update({
-        "valid": (
-            valid_retracement
-            and near_ema
-        ),
-        "retracement": retracement,
-        "distance_atr": distance_atr
-    })
-    return result
-# ============================================================
-# CONFIRMATION CANDLE
-# ============================================================
-def confirmation_candle(
-    candles: List[List],
-    direction: str
-) -> bool:
-    if len(candles) < 2:
-        return False
-    current = candles[-1]
-    previous = candles[-2]
-    open_price = current[1]
-    high = current[2]
-    low = current[3]
-    close = current[4]
-    candle_range = (
-        high - low
-    )
-    if candle_range <= 0:
-        return False
-    body = abs(
-        close - open_price
-    )
-    body_ratio = (
-        body /
-        candle_range
-    )
-    if body_ratio < MIN_BODY_RATIO:
-        return False
-    if direction == "LONG":
-        return (
-            close > open_price
-            and close > previous[2]
-        )
-    return (
-        close < open_price
-        and close < previous[3]
-    )
-# ============================================================
-# SCORE
-# ============================================================
-def calculate_score(
-    direction: str,
-    regime: str,
-    structure: Dict,
-    bos: Dict,
-    rsi: float,
-    adx: float,
-    volume_ratio: float,
-    pullback_valid: bool,
-    confirmation: bool,
-    ema_slope: float
-) -> Tuple[int, Dict]:
-    score = 0
-    details = {}
-    # --------------------------------------------------------
-    # REGIME = 25
-    # --------------------------------------------------------
-    if direction == "LONG":
-        if regime == "BULL":
-            score += 10
-            details["EMA200"] = 10
-            details["EMA200"] = 10
-        if structure.get("hh_hl"):
-            score += 15
-            details["HH_HL"] = 15
-    else:
-        if regime == "BEAR":
-            score += 10
-            details["EMA200"] = 10
-        if structure.get("lh_ll"):
-            score += 15
-            details["LH_LL"] = 15
-    # --------------------------------------------------------
-    # EMA alignment extra component
-    # --------------------------------------------------------
-    # We need the full 25-point regime block:
-    # 10 = price vs EMA200
-    # 10 = EMA50 alignment
-    # 5  = slope
-    #
-    # Structure is separately scored below.
-    # Rebuild score cleanly below.
-    score = 0
-    details = {}
-    # --------------------------------------------------------
-    # REGIME 25
-    # --------------------------------------------------------
-    if direction == "LONG":
-        if regime == "BULL":
-            score += 10
-            details["Price>EMA200"] = 10
-        # EMA50 alignment
-        if regime == "BULL":
-            score += 10
-            details["EMA50>EMA200"] = 10
-        if ema_slope > 0:
-            score += 5
-            details["EMA50Slope"] = 5
-    else:
-        if regime == "BEAR":
-            score += 10
-            details["Price<EMA200"] = 10
-        if regime == "BEAR":
-            score += 10
-            details["EMA50<EMA200"] = 10
-        if ema_slope < 0:
-            score += 5
-            details["EMA50Slope"] = 5
-    # --------------------------------------------------------
-    # STRUCTURE 25
-    # --------------------------------------------------------
-    if direction == "LONG":
-        if structure.get("hh_hl"):
-            score += 15
-            details["HH_HL"] = 15
-        if bos.get("bullish"):
-            score += 10
-            details["BullishBOS"] = 10
-    else:
-        if structure.get("lh_ll"):
-            score += 15
-            details["LH_LL"] = 15
-        if bos.get("bearish"):
-            score += 10
-            details["BearishBOS"] = 10
-    # --------------------------------------------------------
-    # MOMENTUM 20
-    # --------------------------------------------------------
-    if direction == "LONG":
-        if 60 <= rsi < 70:
-            score += 10
-            details["RSI"] = 10
-        elif 50 < rsi < 60:
-            score += 5
-            details["RSI"] = 5
-    else:
-        if 30 < rsi <= 40:
-            score += 10
-            details["RSI"] = 10
-        elif 40 < rsi < 50:
-            score += 5
-            details["RSI"] = 5
-    if adx >= ADX_STRONG:
-        score += 10
-        details["ADX"] = 10
-    elif adx >= ADX_MIN:
-        score += 5
-        details["ADX"] = 5
-    # --------------------------------------------------------
-    # VOLUME 10
-    # --------------------------------------------------------
-    if volume_ratio >= VOLUME_STRONG:
-        score += 10
-        details["Volume"] = 10
-    elif volume_ratio >= VOLUME_NORMAL:
-        score += 5
-        details["Volume"] = 5
-    # --------------------------------------------------------
-    # ENTRY QUALITY 20
-    # --------------------------------------------------------
-    if pullback_valid:
-        score += 10
-        details["Pullback"] = 10
-    if confirmation:
-        score += 10
-        details["Confirmation"] = 10
-    return score, details
-# ============================================================
-# PRICE ROUNDING
-# ============================================================
-def decimals_from_step(
-    step: float
-) -> int:
-    if step <= 0:
-        return 8
-    text = f"{step:.12f}".rstrip("0")
-    if "." not in text:
-        return 0
-    return len(
-        text.split(".")[1]
-    )
-def round_to_tick(
-    value: float,
-    tick: float
-) -> float:
+
+def structure(highs, lows):
+    hhhl = False
+    lhll = False
+    if len(highs) >= 2 and len(lows) >= 2:
+        hhhl = highs[-1][1] > highs[-2][1] and lows[-1][1] > lows[-2][1]
+        lhll = highs[-1][1] < highs[-2][1] and lows[-1][1] < lows[-2][1]
+    return hhhl, lhll
+
+def bos(cs, highs, lows, atrv):
+    if not atrv[-1]:
+        return False, False
+    close = cs[-1][4]
+    buf = atrv[-1] * BOS_ATR_BUFFER
+    bull = bool(highs and close > highs[-1][1] + buf)
+    bear = bool(lows and close < lows[-1][1] - buf)
+    return bull, bear
+
+# ================= SIGNAL =================
+
+def tick_round(x, tick):
     if tick <= 0:
-        return value
-    decimals = decimals_from_step(tick)
-    return round(
-        round(value / tick) * tick,
-        decimals
-    )
-# ============================================================
-# POSITION SIZE
-# ============================================================
-def calculate_position_size(
-    entry: float,
-    stop: float
-) -> Dict:
-    risk_distance = abs(
-        entry - stop
-    )
-    if risk_distance <= 0:
-        return {
-            "risk_usdt": 0,
-            "position_size": 0,
-            "notional": 0
-        }
-    risk_usdt = (
-        ACCOUNT_EQUITY *
-        RISK_PER_TRADE
-    )
-    position_size = (
-        risk_usdt /
-        risk_distance
-    )
-    notional = (
-        position_size *
-        entry
-    )
-    return {
-        "risk_usdt": risk_usdt,
-        "position_size": position_size,
-        "notional": notional
-    }
-# ============================================================
-# SIGNAL CREATION
-# ============================================================
-def build_signal(
-    inst_id: str,
-    candles: List[List],
-    instruments: Dict[str, Dict]
-) -> Optional[Dict]:
-    minimum = max(
-        EMA_SLOW + 20,
-        230
-    )
-    if len(candles) < minimum:
-        logger.warning(
-            "%s insufficient candles: %s",
-            inst_id,
-            len(candles)
-        )
+        return x
+    return round(round(x/tick)*tick, 12)
+
+def build_signal(inst, cs, meta):
+    if len(cs) < 230:
+        log.warning("%s insufficient candles: %s", inst, len(cs))
         return None
-    closes = [
-        c[4]
-        for c in candles
-    ]
-    ema50 = ema(
-        closes,
-        EMA_FAST
-    )
-    ema200 = ema(
-        closes,
-        EMA_SLOW
-    )
-    atr = calculate_atr(
-        candles,
-        ATR_PERIOD
-    )
-    rsi = calculate_rsi(
-        candles,
-        RSI_PERIOD
-    )
-    adx, plus_di, minus_di = calculate_adx(
-        candles,
-        ADX_PERIOD
-    )
-    volume_ratio = calculate_volume_ratio(
-        candles
-    )
-    if (
-        ema50[-1] is None
-        or ema200[-1] is None
-        or atr[-1] is None
-        or rsi[-1] is None
-        or adx[-1] is None
-        or volume_ratio is None
-    ):
+
+    closes = [x[4] for x in cs]
+    e50 = ema(closes, EMA_FAST)
+    e200 = ema(closes, EMA_SLOW)
+    at = atr(cs, ATR_PERIOD)
+    rs = rsi(cs, RSI_PERIOD)
+    ax, pdi, mdi = adx(cs, ADX_PERIOD)
+    vr = volume_ratio(cs, VOL_PERIOD)
+
+    vals = [e50[-1], e200[-1], at[-1], rs[-1], ax[-1], vr]
+    if any(x is None for x in vals):
         return None
-    close = candles[-1][4]
-    current_atr = atr[-1]
-    slope = get_ema_slope(
-        ema50,
-        5
-    )
-    if slope is None:
+
+    slope = e50[-1] - e50[-6]
+    close = cs[-1][4]
+
+    bull_regime = close > e200[-1] and e50[-1] > e200[-1] and slope > 0
+    bear_regime = close < e200[-1] and e50[-1] < e200[-1] and slope < 0
+
+    if not bull_regime and not bear_regime:
         return None
-    regime = determine_regime(
-        close,
-        ema50[-1],
-        ema200[-1],
-        slope
-    )
-    if regime == "NEUTRAL":
-        return None
-    # --------------------------------------------------------
-    # Swings / Structure
-    # --------------------------------------------------------
-    highs, lows = detect_swings(
-        candles
-    )
-    structure = get_structure(
-        highs,
-        lows
-    )
-    # --------------------------------------------------------
-    # BOS
-    # --------------------------------------------------------
-    bos = detect_bos(
-        candles,
-        atr,
-        highs,
-        lows
-    )
-    # --------------------------------------------------------
-    # Direction
-    # --------------------------------------------------------
-    if regime == "BULL":
-        direction = "LONG"
-        if not (
-            structure["hh_hl"]
-            or bos["bullish"]
-        ):
+
+    hs, ls = swings(cs)
+    hhhl, lhll = structure(hs, ls)
+    bull_bos, bear_bos = bos(cs, hs, ls, at)
+
+    if bull_regime:
+        side = "LONG"
+        if not (hhhl or bull_bos):
             return None
-    elif regime == "BEAR":
-        direction = "SHORT"
-        if not (
-            structure["lh_ll"]
-            or bos["bearish"]
-        ):
+        if not 50 < rs[-1] < 70:
+            return None
+        if pdi[-1] is not None and mdi[-1] is not None and pdi[-1] <= mdi[-1]:
             return None
     else:
-        return None
-    # --------------------------------------------------------
-    # Momentum
-    # --------------------------------------------------------
-    current_rsi = rsi[-1]
-    current_adx = adx[-1]
-    if current_adx < ADX_MIN:
-        return None
-    if direction == "LONG":
-        if not (
-            current_rsi > 50
-            and current_rsi < 70
-        ):
+        side = "SHORT"
+        if not (lhll or bear_bos):
             return None
+        if not 30 < rs[-1] < 50:
+            return None
+        if pdi[-1] is not None and mdi[-1] is not None and mdi[-1] <= pdi[-1]:
+            return None
+
+    if ax[-1] < ADX_MIN or vr < VOL_MIN:
+        return None
+
+    # Pullback to EMA50/value zone.
+    distance_atr = abs(close-e50[-1]) / at[-1]
+    if distance_atr > 0.75:
+        return None
+
+    recent = cs[-31:]
+    if side == "LONG":
+        lo = min(x[3] for x in recent)
+        hi = max(x[2] for x in recent)
+        retr = (hi-cs[-1][3])/(hi-lo) if hi > lo else 0
+        confirm = cs[-1][4] > cs[-1][1] and cs[-1][4] > cs[-2][2]
     else:
-        if not (
-            current_rsi < 50
-            and current_rsi > 30
-        ):
-            return None
-    # --------------------------------------------------------
-    # Volume hard filter
-    # --------------------------------------------------------
-    if volume_ratio < VOLUME_HARD_MIN:
+        hi = max(x[2] for x in recent)
+        lo = min(x[3] for x in recent)
+        retr = (cs[-1][2]-lo)/(hi-lo) if hi > lo else 0
+        confirm = cs[-1][4] < cs[-1][1] and cs[-1][4] < cs[-2][3]
+
+    if not 0.30 <= retr <= 0.70 or not confirm:
         return None
-    # --------------------------------------------------------
-    # Pullback
-    # --------------------------------------------------------
-    pullback = detect_pullback(
-        candles,
-        atr,
-        ema50,
-        bos,
-        direction
-    )
-    if not pullback["valid"]:
-        return None
-    # --------------------------------------------------------
-    # Confirmation
-    # --------------------------------------------------------
-    confirmation = confirmation_candle(
-        candles,
-        direction
-    )
-    if not confirmation:
-        return None
-    # --------------------------------------------------------
-    # Score
-    # --------------------------------------------------------
-    score, score_details = calculate_score(
-        direction=direction,
-        regime=regime,
-        structure=structure,
-        bos=bos,
-        rsi=current_rsi,
-        adx=current_adx,
-        volume_ratio=volume_ratio,
-        pullback_valid=pullback["valid"],
-        confirmation=confirmation,
-        ema_slope=slope
-    )
+
+    # Score = 100 possible.
+    score = 0
+    reasons = []
+
+    if bull_regime or bear_regime:
+        score += 20
+        reasons.append("EMA regime +20")
+
+    if side == "LONG" and hhhl:
+        score += 15
+        reasons.append("HH-HL +15")
+    if side == "SHORT" and lhll:
+        score += 15
+        reasons.append("LH-LL +15")
+
+    if (side == "LONG" and bull_bos) or (side == "SHORT" and bear_bos):
+        score += 20
+        reasons.append("BOS +20")
+
+    if side == "LONG":
+        score += 10 if 60 <= rs[-1] < 70 else 5
+    else:
+        score += 10 if 30 < rs[-1] <= 40 else 5
+    reasons.append("RSI")
+
+    if ax[-1] >= ADX_STRONG:
+        score += 15
+        reasons.append("ADX strong +15")
+    else:
+        score += 8
+        reasons.append("ADX +8")
+
+    if vr >= 1.30:
+        score += 10
+        reasons.append("Volume strong +10")
+    elif vr >= 1.00:
+        score += 6
+        reasons.append("Volume +6")
+    else:
+        score += 3
+        reasons.append("Volume +3")
+
+    score += 10
+    reasons.append("Pullback +10")
+
     if score < MIN_SCORE:
         return None
-    # --------------------------------------------------------
-    # Entry
-    # --------------------------------------------------------
-    entry = close
-    # --------------------------------------------------------
-    # Structural SL
-    # --------------------------------------------------------
-    if direction == "LONG":
-        if not structure["latest_low"]:
+
+    if side == "LONG":
+        if not ls:
             return None
-        swing_low = (
-            structure["latest_low"]["price"]
-        )
-        stop = (
-            swing_low -
-            (SL_ATR_BUFFER * current_atr)
-        )
-        risk_distance = (
-            entry - stop
-        )
-        if risk_distance <= 0:
+        sl = ls[-1][1] - SL_ATR_BUFFER*at[-1]
+        risk = close - sl
+        if risk <= 0:
             return None
-        tp = (
-            entry +
-            risk_distance * RR
-        )
+        tp = close + RR*risk
     else:
-        if not structure["latest_high"]:
+        if not hs:
             return None
-        swing_high = (
-            structure["latest_high"]["price"]
-        )
-        stop = (
-            swing_high +
-            (SL_ATR_BUFFER * current_atr)
-        )
-        risk_distance = (
-            stop - entry
-        )
-        if risk_distance <= 0:
+        sl = hs[-1][1] + SL_ATR_BUFFER*at[-1]
+        risk = sl - close
+        if risk <= 0:
             return None
-        tp = (
-            entry -
-            risk_distance * RR
-        )
-    # --------------------------------------------------------
-    # SL distance validation
-    # --------------------------------------------------------
-    sl_atr = (
-        risk_distance /
-        current_atr
-    )
-    if sl_atr < MIN_SL_ATR:
+        tp = close - RR*risk
+
+    sl_atr = risk/at[-1]
+    if not MIN_SL_ATR <= sl_atr <= MAX_SL_ATR:
         return None
-    if sl_atr > MAX_SL_ATR:
-        return None
-    # --------------------------------------------------------
-    # Tick rounding
-    # --------------------------------------------------------
-    instrument = instruments.get(
-        inst_id,
-        {}
-    )
-    tick = instrument.get(
-        "tickSz",
-        0.00000001
-    )
-    entry = round_to_tick(
-        entry,
-        tick
-    )
-    stop = round_to_tick(
-        stop,
-        tick
-    )
-    tp = round_to_tick(
-        tp,
-        tick
-    )
-    # Recalculate exact risk after rounding
-    risk_distance = abs(
-        entry - stop
-    )
-    if risk_distance <= 0:
-        return None
-    # --------------------------------------------------------
-    # Position sizing
-    # --------------------------------------------------------
-    sizing = calculate_position_size(
-        entry,
-        stop
-    )
-    if sizing["position_size"] <= 0:
-        return None
-    # --------------------------------------------------------
-    # Signal ID
-    # --------------------------------------------------------
-    candle_time = candles[-1][0]
-    signal_id = (
-        f"{inst_id}|"
-        f"{direction}|"
-        f"{candle_time}"
-    )
+
+    tick = meta.get(inst, {}).get("tick", 0.00000001)
+    entry = tick_round(close, tick)
+    sl = tick_round(sl, tick)
+    tp = tick_round(tp, tick)
+
+    signal_id = f"{inst}|{side}|{cs[-1][0]}"
+
     return {
         "signal_id": signal_id,
-        "symbol": inst_id,
-        "direction": direction,
-        "timeframe": TIMEFRAME,
-        "signal_candle_time": candle_time,
-        "signal_candle_iso": ms_to_iso(
-            candle_time
-        ),
-        "created_at": now_iso(),
+        "symbol": inst,
+        "direction": side,
+        "timeframe": "1H",
+        "signal_candle_time": cs[-1][0],
+        "signal_candle_iso": iso(cs[-1][0]),
+        "created_at": now(),
         "entry": entry,
-        "sl": stop,
+        "sl": sl,
         "tp": tp,
         "rr": RR,
-        "atr": current_atr,
+        "atr": at[-1],
         "sl_atr": sl_atr,
-        "ema50": ema50[-1],
-        "ema200": ema200[-1],
-        "rsi": current_rsi,
-        "adx": current_adx,
-        "plus_di": plus_di[-1],
-        "minus_di": minus_di[-1],
-        "volume_ratio": volume_ratio,
-        "regime": regime,
-        "structure": (
-            "HH-HL"
-            if direction == "LONG"
-            else "LH-LL"
-        ),
-        "bos": (
-            "BULLISH"
-            if bos["bullish"]
-            else "BEARISH"
-            if bos["bearish"]
-            else "NONE"
-        ),
-        "pullback": pullback["retracement"],
+        "ema50": e50[-1],
+        "ema200": e200[-1],
+        "rsi": rs[-1],
+        "adx": ax[-1],
+        "volume_ratio": vr,
+        "regime": "BULL" if bull_regime else "BEAR",
+        "structure": "HH-HL" if side == "LONG" else "LH-LL",
+        "bos": "BULLISH" if side == "LONG" and bull_bos else
+               "BEARISH" if side == "SHORT" and bear_bos else "NONE",
+        "pullback": retr,
         "score": score,
-        "score_details": score_details,
-        "risk_usdt": sizing["risk_usdt"],
-        "position_size": sizing["position_size"],
-        "notional": sizing["notional"],
+        "score_reasons": reasons,
+        "risk_usdt": ACCOUNT_EQUITY*RISK_PER_TRADE,
         "status": "OPEN",
         "exit_price": None,
         "exit_time": None,
         "result_r": None,
         "result": None
     }
-# ============================================================
-# DUPLICATE / COOLDOWN
-# ============================================================
-def has_duplicate_signal(
-    history: Dict,
-    signal: Dict
-) -> bool:
-    signal_id = signal["signal_id"]
-    for trade in history["open"]:
-        if trade.get("signal_id") == signal_id:
-            return True
-    for trade in history["closed"]:
-        if trade.get("signal_id") == signal_id:
-            return True
-    # Symbol cooldown
-    cutoff = (
-        time.time() -
-        COOLDOWN_HOURS * 3600
-    )
-    for trade in history["closed"]:
-        if trade.get("symbol") != signal["symbol"]:
-            continue
-        created = trade.get(
-            "exit_time"
-        )
-        if not created:
+
+# ================= DEDUPE =================
+
+def blocked(h, sig):
+    sid = sig["signal_id"]
+    if any(x.get("signal_id") == sid for x in h["open"]+h["closed"]):
+        return True
+
+    cutoff = time.time() - COOLDOWN_HOURS*3600
+    for x in h["closed"]:
+        if x.get("symbol") != sig["symbol"]:
             continue
         try:
-            dt = datetime.fromisoformat(
-                created
-            )
-            if dt.timestamp() > cutoff:
+            if datetime.fromisoformat(x["exit_time"]).timestamp() > cutoff:
                 return True
-        except Exception:
-            continue
+        except:
+            pass
     return False
-# ============================================================
-# OPEN POSITION COUNT
-# ============================================================
-def open_position_count(
-    history: Dict
-) -> int:
-    return len(
-        history["open"]
-    )
-# ============================================================
-# SIGNAL TELEGRAM
-# ============================================================
-def format_signal(
-    signal: Dict
-) -> str:
-    side = (
-        "🟢 LONG"
-        if signal["direction"] == "LONG"
-        else "🔴 SHORT"
-    )
-    details = signal["score_details"]
-    score_lines = []
-    for name, value in details.items():
-        score_lines.append(
-            f"• {name}: +{value}"
-        )
-    score_text = "\n".join(
-        score_lines
-    )
-    return f"""
-<b>🚨 ALPHAQUANT V3 SIGNAL</b>
-━━━━━━━━━━━━━━━━━━
-<b>{signal["symbol"]}</b>
-{side}
-🕐 Timeframe: 1H
-📊 Score: <b>{signal["score"]}/100</b>
-🌐 Regime: {signal["regime"]}
-🏗 Structure: {signal["structure"]}
-💥 BOS: {signal["bos"]}
-━━━━━━━━━━━━━━━━━━
-<b>ENTRY</b>
-Entry: <code>{signal["entry"]}</code>
-SL: <code>{signal["sl"]}</code>
-TP: <code>{signal["tp"]}</code>
-RR: <b>1:{signal["rr"]:.1f}</b>
-SL Distance: {signal["sl_atr"]:.2f} ATR
-━━━━━━━━━━━━━━━━━━
-<b>MOMENTUM</b>
-RSI: {signal["rsi"]:.2f}
-ADX: {signal["adx"]:.2f}
-Volume Ratio: {signal["volume_ratio"]:.2f}x
-EMA50: {signal["ema50"]:.8f}
-EMA200: {signal["ema200"]:.8f}
-━━━━━━━━━━━━━━━━━━
-<b>RISK</b>
-Risk: {signal["risk_usdt"]:.2f} USDT
-Position Size: {signal["position_size"]:.8f}
-Notional: {signal["notional"]:.2f} USDT
-━━━━━━━━━━━━━━━━━━
-<b>SCORE BREAKDOWN</b>
-{score_text}
-━━━━━━━━━━━━━━━━━━
-⚠️ Signal only
-❌ No automatic execution
-Signal candle:
-{signal["signal_candle_iso"]}
-""".strip()
-# ============================================================
-# MONITOR OPEN TRADE
-# ============================================================
-def monitor_trade(
-    trade: Dict
-) -> Optional[Dict]:
-    candles = get_klines(
-        trade["symbol"],
-        MONITOR_TF,
-        MONITOR_LIMIT
-    )
-    if not candles:
+
+# ================= MONITOR =================
+
+def monitor(trade):
+    cs = candles(trade["symbol"], MONITOR_TF, MONITOR_BARS)
+    if not cs:
         return None
-    entry = trade["entry"]
-    sl = trade["sl"]
-    tp = trade["tp"]
-    direction = trade["direction"]
-    # --------------------------------------------------------
-    # IMPORTANT:
-    # We need to monitor candles after signal candle.
-    # --------------------------------------------------------
-    signal_time = trade.get(
-        "signal_candle_time",
-        0
-    )
-    relevant = [
-        c for c in candles
-        if c[0] >= signal_time
-    ]
-    if not relevant:
-        return None
-    for candle in relevant:
-        high = candle[2]
-        low = candle[3]
-        hit_sl = False
-        hit_tp = False
-        if direction == "LONG":
-            if low <= sl:
-                hit_sl = True
-            if high >= tp:
-                hit_tp = True
+
+    start = trade.get("signal_candle_time", 0)
+
+    for c in [x for x in cs if x[0] >= start]:
+        hi, lo = c[2], c[3]
+        sl, tp = trade["sl"], trade["tp"]
+
+        if trade["direction"] == "LONG":
+            hit_sl, hit_tp = lo <= sl, hi >= tp
         else:
-            if high >= sl:
-                hit_sl = True
-            if low <= tp:
-                hit_tp = True
-        # ----------------------------------------------------
-        # Same candle TP + SL:
-        # Conservative assumption = SL first.
-        # ----------------------------------------------------
+            hit_sl, hit_tp = hi >= sl, lo <= tp
+
+        # Same 5m candle touches both: conservative SL first.
         if hit_sl and hit_tp:
-            result_r = -1.0
-            return close_trade(
-                trade,
-                sl,
-                candle[0],
-                result_r,
-                "LOSS"
-            )
-        if hit_tp:
-            result_r = RR
-            return close_trade(
-                trade,
-                tp,
-                candle[0],
-                result_r,
-                "WIN"
-            )
-        if hit_sl:
-            result_r = -1.0
-            return close_trade(
-                trade,
-                sl,
-                candle[0],
-                result_r,
-                "LOSS"
-            )
-    return None
-# ============================================================
-# CLOSE TRADE
-# ============================================================
-def close_trade(
-    trade: Dict,
-    exit_price: float,
-    exit_time_ms: int,
-    result_r: float,
-    result: str
-) -> Dict:
-    closed = dict(trade)
-    closed["status"] = "CLOSED"
-    closed["exit_price"] = exit_price
-    closed["exit_time"] = ms_to_iso(
-        exit_time_ms
-    )
-    closed["result_r"] = result_r
-    closed["result"] = result
-    return closed
-# ============================================================
-# CHECK ALL OPEN TRADES
-# ============================================================
-def check_open_trades(
-    history: Dict
-):
-    if not history["open"]:
-        return
-    remaining = []
-    closed_now = []
-    for trade in history["open"]:
-        try:
-            result = monitor_trade(
-                trade
-            )
-            if result is None:
-                remaining.append(
-                    trade
-                )
-                continue
-            closed_now.append(
-                result
-            )
-        except Exception as e:
-            logger.exception(
-                "Monitor error %s: %s",
-                trade["symbol"],
-                e
-            )
-            remaining.append(
-                trade
-            )
-    history["open"] = remaining
-    history["closed"].extend(
-        closed_now
-    )
-    if closed_now:
-        save_history(
-            history
-        )
-    for trade in closed_now:
-        emoji = (
-            "✅"
-            if trade["result"] == "WIN"
-            else "❌"
-        )
-        telegram_send(
-            f"""
-<b>{emoji} TRADE CLOSED</b>
-━━━━━━━━━━━━━━━━━━
-<b>{trade["symbol"]}</b>
-{trade["direction"]}
-Entry: <code>{trade["entry"]}</code>
-Exit: <code>{trade["exit_price"]}</code>
-Result:
-<b>{trade["result_r"]:+.2f}R</b>
-Score:
-{trade["score"]}/100
-Regime:
-{trade["regime"]}
-Closed:
-{trade["exit_time"]}
-""".strip()
-        )
-# ============================================================
-# RUNNING POSITIONS REPORT
-# ============================================================
-def calculate_floating_r(
-    trade: Dict,
-    current_price: float
-) -> float:
-    entry = trade["entry"]
-    sl = trade["sl"]
-    risk = abs(
-        entry - sl
-    )
-    if risk <= 0:
-        return 0.0
-    if trade["direction"] == "LONG":
-        return (
-            current_price -
-            entry
-        ) / risk
-    return (
-        entry -
-        current_price
-    ) / risk
-def send_running_report(
-    history: Dict
-):
-    if not history["open"]:
-        telegram_send(
-            """
-<b>📡 RUNNING POSITIONS</b>
-━━━━━━━━━━━━━━━━━━
-No open positions.
-System is waiting for
-the next qualified setup.
-""".strip()
-        )
-        return
-    lines = []
-    floating_values = []
-    profitable = 0
-    negative = 0
-    for trade in history["open"]:
-        price = get_current_price(
-            trade["symbol"]
-        )
-        if price is None:
+            exit_price, r, result = sl, -1.0, "LOSS"
+        elif hit_tp:
+            exit_price, r, result = tp, RR, "WIN"
+        elif hit_sl:
+            exit_price, r, result = sl, -1.0, "LOSS"
+        else:
             continue
-        floating_r = calculate_floating_r(
-            trade,
-            price
-        )
-        floating_values.append(
-            floating_r
-        )
-        if floating_r > 0:
-            profitable += 1
-        elif floating_r < 0:
-            negative += 1
-        emoji = (
-            "🟢"
-            if floating_r > 0
-            else "🔴"
-            if floating_r < 0
-            else "⚪"
-        )
-        lines.append(
-            f"{emoji} "
-            f"<b>{trade['symbol']}</b> · "
-            f"{trade['direction']}\n"
-            f"Entry <code>{trade['entry']}</code>\n"
-            f"Now   <code>{price}</code>\n"
-            f"SL    <code>{trade['sl']}</code>\n"
-            f"TP    <code>{trade['tp']}</code>\n"
-            f"Float <b>{floating_r:+.2f}R</b>\n"
-        )
-    if not floating_values:
+
+        t = dict(trade)
+        t.update({
+            "status": "CLOSED",
+            "exit_price": exit_price,
+            "exit_time": iso(c[0]),
+            "result_r": r,
+            "result": result
+        })
+        return t
+    return None
+
+def check_open(h):
+    if not h["open"]:
         return
-    total_float = sum(
-        floating_values
-    )
-    average_float = (
-        total_float /
-        len(floating_values)
-    )
-    best = max(
-        floating_values
-    )
-    worst = min(
-        floating_values
-    )
-    theoretical_tp = (
-        len(history["open"]) *
-        RR
-    )
-    sl_exposure = -len(
-        history["open"]
-    )
-    report = f"""
-<b>📡 RUNNING POSITIONS</b>
-━━━━━━━━━━━━━━━━━━
-<b>{len(history["open"])} OPEN POSITIONS</b>
-{chr(10).join(lines)}
-━━━━━━━━━━━━━━━━━━
-<b>OPEN SUMMARY</b>
-Open Positions : {len(history["open"])}
-Profitable     : {profitable}
-Negative       : {negative}
-Floating R     : <b>{total_float:+.2f}R</b>
-Average Float  : {average_float:+.2f}R
-Best           : +{best:.2f}R
-Worst          : {worst:+.2f}R
-━━━━━━━━━━━━━━━━━━
-Target RR      : 1:{RR:.1f}
-TP Potential   : +{theoretical_tp:.2f}R
-SL Exposure    : {sl_exposure:.2f}R
-⚠️ Floating R is unrealized.
-TP Potential is theoretical.
-"""
-    telegram_send(
-        report.strip()
-    )
-# ============================================================
-# PERFORMANCE
-# ============================================================
-def calculate_statistics(
-    history: Dict
-) -> Dict:
-    trades = history["closed"]
-    if not trades:
-        return {
-            "total": 0,
-            "wins": 0,
-            "losses": 0,
-            "wr": 0,
-            "total_r": 0,
-            "avg_r": 0,
-            "profit_factor": 0,
-            "max_drawdown": 0
-        }
-    wins = [
-        t["result_r"]
-        for t in trades
-        if t["result"] == "WIN"
-    ]
-    losses = [
-        t["result_r"]
-        for t in trades
-        if t["result"] == "LOSS"
-    ]
-    total_r = sum(
-        t["result_r"]
-        for t in trades
-    )
-    gross_profit = sum(
-        max(t["result_r"], 0)
-        for t in trades
-    )
-    gross_loss = abs(
-        sum(
-            min(t["result_r"], 0)
-            for t in trades
-        )
-    )
-    if gross_loss > 0:
-        profit_factor = (
-            gross_profit /
-            gross_loss
-        )
-    else:
-        profit_factor = float("inf")
-    # --------------------------------------------------------
-    # Max drawdown
-    # --------------------------------------------------------
-    equity = 0.0
-    peak = 0.0
-    max_drawdown = 0.0
-    for trade in trades:
-        equity += trade["result_r"]
-        peak = max(
-            peak,
-            equity
-        )
-        drawdown = (
-            peak -
-            equity
-        )
-        max_drawdown = max(
-            max_drawdown,
-            drawdown
-        )
-    return {
-        "total": len(trades),
-        "wins": len(wins),
-        "losses": len(losses),
-        "wr": (
-            len(wins) /
-            len(trades) *
-            100
-        ),
-        "total_r": total_r,
-        "avg_r": (
-            total_r /
-            len(trades)
-        ),
-        "profit_factor": profit_factor,
-        "max_drawdown": max_drawdown
-    }
-def send_statistics(
-    history: Dict
-):
-    stats = calculate_statistics(
-        history
-    )
-    if stats["total"] == 0:
-        return
-    pf = stats["profit_factor"]
-    if math.isinf(pf):
-        pf_text = "∞"
-    else:
-        pf_text = f"{pf:.2f}"
-    telegram_send(
-        f"""
-<b>📊 V3 PERFORMANCE</b>
-━━━━━━━━━━━━━━━━━━
-Trades        : {stats["total"]}
-Wins          : {stats["wins"]}
-Losses        : {stats["losses"]}
-Win Rate      : <b>{stats["wr"]:.2f}%</b>
-Total R       : <b>{stats["total_r"]:+.2f}R</b>
-Avg R/Trade   : {stats["avg_r"]:+.3f}R
-Profit Factor : {pf_text}
-Max Drawdown  : -{stats["max_drawdown"]:.2f}R
-RR Target     : 1:{RR:.1f}
-━━━━━━━━━━━━━━━━━━
-BEP WR @ 1:2:
-<b>33.33%</b>
-⚠️ Before fees,
-slippage and funding.
-""".strip()
-    )
-# ============================================================
-# SCAN ONE SYMBOL
-# ============================================================
-def scan_symbol(
-    inst_id: str,
-    instruments: Dict[str, Dict],
-    history: Dict
-) -> Optional[Dict]:
-    candles = get_klines(
-        inst_id,
-        TIMEFRAME,
-        KLINE_LIMIT
-    )
-    if not candles:
-        return None
-    signal = build_signal(
-        inst_id,
-        candles,
-        instruments
-    )
-    if signal is None:
-        return None
-    if has_duplicate_signal(
-        history,
-        signal
-    ):
-        logger.info(
-            "Duplicate/cooldown: %s",
-            inst_id
-        )
-        return None
-    return signal
-# ============================================================
-# MAIN SCANNER
-# ============================================================
-def scan_market(
-    history: Dict
-):
-    current_open = (
-        len(history["open"])
-    )
-    if current_open >= MAX_OPEN_POSITIONS:
-        logger.info(
-            "Maximum open positions reached: %s",
-            current_open
-        )
-        return
-    pairs = get_top_pairs()
-    if not pairs:
-        logger.warning(
-            "No pairs found."
-        )
-        return
-    instruments = get_instruments()
-    logger.info(
-        "Scanning %s pairs...",
-        len(pairs)
-    )
-    signals_created = 0
-    for inst_id in pairs:
-        if (
-            len(history["open"])
-            >= MAX_OPEN_POSITIONS
-        ):
-            break
+
+    remain, closed = [], []
+
+    for t in h["open"]:
         try:
-            signal = scan_symbol(
-                inst_id,
-                instruments,
-                history
-            )
-            if signal is None:
-                continue
-            history["open"].append(
-                signal
-            )
-            save_history(
-                history
-            )
-            telegram_send(
-                format_signal(
-                    signal
+            result = monitor(t)
+            if result:
+                closed.append(result)
+            else:
+                remain.append(t)
+        except Exception as e:
+            log.error("Monitor %s failed: %s", t["symbol"], e)
+            remain.append(t)
+
+    h["open"] = remain
+    if closed:
+        h["closed"].extend(closed)
+        save_history(h)
+
+    for t in closed:
+        emoji = "✅" if t["result"] == "WIN" else "❌"
+        tg(
+            f"<b>{emoji} TRADE CLOSED</b>\n"
+            f"━━━━━━━━━━━━━━━━━━\n"
+            f"<b>{t['symbol']}</b> {t['direction']}\n"
+            f"Entry: <code>{t['entry']}</code>\n"
+            f"Exit: <code>{t['exit_price']}</code>\n"
+            f"Result: <b>{t['result_r']:+.2f}R</b>\n"
+            f"Score: {t['score']}/100\n"
+            f"Closed: {t['exit_time']}"
+        )
+
+# ================= REPORT =================
+
+def float_r(t, p):
+    risk = abs(t["entry"]-t["sl"])
+    if risk <= 0:
+        return 0
+    return ((p-t["entry"])/risk
+            if t["direction"]=="LONG"
+            else (t["entry"]-p)/risk)
+
+def running_report(h):
+    if not h["open"]:
+        tg("<b>📡 RUNNING POSITIONS</b>\n━━━━━━━━━━━━━━━━━━\nNo open positions.")
+        return
+
+    blocks, rs = [], []
+
+    for t in h["open"]:
+        p = price(t["symbol"])
+        if p is None:
+            continue
+        r = float_r(t, p)
+        rs.append(r)
+        emoji = "🟢" if r > 0 else "🔴" if r < 0 else "⚪"
+        blocks.append(
+            f"{emoji} <b>{t['symbol']}</b> · {t['direction']}\n"
+            f"Entry <code>{t['entry']}</code> | Now <code>{p}</code>\n"
+            f"SL <code>{t['sl']}</code> | TP <code>{t['tp']}</code>\n"
+            f"Float <b>{r:+.2f}R</b>"
+        )
+
+    if not rs:
+        return
+
+    total = sum(rs)
+    avg = total/len(rs)
+
+    tg(
+        "<b>📡 RUNNING POSITIONS</b>\n"
+        "━━━━━━━━━━━━━━━━━━\n\n" +
+        "\n\n".join(blocks) +
+        "\n\n━━━━━━━━━━━━━━━━━━\n"
+        f"Open Positions : {len(h['open'])}\n"
+        f"Profitable     : {sum(x>0 for x in rs)}\n"
+        f"Negative       : {sum(x<0 for x in rs)}\n"
+        f"Floating R     : <b>{total:+.2f}R</b>\n"
+        f"Average Float  : {avg:+.2f}R\n"
+        f"Best           : {max(rs):+.2f}R\n"
+        f"Worst          : {min(rs):+.2f}R\n\n"
+        f"Target RR      : 1:{RR:.1f}\n"
+        f"TP Potential   : +{len(h['open'])*RR:.2f}R\n"
+        f"SL Exposure    : -{len(h['open']):.2f}R\n\n"
+        "⚠️ Floating R is unrealized."
+    )
+
+def stats(h):
+    ts = h["closed"]
+    if not ts:
+        return
+
+    wins = [x for x in ts if x.get("result") == "WIN"]
+    losses = [x for x in ts if x.get("result") == "LOSS"]
+    total_r = sum(float(x.get("result_r",0)) for x in ts)
+    gp = sum(max(float(x.get("result_r",0)),0) for x in ts)
+    gl = abs(sum(min(float(x.get("result_r",0)),0) for x in ts))
+    pf = gp/gl if gl else float("inf")
+
+    eq = peak = dd = 0
+    for x in ts:
+        eq += float(x.get("result_r",0))
+        peak = max(peak, eq)
+        dd = max(dd, peak-eq)
+
+    pf_text = "∞" if math.isinf(pf) else f"{pf:.2f}"
+
+    tg(
+        "<b>📊 V3.1 PERFORMANCE</b>\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"Trades        : {len(ts)}\n"
+        f"Wins          : {len(wins)}\n"
+        f"Losses        : {len(losses)}\n"
+        f"Win Rate      : <b>{len(wins)/len(ts)*100:.2f}%</b>\n"
+        f"Total R       : <b>{total_r:+.2f}R</b>\n"
+        f"Avg R/Trade   : {total_r/len(ts):+.3f}R\n"
+        f"Profit Factor : {pf_text}\n"
+        f"Max Drawdown  : -{dd:.2f}R\n"
+        f"RR Target     : 1:{RR:.1f}\n"
+        "BEP WR @ 1:2  : <b>33.33%</b>"
+    )
+
+# ================= SCAN =================
+
+def signal_message(s):
+    return (
+        "<b>🚨 ALPHAQUANT V3.1 SIGNAL</b>\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"<b>{s['symbol']}</b> · <b>{s['direction']}</b>\n"
+        f"1H | Score <b>{s['score']}/100</b>\n"
+        f"Regime: {s['regime']}\n"
+        f"Structure: {s['structure']}\n"
+        f"BOS: {s['bos']}\n\n"
+        "<b>TRADE PLAN</b>\n"
+        f"Entry: <code>{s['entry']}</code>\n"
+        f"SL: <code>{s['sl']}</code>\n"
+        f"TP: <code>{s['tp']}</code>\n"
+        f"RR: <b>1:{RR:.1f}</b>\n"
+        f"SL: {s['sl_atr']:.2f} ATR\n\n"
+        "<b>FILTERS</b>\n"
+        f"RSI: {s['rsi']:.2f}\n"
+        f"ADX: {s['adx']:.2f}\n"
+        f"Volume: {s['volume_ratio']:.2f}x\n"
+        f"EMA50: {s['ema50']:.8f}\n"
+        f"EMA200: {s['ema200']:.8f}\n\n"
+        f"Risk: {s['risk_usdt']:.2f} USDT\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        "⚠️ SIGNAL ONLY — NO AUTO EXECUTION\n"
+        f"Candle: {s['signal_candle_iso']}"
+    )
+
+def scan(h):
+    if len(h["open"]) >= MAX_OPEN:
+        log.info("Max open positions reached.")
+        return
+
+    pairs = top_pairs()
+    meta = instruments()
+
+    log.info("Scanning %s pairs...", len(pairs))
+    created = 0
+
+    for inst in pairs:
+        if len(h["open"]) >= MAX_OPEN:
+            break
+
+        try:
+            cs = candles(inst, TIMEFRAME, HISTORY_BARS)
+            if len(cs) < 230:
+                log.warning(
+                    "%s insufficient candles after pagination: %s",
+                    inst, len(cs)
                 )
+                continue
+
+            s = build_signal(inst, cs, meta)
+            if not s or blocked(h, s):
+                continue
+
+            h["open"].append(s)
+            save_history(h)
+
+            tg(signal_message(s))
+            log.info(
+                "NEW SIGNAL %s %s score=%s",
+                s["symbol"], s["direction"], s["score"]
             )
-            signals_created += 1
-            logger.info(
-                "NEW SIGNAL: %s %s score=%s",
-                signal["symbol"],
-                signal["direction"],
-                signal["score"]
-            )
-            # Small delay to avoid
-            # hammering API
-            time.sleep(0.5)
+            created += 1
+            time.sleep(0.3)
+
         except Exception as e:
-            logger.exception(
-                "Scan error %s: %s",
-                inst_id,
-                e
-            )
-    logger.info(
-        "Scan complete. New signals: %s",
-        signals_created
-    )
-# ============================================================
-# SYSTEM STATUS
-# ============================================================
-def send_system_status(
-    history: Dict
-):
-    stats = calculate_statistics(
-        history
-    )
-    telegram_send(
-        f"""
-<b>🧠 ALPHAQUANT V3 STATUS</b>
-━━━━━━━━━━━━━━━━━━
-Mode:
-<b>QUANT MOMENTUM–STRUCTURE</b>
-Timeframe:
-1H
-Open Positions:
-{len(history["open"])}
-Closed Trades:
-{stats["total"]}
-Minimum Score:
-{MIN_SCORE}/100
-RR:
-1:{RR:.1f}
-Risk/Trade:
-{RISK_PER_TRADE * 100:.2f}%
-Regime:
-EMA50 / EMA200
-Structure:
-HH-HL / LH-LL / BOS
-Momentum:
-RSI + ADX
-Activity:
-Volume Ratio
-Risk:
-ATR Structural SL
-━━━━━━━━━━━━━━━━━━
-System is running.
-""".strip()
-    )
-# ============================================================
-# MAIN LOOP
-# ============================================================
+            log.exception("Scan error %s: %s", inst, e)
+
+    log.info("Scan complete. New signals: %s", created)
+
+# ================= MAIN =================
+
 def main():
-    logger.info(
-        "=================================================="
+    global TELEGRAM
+
+    log.info("==========================================")
+    log.info("ALPHAQUANT V3.1 STARTING")
+    log.info("==========================================")
+
+    if not TOKEN or not CHAT_ID:
+        TELEGRAM = False
+        missing = []
+        if not TOKEN: missing.append("TELEGRAM_BOT_TOKEN")
+        if not CHAT_ID: missing.append("TELEGRAM_CHAT_ID")
+        log.warning(
+            "Telegram disabled. Missing: %s",
+            ", ".join(missing)
+        )
+    else:
+        TELEGRAM = True
+        log.info("Telegram credentials detected.")
+
+    h = load_history()
+
+    log.info(
+        "Open trades: %s | Closed trades: %s",
+        len(h["open"]), len(h["closed"])
     )
-    logger.info(
-        "ALPHAQUANT V3 STARTING"
-    )
-    logger.info(
-        "=================================================="
-    )
-    history = load_history()
-    logger.info(
-        "Open trades: %s",
-        len(history["open"])
-    )
-    logger.info(
-        "Closed trades: %s",
-        len(history["closed"])
-    )
-    telegram_send(
-        """
-<b>🟢 ALPHAQUANT V3 ONLINE</b>
-Quant Momentum–Structure
-Signal Engine
-1H
-EMA50 / EMA200
-Market Structure
-BOS
-RSI
-ADX
-ATR
-Volume
-RR 1:2
-Signal-only mode
-Waiting for A+ setups...
-""".strip()
-    )
+
+    if TELEGRAM:
+        tg(
+            "<b>🟢 ALPHAQUANT V3.1 ONLINE</b>\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            "1H Quant Momentum–Structure\n"
+            "EMA50/200 • Structure • BOS\n"
+            "RSI • ADX • ATR • Volume\n"
+            "RR 1:2 • Signal-only\n"
+            "Candle pagination: ENABLED"
+        )
+
     while True:
-        cycle_start = time.time()
+        started = time.time()
+
         try:
-            logger.info(
-                "Starting engine cycle..."
-            )
-            # ------------------------------------------------
-            # 1. Monitor existing positions
-            # ------------------------------------------------
-            check_open_trades(
-                history
-            )
-            # ------------------------------------------------
-            # 2. Running report
-            # ------------------------------------------------
-            send_running_report(
-                history
-            )
-            # ------------------------------------------------
-            # 3. Performance
-            # ------------------------------------------------
-            send_statistics(
-                history
-            )
-            # ------------------------------------------------
-            # 4. Scan new setups
-            # ------------------------------------------------
-            scan_market(
-                history
-            )
-            # ------------------------------------------------
-            # 5. Save
-            # ------------------------------------------------
-            save_history(
-                history
-            )
+            log.info("Starting engine cycle...")
+            check_open(h)
+            running_report(h)
+            stats(h)
+            scan(h)
+            save_history(h)
         except KeyboardInterrupt:
-            logger.info(
-                "Engine stopped manually."
-            )
+            log.info("Engine stopped.")
             break
         except Exception as e:
-            logger.exception(
-                "MAIN LOOP ERROR: %s",
-                e
-            )
-            telegram_send(
-                f"""
-<b>⚠️ V3 ENGINE ERROR</b>
-<code>{str(e)[:500]}</code>
-Engine will continue.
-""".strip()
-            )
-        elapsed = (
-            time.time() -
-            cycle_start
-        )
-        sleep_time = max(
-            10,
-            SCAN_INTERVAL_SECONDS -
-            elapsed
-        )
-        logger.info(
+            log.exception("MAIN LOOP ERROR: %s", e)
+
+        elapsed = time.time() - started
+        sleep_for = max(10, SCAN_INTERVAL - elapsed)
+        log.info(
             "Cycle finished. Sleeping %.1f seconds.",
-            sleep_time
+            sleep_for
         )
-        time.sleep(
-            sleep_time
-        )
-# ============================================================
-# ENTRY POINT
-# ============================================================
+        time.sleep(sleep_for)
+
 if __name__ == "__main__":
     main()
 
