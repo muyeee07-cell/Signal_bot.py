@@ -320,10 +320,12 @@
     "adx": 19.8,
     "rsi": 29.9,
     "reason": "Mean Reversion Oversold",
-    "status": "open",
+    "status": "SL",
     "opened_time": "2026-09-28 14:18:05",
-    "closed_time": null,
-    "r_result": null
+    "closed_time": "2026-09-29 02:43:33",
+    "r_result": -1.0,
+    "hit_time": "2026-09-29 02:30:00",
+    "hit_price": 0.0009663742857142858
   },
   {
     "symbol": "DOOD-USDT-SWAP",
