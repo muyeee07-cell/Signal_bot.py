@@ -656,5 +656,26 @@
     "r_result": -1.0,
     "hit_price": 0.10005778768840871,
     "hit_time": "2026-09-29 06:25:00"
+  },
+  {
+    "symbol": "ONE-USDT-SWAP",
+    "side": "SHORT",
+    "entry": 0.002299,
+    "sl": 0.002459041952054276,
+    "tp": 0.0019789160958914474,
+    "rr": 2.0,
+    "atr": 0.00010002622003392266,
+    "adx": 23.72,
+    "rsi": 35.44,
+    "volume_ratio": 1.66,
+    "score": 4,
+    "reason": "Price < EMA21 | Directional strength | RSI bearish zone | Volume confirmed",
+    "signal_candle_time": 1790661600000,
+    "status": "open",
+    "opened_time": "2026-09-29 07:18:17",
+    "closed_time": null,
+    "r_result": null,
+    "hit_price": null,
+    "hit_time": null
   }
 ]
