@@ -1,0 +1,53 @@
+name: backtest
+
+# Manual run only: Actions tab -> backtest -> Run workflow
+on:
+  workflow_dispatch:
+    inputs:
+      setup:
+        description: "Setup yang diuji"
+        type: choice
+        default: ALL
+        options:
+          - ALL
+          - PULLBACK
+          - BREAKOUT
+          - MEAN_REV
+          - SMC_SCALP
+          - ICT_SCALP
+      days:
+        description: "Jumlah hari ke belakang"
+        default: "90"
+      pairs:
+        description: "Jumlah pair teratas (setup 4H)"
+        default: "20"
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install requests
+
+      - name: Run backtest
+        env:
+          SETUP: ${{ inputs.setup }}
+          DAYS: ${{ inputs.days }}
+          PAIRS: ${{ inputs.pairs }}
+          # Same secret names as your scan workflow (optional: only for the Telegram summary)
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python backtest.py --setup "$SETUP" --days "$DAYS" --pairs "$PAIRS" --telegram
+
+      - name: Save results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-results
+          path: bt_out/
