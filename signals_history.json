@@ -37,18 +37,18 @@
   ],
   "closed": [],
   "last_scan_candle": 1790740800000,
-  "last_smc_candle": 1790764200000,
+  "last_smc_candle": 1790765100000,
   "last_online_day": "2026-09-30",
   "smc_rej": {
-    "scans": 1,
+    "scans": 2,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 1
+      "Konfirmasi": 2
     },
     "best": {
       "depth": 6,
       "stage": "Konfirmasi",
-      "detail": "LONG konfirmasi terlalu lama (6 bar lalu)"
+      "detail": "LONG konfirmasi terlalu lama (7 bar lalu)"
     }
   }
 }
