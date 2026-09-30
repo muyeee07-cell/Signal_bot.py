@@ -33,23 +33,45 @@
       "exit_time": null,
       "result_r": null,
       "result": null
+    },
+    {
+      "signal_id": "TRX-USDT-SWAP|LONG|1790755200000",
+      "symbol": "TRX-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.33843 | squeeze P10 | vol 2.30x",
+      "signal_candle_time": 1790755200000,
+      "signal_candle_iso": "2026-09-30T08:00:00+00:00",
+      "created_at": "2026-09-30T12:07:17.376833+00:00",
+      "entry": 0.34043,
+      "sl": 0.33746,
+      "tp": 0.34636,
+      "rr": 2.0,
+      "atr": 0.0019303084280131015,
+      "sl_atr": 1.536103853133275,
+      "ema50": 0.33687221231699893,
+      "ema200": 0.3369608776307991,
+      "rsi": 65.02304155740967,
+      "adx": 24.961311658476323,
+      "volume_ratio": 2.2977682349587805,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
     }
   ],
   "closed": [],
-  "last_scan_candle": 1790740800000,
-  "last_smc_candle": 1790767800000,
+  "last_scan_candle": 1790755200000,
+  "last_smc_candle": 1790768700000,
   "last_online_day": "2026-09-30",
-  "smc_rej": {
-    "scans": 5,
-    "signals": 0,
-    "stages": {
-      "Konfirmasi": 2,
-      "Retest": 3
-    },
-    "best": {
-      "depth": 6,
-      "stage": "Konfirmasi",
-      "detail": "LONG konfirmasi terlalu lama (7 bar lalu)"
-    }
-  }
+  "smc_rej": null
 }
