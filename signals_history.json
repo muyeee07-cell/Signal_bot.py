@@ -1,40 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
-      "symbol": "RLS-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "4H",
-      "setup": "MEAN_REV",
-      "note": "Reversal dari Bollinger bawah | RSI 35.7 | ADX 13.2 | TP di mean SMA20",
-      "signal_candle_time": 1790726400000,
-      "signal_candle_iso": "2026-09-30T00:00:00+00:00",
-      "created_at": "2026-09-30T04:37:42.894861+00:00",
-      "entry": 0.002322,
-      "sl": 0.002256,
-      "tp": 0.002479,
-      "rr": 2.36,
-      "atr": 0.00010116738781651844,
-      "sl_atr": 0.6558458983372311,
-      "ema50": 0.002477201692769119,
-      "ema200": 0.002262317317526919,
-      "rsi": 35.6809579382563,
-      "adx": 13.224936393151339,
-      "volume_ratio": 0.33929529537025493,
-      "regime": "RANGE",
-      "structure": "-",
-      "bos": "NONE",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null
-    },
-    {
       "signal_id": "TRX-USDT-SWAP|LONG|1790755200000",
       "symbol": "TRX-USDT-SWAP",
       "direction": "LONG",
@@ -69,9 +35,55 @@
       "result": null
     }
   ],
-  "closed": [],
+  "closed": [
+    {
+      "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
+      "symbol": "RLS-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "MEAN_REV",
+      "note": "Reversal dari Bollinger bawah | RSI 35.7 | ADX 13.2 | TP di mean SMA20",
+      "signal_candle_time": 1790726400000,
+      "signal_candle_iso": "2026-09-30T00:00:00+00:00",
+      "created_at": "2026-09-30T04:37:42.894861+00:00",
+      "entry": 0.002322,
+      "sl": 0.002256,
+      "tp": 0.002479,
+      "rr": 2.36,
+      "atr": 0.00010116738781651844,
+      "sl_atr": 0.6558458983372311,
+      "ema50": 0.002477201692769119,
+      "ema200": 0.002262317317526919,
+      "rsi": 35.6809579382563,
+      "adx": 13.224936393151339,
+      "volume_ratio": 0.33929529537025493,
+      "regime": "RANGE",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.002256,
+      "exit_time": "2026-09-30T12:00:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS"
+    }
+  ],
   "last_scan_candle": 1790755200000,
-  "last_smc_candle": 1790768700000,
+  "last_smc_candle": 1790769600000,
   "last_online_day": "2026-09-30",
-  "smc_rej": null
+  "smc_rej": {
+    "scans": 1,
+    "signals": 0,
+    "stages": {
+      "Retest": 1
+    },
+    "best": {
+      "depth": 5,
+      "stage": "Retest",
+      "detail": "LONG belum retest order block"
+    }
+  }
 }
