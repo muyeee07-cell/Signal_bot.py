@@ -43,7 +43,7 @@ TF_MS = 4 * 3_600_000          # 4H candle length (ms)
 MONITOR_TF = "15m"
 MONITOR_MS = 15 * 60_000       # 15m candle length (ms)
 
-TOP_PAIRS = 150
+TOP_PAIRS = 200
 MIN_VOLUME_USDT = 3_000_000
 
 HISTORY_BARS = 350
