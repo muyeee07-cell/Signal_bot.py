@@ -140,18 +140,28 @@
     }
   ],
   "last_scan_candle": 1790784000000,
-  "last_smc_candle": 1790801100000,
+  "last_smc_candle": 1790802000000,
   "last_online_day": "2026-09-30",
   "smc_rej": {
-    "scans": 3,
-    "signals": 0,
-    "stages": {
-      "Sweep": 3
+    "SMC_SCALP": {
+      "scans": 4,
+      "signals": 0,
+      "stages": {
+        "Sweep": 4
+      },
+      "best": {
+        "depth": 2,
+        "stage": "Sweep",
+        "detail": "tidak ada liquidity sweep terkini"
+      }
     },
-    "best": {
-      "depth": 2,
-      "stage": "Sweep",
-      "detail": "tidak ada liquidity sweep terkini"
+    "ICT_SCALP": {
+      "scans": 1,
+      "signals": 0,
+      "stages": {
+        "Sesi": 1
+      },
+      "best": null
     }
   }
 }
