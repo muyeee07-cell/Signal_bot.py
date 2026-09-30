@@ -140,7 +140,18 @@
     }
   ],
   "last_scan_candle": 1790784000000,
-  "last_smc_candle": 1790797500000,
+  "last_smc_candle": 1790799300000,
   "last_online_day": "2026-09-30",
-  "smc_rej": null
+  "smc_rej": {
+    "scans": 1,
+    "signals": 0,
+    "stages": {
+      "Sweep": 1
+    },
+    "best": {
+      "depth": 2,
+      "stage": "Sweep",
+      "detail": "tidak ada liquidity sweep terkini"
+    }
+  }
 }
