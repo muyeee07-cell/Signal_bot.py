@@ -33,6 +33,40 @@
       "exit_time": null,
       "result_r": null,
       "result": null
+    },
+    {
+      "signal_id": "DYDX-USDT-SWAP|LONG|1790769600000",
+      "symbol": "DYDX-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.146 | squeeze P18 | vol 1.83x",
+      "signal_candle_time": 1790769600000,
+      "signal_candle_iso": "2026-09-30T12:00:00+00:00",
+      "created_at": "2026-09-30T16:17:29.273472+00:00",
+      "entry": 0.14712,
+      "sl": 0.14348,
+      "tp": 0.1544,
+      "rr": 2.0,
+      "atr": 0.00504066074587563,
+      "sl_atr": 0.7221930926250905,
+      "ema50": 0.1360900197260618,
+      "ema200": 0.125139007095233,
+      "rsi": 65.09354929890269,
+      "adx": 20.759958826328358,
+      "volume_ratio": 1.8262213490527142,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
     }
   ],
   "closed": [
@@ -71,21 +105,8 @@
       "result": "LOSS"
     }
   ],
-  "last_scan_candle": 1790755200000,
-  "last_smc_candle": 1790782200000,
+  "last_scan_candle": 1790769600000,
+  "last_smc_candle": 1790783100000,
   "last_online_day": "2026-09-30",
-  "smc_rej": {
-    "scans": 10,
-    "signals": 0,
-    "stages": {
-      "Retest": 2,
-      "Displacement": 1,
-      "Sweep": 7
-    },
-    "best": {
-      "depth": 5,
-      "stage": "Retest",
-      "detail": "LONG belum retest order block"
-    }
-  }
+  "smc_rej": null
 }
