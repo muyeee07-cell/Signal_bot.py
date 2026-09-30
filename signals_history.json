@@ -1,5 +1,40 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "STX-USDT-SWAP|LONG|1790784000000",
+      "symbol": "STX-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.352 | squeeze P27 | vol 6.02x",
+      "signal_candle_time": 1790784000000,
+      "signal_candle_iso": "2026-09-30T16:00:00+00:00",
+      "created_at": "2026-09-30T20:16:17.215337+00:00",
+      "entry": 0.3611,
+      "sl": 0.3457,
+      "tp": 0.392,
+      "rr": 2.0,
+      "atr": 0.012659520040413586,
+      "sl_atr": 1.218826619883664,
+      "ema50": 0.322069674139556,
+      "ema200": 0.27652316049542297,
+      "rsi": 69.7133193826144,
+      "adx": 21.393288143276784,
+      "volume_ratio": 6.0172100461694775,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
+    }
+  ],
   "closed": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -104,19 +139,8 @@
       "result": "LOSS"
     }
   ],
-  "last_scan_candle": 1790769600000,
-  "last_smc_candle": 1790796600000,
+  "last_scan_candle": 1790784000000,
+  "last_smc_candle": 1790797500000,
   "last_online_day": "2026-09-30",
-  "smc_rej": {
-    "scans": 12,
-    "signals": 0,
-    "stages": {
-      "Sweep": 12
-    },
-    "best": {
-      "depth": 2,
-      "stage": "Sweep",
-      "detail": "tidak ada liquidity sweep terkini"
-    }
-  }
+  "smc_rej": null
 }
