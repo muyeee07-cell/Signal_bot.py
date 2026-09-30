@@ -72,15 +72,15 @@
     }
   ],
   "last_scan_candle": 1790755200000,
-  "last_smc_candle": 1790781300000,
+  "last_smc_candle": 1790782200000,
   "last_online_day": "2026-09-30",
   "smc_rej": {
-    "scans": 9,
+    "scans": 10,
     "signals": 0,
     "stages": {
       "Retest": 2,
       "Displacement": 1,
-      "Sweep": 6
+      "Sweep": 7
     },
     "best": {
       "depth": 5,
