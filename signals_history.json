@@ -37,13 +37,14 @@
   ],
   "closed": [],
   "last_scan_candle": 1790740800000,
-  "last_smc_candle": 1790765100000,
+  "last_smc_candle": 1790766000000,
   "last_online_day": "2026-09-30",
   "smc_rej": {
-    "scans": 2,
+    "scans": 3,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 2
+      "Konfirmasi": 2,
+      "Retest": 1
     },
     "best": {
       "depth": 6,
