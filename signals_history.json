@@ -68,6 +68,40 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "2Z-USDT-SWAP|LONG|1790841600000",
+      "symbol": "2Z-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "MEAN_REV",
+      "note": "Reversal dari Bollinger bawah | RSI 36.6 | ADX 24.8 | TP di mean SMA20",
+      "signal_candle_time": 1790841600000,
+      "signal_candle_iso": "2026-10-01T08:00:00+00:00",
+      "created_at": "2026-10-01T12:17:37.623234+00:00",
+      "entry": 0.05893,
+      "sl": 0.05671,
+      "tp": 0.064,
+      "rr": 2.29,
+      "atr": 0.0027618592062909645,
+      "sl_atr": 0.8032841633758376,
+      "ema50": 0.061308847279173906,
+      "ema200": 0.05525776526782828,
+      "rsi": 36.648964621899694,
+      "adx": 24.811903026972736,
+      "volume_ratio": 0.9714809741543874,
+      "regime": "RANGE",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
     }
   ],
   "closed": [
@@ -311,34 +345,8 @@
       "result": "LOSS"
     }
   ],
-  "last_scan_candle": 1790827200000,
+  "last_scan_candle": 1790841600000,
   "last_smc_candle": 1790846100000,
   "last_online_day": "2026-10-01",
-  "smc_rej": {
-    "SMC_SCALP": {
-      "scans": 4,
-      "signals": 1,
-      "stages": {
-        "Retest": 3
-      },
-      "best": {
-        "depth": 5,
-        "stage": "Retest",
-        "detail": "LONG belum retest order block"
-      }
-    },
-    "ICT_SCALP": {
-      "scans": 4,
-      "signals": 0,
-      "stages": {
-        "MSS": 2,
-        "Sesi": 2
-      },
-      "best": {
-        "depth": 3,
-        "stage": "MSS",
-        "detail": "LONG belum ada displacement yang close melewati 84367.8"
-      }
-    }
-  }
+  "smc_rej": null
 }
