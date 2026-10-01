@@ -7,7 +7,7 @@ on:
       setup:
         description: "Setup yang diuji"
         type: choice
-        default: ALL
+        default: ADAPTIVE
         options:
           - ALL
           - PULLBACK
@@ -24,7 +24,7 @@ on:
         default: "1"
       pairs:
         description: "Jumlah pair teratas (setup 4H)"
-        default: "20"
+        default: "15"
       fee:
         description: "Fee per sisi (0.0005 = 0,05% taker, 0.0002 = 0,02% maker)"
         default: "0.0005"
