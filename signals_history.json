@@ -276,35 +276,8 @@
       "monitor_tf_ms": 900000
     }
   ],
-  "last_scan_candle": 1790812800000,
-  "last_smc_candle": 1790839800000,
+  "last_scan_candle": 1790827200000,
+  "last_smc_candle": 1790841600000,
   "last_online_day": "2026-10-01",
-  "smc_rej": {
-    "SMC_SCALP": {
-      "scans": 9,
-      "signals": 0,
-      "stages": {
-        "Retest": 8,
-        "Struktur": 1
-      },
-      "best": {
-        "depth": 5,
-        "stage": "Retest",
-        "detail": "LONG belum retest order block"
-      }
-    },
-    "ICT_SCALP": {
-      "scans": 9,
-      "signals": 0,
-      "stages": {
-        "Sesi": 4,
-        "Raid": 5
-      },
-      "best": {
-        "depth": 2,
-        "stage": "Raid",
-        "detail": "LONG tidak ada raid likuiditas (PDL/Asia/London) terkini"
-      }
-    }
-  }
+  "smc_rej": null
 }
