@@ -277,14 +277,14 @@
     }
   ],
   "last_scan_candle": 1790812800000,
-  "last_smc_candle": 1790833500000,
+  "last_smc_candle": 1790835300000,
   "last_online_day": "2026-10-01",
   "smc_rej": {
     "SMC_SCALP": {
-      "scans": 4,
+      "scans": 5,
       "signals": 0,
       "stages": {
-        "Retest": 4
+        "Retest": 5
       },
       "best": {
         "depth": 5,
@@ -293,12 +293,17 @@
       }
     },
     "ICT_SCALP": {
-      "scans": 4,
+      "scans": 5,
       "signals": 0,
       "stages": {
-        "Sesi": 4
+        "Sesi": 4,
+        "Raid": 1
       },
-      "best": null
+      "best": {
+        "depth": 2,
+        "stage": "Raid",
+        "detail": "LONG tidak ada raid likuiditas (PDL/Asia/London) terkini"
+      }
     }
   }
 }
