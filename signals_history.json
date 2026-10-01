@@ -345,34 +345,8 @@
       "monitor_tf_ms": 900000
     }
   ],
-  "last_scan_candle": 1790856000000,
-  "last_smc_candle": 1790883000000,
+  "last_scan_candle": 1790870400000,
+  "last_smc_candle": 1790883900000,
   "last_online_day": "2026-10-01",
-  "smc_rej": {
-    "SMC_SCALP": {
-      "scans": 7,
-      "signals": 0,
-      "stages": {
-        "Retest": 2,
-        "Struktur": 5
-      },
-      "best": {
-        "depth": 5,
-        "stage": "Retest",
-        "detail": "SHORT order block ditembus (close di atas OB)"
-      }
-    },
-    "ICT_SCALP": {
-      "scans": 7,
-      "signals": 0,
-      "stages": {
-        "MSS": 7
-      },
-      "best": {
-        "depth": 3,
-        "stage": "MSS",
-        "detail": "SHORT belum ada displacement yang close melewati 83777"
-      }
-    }
-  }
+  "smc_rej": null
 }
