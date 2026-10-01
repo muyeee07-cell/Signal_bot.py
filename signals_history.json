@@ -277,14 +277,14 @@
     }
   ],
   "last_scan_candle": 1790812800000,
-  "last_smc_candle": 1790835300000,
+  "last_smc_candle": 1790836200000,
   "last_online_day": "2026-10-01",
   "smc_rej": {
     "SMC_SCALP": {
-      "scans": 5,
+      "scans": 6,
       "signals": 0,
       "stages": {
-        "Retest": 5
+        "Retest": 6
       },
       "best": {
         "depth": 5,
@@ -293,11 +293,11 @@
       }
     },
     "ICT_SCALP": {
-      "scans": 5,
+      "scans": 6,
       "signals": 0,
       "stages": {
         "Sesi": 4,
-        "Raid": 1
+        "Raid": 2
       },
       "best": {
         "depth": 2,
