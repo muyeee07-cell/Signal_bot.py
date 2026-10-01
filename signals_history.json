@@ -345,7 +345,7 @@
       "result": "LOSS"
     }
   ],
-  "last_scan_candle": 1790841600000,
+  "last_scan_candle": 1790856000000,
   "last_smc_candle": 1790846100000,
   "last_online_day": "2026-10-01",
   "smc_rej": null
