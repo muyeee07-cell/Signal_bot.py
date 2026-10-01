@@ -140,27 +140,28 @@
     }
   ],
   "last_scan_candle": 1790798400000,
-  "last_smc_candle": 1790813700000,
+  "last_smc_candle": 1790815500000,
   "last_online_day": "2026-10-01",
   "smc_rej": {
     "ICT_SCALP": {
-      "scans": 1,
+      "scans": 2,
       "signals": 0,
       "stages": {
-        "Sesi": 1
+        "Sesi": 2
       },
       "best": null
     },
     "SMC_SCALP": {
-      "scans": 1,
+      "scans": 2,
       "signals": 0,
       "stages": {
-        "Displacement": 1
+        "Displacement": 1,
+        "Retest": 1
       },
       "best": {
-        "depth": 3,
-        "stage": "Displacement",
-        "detail": "LONG tidak ada displacement setelah sweep"
+        "depth": 5,
+        "stage": "Retest",
+        "detail": "LONG belum retest order block"
       }
     }
   }
