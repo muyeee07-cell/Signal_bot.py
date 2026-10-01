@@ -68,6 +68,108 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "PLUME-USDT-SWAP|LONG|1790812800000",
+      "symbol": "PLUME-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.019424 | squeeze P35 | vol 7.29x",
+      "signal_candle_time": 1790812800000,
+      "signal_candle_iso": "2026-10-01T00:00:00+00:00",
+      "created_at": "2026-10-01T04:10:49.339059+00:00",
+      "entry": 0.020713,
+      "sl": 0.01894,
+      "tp": 0.02426,
+      "rr": 2.0,
+      "atr": 0.000968613830317969,
+      "sl_atr": 1.8307677008667682,
+      "ema50": 0.01758993970062124,
+      "ema200": 0.015210915622925907,
+      "rsi": 69.05403229132914,
+      "adx": 34.26046714974548,
+      "volume_ratio": 7.294792785943962,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
+    },
+    {
+      "signal_id": "MOVE-USDT-SWAP|LONG|1790812800000",
+      "symbol": "MOVE-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.009702 | squeeze P24 | vol 5.37x",
+      "signal_candle_time": 1790812800000,
+      "signal_candle_iso": "2026-10-01T00:00:00+00:00",
+      "created_at": "2026-10-01T04:11:03.913049+00:00",
+      "entry": 0.010104,
+      "sl": 0.00953,
+      "tp": 0.011252,
+      "rr": 2.0,
+      "atr": 0.0003442945370416358,
+      "sl_atr": 1.667604933421831,
+      "ema50": 0.009215813334543544,
+      "ema200": 0.008640837907650417,
+      "rsi": 67.16764201810602,
+      "adx": 23.13733253759284,
+      "volume_ratio": 5.371851257343256,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
+    },
+    {
+      "signal_id": "ZETA-USDT-SWAP|LONG|1790812800000",
+      "symbol": "ZETA-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "4H",
+      "setup": "BREAKOUT",
+      "note": "Break 20-candle high @ 0.05505 | squeeze P1 | vol 2.28x",
+      "signal_candle_time": 1790812800000,
+      "signal_candle_iso": "2026-10-01T00:00:00+00:00",
+      "created_at": "2026-10-01T04:12:46.604414+00:00",
+      "entry": 0.0554,
+      "sl": 0.05408,
+      "tp": 0.05804,
+      "rr": 2.0,
+      "atr": 0.0019403619969258486,
+      "sl_atr": 0.6803787131238953,
+      "ema50": 0.05156957818930287,
+      "ema200": 0.042689530926682685,
+      "rsi": 59.48994690295224,
+      "adx": 11.263783863202201,
+      "volume_ratio": 2.2812634234712696,
+      "regime": "BULL",
+      "structure": "-",
+      "bos": "NONE",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null
     }
   ],
   "closed": [
@@ -174,30 +276,8 @@
       "result": "LOSS"
     }
   ],
-  "last_scan_candle": 1790798400000,
+  "last_scan_candle": 1790812800000,
   "last_smc_candle": 1790816400000,
   "last_online_day": "2026-10-01",
-  "smc_rej": {
-    "ICT_SCALP": {
-      "scans": 3,
-      "signals": 0,
-      "stages": {
-        "Sesi": 3
-      },
-      "best": null
-    },
-    "SMC_SCALP": {
-      "scans": 3,
-      "signals": 1,
-      "stages": {
-        "Displacement": 1,
-        "Retest": 1
-      },
-      "best": {
-        "depth": 5,
-        "stage": "Retest",
-        "detail": "LONG belum retest order block"
-      }
-    }
-  }
+  "smc_rej": null
 }
