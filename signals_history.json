@@ -140,7 +140,28 @@
     }
   ],
   "last_scan_candle": 1790798400000,
-  "last_smc_candle": 1790811900000,
+  "last_smc_candle": 1790813700000,
   "last_online_day": "2026-10-01",
-  "smc_rej": null
+  "smc_rej": {
+    "ICT_SCALP": {
+      "scans": 1,
+      "signals": 0,
+      "stages": {
+        "Sesi": 1
+      },
+      "best": null
+    },
+    "SMC_SCALP": {
+      "scans": 1,
+      "signals": 0,
+      "stages": {
+        "Displacement": 1
+      },
+      "best": {
+        "depth": 3,
+        "stage": "Displacement",
+        "detail": "LONG tidak ada displacement setelah sweep"
+      }
+    }
+  }
 }
