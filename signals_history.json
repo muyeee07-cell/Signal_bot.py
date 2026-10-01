@@ -1,41 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
-      "symbol": "BTC-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BEAR | Sweep low @ 83465.30 | OB [83368.60-83486.40] | Disp bar 397 | RSI 43.4",
-      "signal_candle_time": 1790816400000,
-      "signal_candle_iso": "2026-10-01T01:00:00+00:00",
-      "created_at": "2026-10-01T01:28:11.865573+00:00",
-      "entry": 83549.3,
-      "sl": 83320.1,
-      "tp": 83950.40000000001,
-      "rr": 1.75,
-      "atr": 161.6049754818327,
-      "sl_atr": 1.4181586424628085,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 43.36729936902666,
-      "adx": 0.0,
-      "volume_ratio": 0.8021447386563159,
-      "regime": "BEAR",
-      "structure": "CHOCH",
-      "bos": "CHOCH",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "PLUME-USDT-SWAP|LONG|1790812800000",
       "symbol": "PLUME-USDT-SWAP",
       "direction": "LONG",
@@ -274,10 +239,66 @@
       "exit_time": "2026-10-01T04:15:00+00:00",
       "result_r": -1.0,
       "result": "LOSS"
+    },
+    {
+      "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
+      "symbol": "BTC-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 83465.30 | OB [83368.60-83486.40] | Disp bar 397 | RSI 43.4",
+      "signal_candle_time": 1790816400000,
+      "signal_candle_iso": "2026-10-01T01:00:00+00:00",
+      "created_at": "2026-10-01T01:28:11.865573+00:00",
+      "entry": 83549.3,
+      "sl": 83320.1,
+      "tp": 83950.40000000001,
+      "rr": 1.75,
+      "atr": 161.6049754818327,
+      "sl_atr": 1.4181586424628085,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 43.36729936902666,
+      "adx": 0.0,
+      "volume_ratio": 0.8021447386563159,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 83950.40000000001,
+      "exit_time": "2026-10-01T04:45:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790812800000,
-  "last_smc_candle": 1790816400000,
+  "last_smc_candle": 1790829900000,
   "last_online_day": "2026-10-01",
-  "smc_rej": null
+  "smc_rej": {
+    "SMC_SCALP": {
+      "scans": 1,
+      "signals": 0,
+      "stages": {
+        "Retest": 1
+      },
+      "best": {
+        "depth": 5,
+        "stage": "Retest",
+        "detail": "LONG belum retest order block"
+      }
+    },
+    "ICT_SCALP": {
+      "scans": 1,
+      "signals": 0,
+      "stages": {
+        "Sesi": 1
+      },
+      "best": null
+    }
+  }
 }
