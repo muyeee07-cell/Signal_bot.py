@@ -348,6 +348,41 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "PENGU-USDT-SWAP|SHORT|1790937900000|SMC",
+      "symbol": "PENGU-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.009975 | OB [0.009929-0.009985] | Disp bar 196 | RSI 52.8",
+      "signal_candle_time": 1790937900000,
+      "signal_candle_iso": "2026-10-02T10:45:00+00:00",
+      "created_at": "2026-10-02T11:09:04.679488+00:00",
+      "entry": 0.009908,
+      "sl": 0.010018,
+      "tp": 0.009716,
+      "rr": 1.75,
+      "atr": 7.57573956245407e-05,
+      "sl_atr": 1.4484027306215532,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 52.81682883778657,
+      "adx": 0.0,
+      "volume_ratio": 0.6102100518013056,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -1571,18 +1606,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790937000000,
+  "last_smc_candle": 1790937900000,
   "last_online_day": "2026-10-02",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 192,
-    "signals": 6,
+    "scans": 5,
+    "pairs": 202,
+    "signals": 7,
     "stages": {
-      "Retest": 58,
-      "Struktur": 35,
+      "Retest": 62,
+      "Struktur": 36,
       "Displacement": 40,
-      "Sweep": 26,
-      "Konfirmasi": 27
+      "Sweep": 27,
+      "Konfirmasi": 30
     },
     "near": [
       {
