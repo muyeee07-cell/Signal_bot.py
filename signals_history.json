@@ -1746,46 +1746,8 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790945100000,
+  "last_smc_candle": 1790946900000,
   "last_online_day": "2026-10-02",
-  "smc_rej": {
-    "scans": 7,
-    "pairs": 283,
-    "signals": 11,
-    "stages": {
-      "Retest": 83,
-      "Struktur": 51,
-      "Displacement": 58,
-      "Sweep": 39,
-      "Konfirmasi": 40,
-      "SL/RR": 1
-    },
-    "near": [
-      {
-        "depth": 7,
-        "text": "SOPH-USDT-SWAP → SL/RR: LONG SL 2.74 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 6,
-        "text": "MON-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PLUME-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
-      }
-    ]
-  },
-  "last_report_ts": 1790933462.681979
+  "smc_rej": null,
+  "last_report_ts": 1790947913.9514284
 }
