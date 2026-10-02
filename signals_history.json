@@ -105,41 +105,6 @@
       "monitor_tf_ms": 900000
     },
     {
-      "signal_id": "POL-USDT-SWAP|SHORT|1790888400000|SMC",
-      "symbol": "POL-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BEAR | Sweep high @ 0.10808 | OB [0.10732-0.10788] | Disp bar 192 | RSI 43.2",
-      "signal_candle_time": 1790888400000,
-      "signal_candle_iso": "2026-10-01T21:00:00+00:00",
-      "created_at": "2026-10-01T21:29:19.970604+00:00",
-      "entry": 0.10733,
-      "sl": 0.10851,
-      "tp": 0.10526,
-      "rr": 1.75,
-      "atr": 0.0007134864790561163,
-      "sl_atr": 1.6595212081429076,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 43.201894291610856,
-      "adx": 0.0,
-      "volume_ratio": 0.49551149302547687,
-      "regime": "BEAR",
-      "structure": "CHOCH",
-      "bos": "CHOCH",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "OPN-USDT-SWAP|SHORT|1790901000000|SMC",
       "symbol": "OPN-USDT-SWAP",
       "direction": "SHORT",
@@ -195,6 +160,41 @@
       "rsi": 49.06498135546188,
       "adx": 0.0,
       "volume_ratio": 0.6852700263778981,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "NEAR-USDT-SWAP|LONG|1790905500000|SMC",
+      "symbol": "NEAR-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 4.804 | OB [4.81-4.855] | Disp bar 197 | RSI 57.9",
+      "signal_candle_time": 1790905500000,
+      "signal_candle_iso": "2026-10-02T01:45:00+00:00",
+      "created_at": "2026-10-02T02:11:13.510233+00:00",
+      "entry": 4.876,
+      "sl": 4.78,
+      "tp": 5.045,
+      "rr": 1.75,
+      "atr": 0.04470600740770208,
+      "sl_atr": 2.156573754016345,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 57.89625851014773,
+      "adx": 0.0,
+      "volume_ratio": 2.1092590130469,
       "regime": "BEAR",
       "structure": "CHOCH",
       "bos": "CHOCH",
@@ -693,35 +693,81 @@
       "result_r": 1.75,
       "result": "WIN",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "POL-USDT-SWAP|SHORT|1790888400000|SMC",
+      "symbol": "POL-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.10808 | OB [0.10732-0.10788] | Disp bar 192 | RSI 43.2",
+      "signal_candle_time": 1790888400000,
+      "signal_candle_iso": "2026-10-01T21:00:00+00:00",
+      "created_at": "2026-10-01T21:29:19.970604+00:00",
+      "entry": 0.10733,
+      "sl": 0.10851,
+      "tp": 0.10526,
+      "rr": 1.75,
+      "atr": 0.0007134864790561163,
+      "sl_atr": 1.6595212081429076,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 43.201894291610856,
+      "adx": 0.0,
+      "volume_ratio": 0.49551149302547687,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.10851,
+      "exit_time": "2026-10-02T02:00:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790904600000,
+  "last_smc_candle": 1790905500000,
   "last_online_day": "2026-10-02",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 5,
-    "signals": 1,
+    "scans": 2,
+    "pairs": 78,
+    "signals": 2,
     "stages": {
-      "Displacement": 2,
-      "Retest": 2
+      "Displacement": 17,
+      "Retest": 23,
+      "Struktur": 21,
+      "Konfirmasi": 13,
+      "Sweep": 2
     },
     "near": [
       {
-        "depth": 5,
-        "text": "BONK-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "SHIB-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "ONE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 3,
-        "text": "SATS-USDT-SWAP → Displacement: SHORT tidak ada displacement setelah sweep"
+        "depth": 6,
+        "text": "MOVE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 3,
-        "text": "PEPE-USDT-SWAP → Displacement: SHORT tidak ada displacement setelah sweep"
+        "depth": 6,
+        "text": "XDP-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "RLS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "XRP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
