@@ -63,7 +63,7 @@ SMC_SWEEP_TOL_ATR = 0.15
 SMC_CONFIRM_BARS = 1
 SMC_COOLDOWN_HOURS = 4
 SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))   # 0 disables the cost gate
-SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "5"))
+SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "10"))
 
 # --- universe ---
 TOP_PAIRS = int(os.getenv("TOP_PAIRS", "150"))
