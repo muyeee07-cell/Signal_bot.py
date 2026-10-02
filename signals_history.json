@@ -315,41 +315,6 @@
       "monitor_tf_ms": 900000
     },
     {
-      "signal_id": "MOVE-USDT-SWAP|LONG|1790957700000|SMC",
-      "symbol": "MOVE-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BEAR | Sweep low @ 0.01018 | OB [0.010048-0.010209] | Disp bar 194 | RSI 47.7",
-      "signal_candle_time": 1790957700000,
-      "signal_candle_iso": "2026-10-02T16:15:00+00:00",
-      "created_at": "2026-10-02T16:43:57.619055+00:00",
-      "entry": 0.01019,
-      "sl": 0.010011,
-      "tp": 0.010504,
-      "rr": 1.75,
-      "atr": 0.00012447586744750248,
-      "sl_atr": 1.4407833736116669,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 47.726838683398675,
-      "adx": 0.0,
-      "volume_ratio": 0.24253326627093078,
-      "regime": "BEAR",
-      "structure": "CHOCH",
-      "bos": "CHOCH",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "TRIA-USDT-SWAP|SHORT|1790958600000|SMC",
       "symbol": "TRIA-USDT-SWAP",
       "direction": "SHORT",
@@ -2198,27 +2163,66 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "MOVE-USDT-SWAP|LONG|1790957700000|SMC",
+      "symbol": "MOVE-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.01018 | OB [0.010048-0.010209] | Disp bar 194 | RSI 47.7",
+      "signal_candle_time": 1790957700000,
+      "signal_candle_iso": "2026-10-02T16:15:00+00:00",
+      "created_at": "2026-10-02T16:43:57.619055+00:00",
+      "entry": 0.01019,
+      "sl": 0.010011,
+      "tp": 0.010504,
+      "rr": 1.75,
+      "atr": 0.00012447586744750248,
+      "sl_atr": 1.4407833736116669,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 47.726838683398675,
+      "adx": 0.0,
+      "volume_ratio": 0.24253326627093078,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.010011,
+      "exit_time": "2026-10-02T17:05:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790958600000,
+  "last_smc_candle": 1790960400000,
   "last_online_day": "2026-10-02",
   "smc_rej": {
-    "scans": 10,
-    "pairs": 447,
+    "scans": 11,
+    "pairs": 496,
     "signals": 13,
     "stages": {
-      "Struktur": 105,
-      "Retest": 100,
-      "Displacement": 119,
-      "Sweep": 45,
-      "Konfirmasi": 64,
-      "SL/RR": 1
+      "Struktur": 117,
+      "Retest": 114,
+      "Displacement": 132,
+      "Sweep": 50,
+      "Konfirmasi": 68,
+      "SL/RR": 2
     },
     "near": [
       {
         "depth": 7,
         "text": "HOME-USDT-SWAP → SL/RR: LONG SL 3.03 ATR (perlu 0.35-2.5)"
+      },
+      {
+        "depth": 7,
+        "text": "TRUTH-USDT-SWAP → SL/RR: SHORT SL 3.18 ATR (perlu 0.35-2.5)"
       },
       {
         "depth": 6,
@@ -2235,10 +2239,6 @@
       {
         "depth": 6,
         "text": "MOVE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "AKE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
