@@ -348,6 +348,41 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "FOGO-USDT-SWAP|LONG|1790961300000|SMC",
+      "symbol": "FOGO-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.005378 | OB [0.00535-0.005408] | Disp bar 192 | RSI 47.8",
+      "signal_candle_time": 1790961300000,
+      "signal_candle_iso": "2026-10-02T17:15:00+00:00",
+      "created_at": "2026-10-02T17:41:33.455900+00:00",
+      "entry": 0.005396,
+      "sl": 0.005319,
+      "tp": 0.005531,
+      "rr": 1.75,
+      "atr": 4.9567617904243114e-05,
+      "sl_atr": 1.5508166141809296,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 47.82685114379207,
+      "adx": 0.0,
+      "volume_ratio": 0.6725410578662055,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -2201,46 +2236,45 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790960400000,
+  "last_smc_candle": 1790961300000,
   "last_online_day": "2026-10-02",
   "smc_rej": {
-    "scans": 11,
-    "pairs": 496,
-    "signals": 13,
+    "scans": 1,
+    "pairs": 50,
+    "signals": 1,
     "stages": {
-      "Struktur": 117,
-      "Retest": 114,
-      "Displacement": 132,
-      "Sweep": 50,
-      "Konfirmasi": 68,
-      "SL/RR": 2
+      "Retest": 14,
+      "Displacement": 14,
+      "Struktur": 12,
+      "Sweep": 5,
+      "Konfirmasi": 4
     },
     "near": [
       {
-        "depth": 7,
-        "text": "HOME-USDT-SWAP → SL/RR: LONG SL 3.03 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 7,
-        "text": "TRUTH-USDT-SWAP → SL/RR: SHORT SL 3.18 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "MOVE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "text": "RLS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "AKE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "text": "TRUTH-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "SOPH-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
+        "text": "OP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 6,
-        "text": "MOVE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
+        "depth": 5,
+        "text": "SATS-USDT-SWAP → Retest: LONG order block ditembus (close di bawah OB)"
+      },
+      {
+        "depth": 5,
+        "text": "PEPE-USDT-SWAP → Retest: SHORT belum retest order block"
       }
     ]
   },
-  "last_report_ts": 1790947913.9514284
+  "last_report_ts": 1790962863.3502328
 }
