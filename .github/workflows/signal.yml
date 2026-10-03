@@ -7,7 +7,7 @@ name: scan
 #   Run yang dibatalkan/menunggu di daftar Actions itu NORMAL.
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:           # tombol "Run workflow" manual
 
 # Hanya satu run aktif; run berikutnya menunggu sampai yang berjalan selesai
