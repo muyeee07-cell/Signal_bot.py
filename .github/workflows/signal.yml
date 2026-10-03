@@ -32,6 +32,7 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          SMC_MIN_RISK_PCT_BTC: "0.0015"
         run: python signal_bot.py
 
       - name: Commit signal history
