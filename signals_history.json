@@ -174,41 +174,6 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
-    },
-    {
-      "signal_id": "MUBARAK-USDT-SWAP|SHORT|1790995500000|SMC",
-      "symbol": "MUBARAK-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.061905 | OB [0.061308-0.062102] | Disp bar 198 | RSI 42.5",
-      "signal_candle_time": 1790995500000,
-      "signal_candle_iso": "2026-10-03T02:45:00+00:00",
-      "created_at": "2026-10-03T03:04:14.235154+00:00",
-      "entry": 0.06098,
-      "sl": 0.062267,
-      "tp": 0.058728,
-      "rr": 1.75,
-      "atr": 0.0005486229255738125,
-      "sl_atr": 2.3451205148353638,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 42.47906000758702,
-      "adx": 0.0,
-      "volume_ratio": 1.5255691191026064,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -2556,50 +2521,48 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "MUBARAK-USDT-SWAP|SHORT|1790995500000|SMC",
+      "symbol": "MUBARAK-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.061905 | OB [0.061308-0.062102] | Disp bar 198 | RSI 42.5",
+      "signal_candle_time": 1790995500000,
+      "signal_candle_iso": "2026-10-03T02:45:00+00:00",
+      "created_at": "2026-10-03T03:04:14.235154+00:00",
+      "entry": 0.06098,
+      "sl": 0.062267,
+      "tp": 0.058728,
+      "rr": 1.75,
+      "atr": 0.0005486229255738125,
+      "sl_atr": 2.3451205148353638,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 42.47906000758702,
+      "adx": 0.0,
+      "volume_ratio": 1.5255691191026064,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.062267,
+      "exit_time": "2026-10-03T06:00:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791005400000,
+  "last_smc_candle": 1791007200000,
   "last_online_day": "2026-10-03",
-  "smc_rej": {
-    "scans": 2,
-    "pairs": 121,
-    "signals": 2,
-    "stages": {
-      "Sweep": 72,
-      "Retest": 10,
-      "Displacement": 14,
-      "Struktur": 19,
-      "Konfirmasi": 4
-    },
-    "near": [
-      {
-        "depth": 6,
-        "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PIPPIN-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ONDO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SOON-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 5,
-        "text": "BOME-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "MON-USDT-SWAP → Retest: LONG belum retest order block"
-      }
-    ]
-  },
-  "last_report_ts": 1790993368.0114214,
+  "smc_rej": null,
+  "last_report_ts": 1791008300.5512066,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
