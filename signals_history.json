@@ -2489,48 +2489,10 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1790991000000,
+  "last_smc_candle": 1790991900000,
   "last_online_day": "2026-10-03",
-  "smc_rej": {
-    "scans": 15,
-    "pairs": 1225,
-    "signals": 10,
-    "stages": {
-      "Sweep": 592,
-      "Displacement": 205,
-      "Retest": 143,
-      "Struktur": 174,
-      "Konfirmasi": 31,
-      "Data": 70
-    },
-    "near": [
-      {
-        "depth": 6,
-        "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "BEAT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "OL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "BEAT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "OL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
-      }
-    ]
-  },
-  "last_report_ts": 1790978026.1355746,
+  "smc_rej": null,
+  "last_report_ts": 1790993368.0114214,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
