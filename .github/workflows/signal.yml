@@ -4,10 +4,13 @@ name: scan
 # - Tiap run menjalankan bot TERUS-MENERUS selama +-25 menit (cek candle baru tiap 5 menit),
 #   jadi tidak bergantung pada jadwal GitHub yang sering telat atau terlewat.
 # - Jadwal cron hanya memastikan selalu ada run berikutnya yang mengantre.
-#   Run yang dibatalkan/menunggu di daftar Actions itu NORMAL.
+#   Run yang menunggu/dibatalkan di daftar Actions itu NORMAL.
+# - Run baru dijadwalkan tiap 20 menit (menit 7, 27, 47: menghindari jam bulat yang
+#   paling padat di GitHub). Satu run berjalan +-25 menit, jadi run berikutnya
+#   menunggu lalu langsung lanjut begitu yang lama selesai.
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "7,27,47 * * * *"
   workflow_dispatch:           # tombol "Run workflow" manual
 
 # Hanya satu run aktif; run berikutnya menunggu sampai yang berjalan selesai
@@ -62,5 +65,3 @@ jobs:
             git pull --rebase --autostash origin "${{ github.ref_name }}"
             git push origin "HEAD:${{ github.ref_name }}"
           fi
-
-
