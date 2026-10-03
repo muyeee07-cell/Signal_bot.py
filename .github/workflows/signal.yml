@@ -2,8 +2,11 @@ name: scan
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # tiap jam, sesuaikan sendiri
-  workflow_dispatch: {}     # supaya bisa di-trigger manual dari tab Actions
+    - cron: "*/5 * * * *"
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
 
 permissions:
   contents: write   # wajib, supaya job ini boleh commit & push balik ke repo
