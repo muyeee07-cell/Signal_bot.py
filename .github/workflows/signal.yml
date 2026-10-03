@@ -2,23 +2,22 @@ name: scan
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/5 * * * *"      # cek candle 15m baru tiap 5 menit (run tanpa candle baru hanya ~15 detik)
+  workflow_dispatch:           # tombol "Run workflow" manual
+
+# Dua run tidak boleh jalan bersamaan (menghindari riwayat rusak / konflik commit)
 concurrency:
   group: scan
   cancel-in-progress: false
-
 
 permissions:
-  contents: write   # wajib, supaya job ini boleh commit & push balik ke repo
-
-# Mencegah dua run jalan bersamaan dan rebutan push ke branch yang sama
-concurrency:
-  group: scan
-  cancel-in-progress: false
+  contents: write              # dibutuhkan untuk menyimpan signals_history.json
 
 jobs:
   scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -29,22 +28,32 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install requests pandas numpy
+        run: pip install requests
 
       - name: Run bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          SMC_MIN_RISK_PCT_BTC: "0.0015"
+          TOP_PAIRS: "50"              # jumlah pair teratas (volume 24 jam)
+          SMC_MAX_OPEN: "10"            # maksimal posisi terbuka bersamaan
+          SMC_MIN_RISK_PCT: "0.004"    # SL minimal 0,4% harga (batas biaya)
+          # SMC_MIN_RISK_PCT_BTC: "0.0015"   # aktifkan untuk membolehkan sinyal BTC dengan SL sempit
+          # ACCOUNT_EQUITY: "1000"           # ukuran akun untuk perhitungan Risk (USDT) di sinyal
+          # RISK_PER_TRADE: "0.004"          # risiko per trade (0.004 = 0,4%)
+          # REPORT_EVERY_HOURS: "4"          # jarak laporan berkala
         run: python signal_bot.py
 
       - name: Commit signal history
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add signals_history.json
-          git diff --staged --quiet || git commit -m "update signal history"
-          git pull --rebase origin main
-          git push
-
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f signals_history.json ]; then git add signals_history.json; fi
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan riwayat."
+          else
+            git commit -m "Update signal history"
+            git pull --rebase --autostash origin "${{ github.ref_name }}"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
 
