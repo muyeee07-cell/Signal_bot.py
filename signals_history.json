@@ -139,6 +139,41 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "WLD-USDT-SWAP|LONG|1791018000000|SMC",
+      "symbol": "WLD-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.5592 | OB [0.5576-0.5617] | Disp bar 197 | RSI 55.7",
+      "signal_candle_time": 1791018000000,
+      "signal_candle_iso": "2026-10-03T09:00:00+00:00",
+      "created_at": "2026-10-03T09:29:13.440076+00:00",
+      "entry": 0.5671,
+      "sl": 0.5558,
+      "tp": 0.5869,
+      "rr": 1.75,
+      "atr": 0.006055867915448121,
+      "sl_atr": 1.868726420826676,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 55.74622587404203,
+      "adx": 0.0,
+      "volume_ratio": 0.9387594750678944,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -2664,18 +2699,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791017100000,
+  "last_smc_candle": 1791018000000,
   "last_online_day": "2026-10-03",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 99,
-    "signals": 3,
+    "scans": 5,
+    "pairs": 125,
+    "signals": 4,
     "stages": {
-      "Struktur": 30,
-      "Retest": 17,
-      "Sweep": 14,
-      "Konfirmasi": 17,
-      "Displacement": 18
+      "Struktur": 38,
+      "Retest": 22,
+      "Sweep": 19,
+      "Konfirmasi": 20,
+      "Displacement": 22
     },
     "near": [
       {
