@@ -1,19 +1,13 @@
 name: scan
 
-# Cara kerja:
-# - Tiap run menjalankan bot TERUS-MENERUS selama +-25 menit (cek candle baru tiap 5 menit),
-#   jadi tidak bergantung pada jadwal GitHub yang sering telat atau terlewat.
-# - Jadwal cron hanya memastikan selalu ada run berikutnya yang mengantre.
-#   Run yang menunggu/dibatalkan di daftar Actions itu NORMAL.
-# - Run baru dijadwalkan tiap 20 menit (menit 7, 27, 47: menghindari jam bulat yang
-#   paling padat di GitHub). Satu run berjalan +-25 menit, jadi run berikutnya
-#   menunggu lalu langsung lanjut begitu yang lama selesai.
+# Satu run = satu siklus bot (+-40 detik), dijadwalkan tiap 20 menit.
+# Menit 7, 27, 47 dipilih supaya tidak jatuh di jam bulat yang paling padat di GitHub.
 on:
   schedule:
     - cron: "7,27,47 * * * *"
   workflow_dispatch:           # tombol "Run workflow" manual
 
-# Hanya satu run aktif; run berikutnya menunggu sampai yang berjalan selesai
+# Dua run tidak boleh jalan bersamaan (menghindari riwayat rusak / konflik commit)
 concurrency:
   group: scan
   cancel-in-progress: false
@@ -24,7 +18,7 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 32        # pengaman: run macet tidak memblokir antrean
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repo
@@ -38,19 +32,18 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run bot (+-25 menit)
+      - name: Run bot
         env:
           PYTHONUNBUFFERED: "1"
-          RUN_FOREVER: "1"             # bot berputar terus sampai dihentikan oleh timeout
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           TOP_PAIRS: "50"              # jumlah pair teratas (volume 24 jam)
-          SMC_MAX_OPEN: "10"            # maksimal posisi terbuka bersamaan
+          SMC_MAX_OPEN: "5"            # maksimal posisi terbuka bersamaan
           SMC_MIN_RISK_PCT: "0.004"    # SL minimal 0,4% harga (batas biaya)
           # SMC_MIN_RISK_PCT_BTC: "0.0015"   # aktifkan untuk membolehkan sinyal BTC dengan SL sempit
           # ACCOUNT_EQUITY: "1000"           # ukuran akun untuk perhitungan Risk (USDT) di sinyal
           # RISK_PER_TRADE: "0.004"          # risiko per trade (0.004 = 0,4%)
-        run: timeout 25m python signal_bot.py || [ $? -eq 124 ]
+        run: python signal_bot.py
 
       - name: Commit signal history
         if: always()
