@@ -13,12 +13,7 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      ...
-         # tombol "Run workflow" manual
 
-# Dua run tidak boleh jalan bersamaan (menghindari riwayat rusak / konflik 
-
-    steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
