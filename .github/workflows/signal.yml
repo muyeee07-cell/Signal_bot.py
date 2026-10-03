@@ -45,7 +45,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           TOP_PAIRS: "50"              # jumlah pair teratas (volume 24 jam)
-          SMC_MAX_OPEN: "5"            # maksimal posisi terbuka bersamaan
+          SMC_MAX_OPEN: "10"            # maksimal posisi terbuka bersamaan
           SMC_MIN_RISK_PCT: "0.004"    # SL minimal 0,4% harga (batas biaya)
           # SMC_MIN_RISK_PCT_BTC: "0.0015"   # aktifkan untuk membolehkan sinyal BTC dengan SL sempit
           # ACCOUNT_EQUITY: "1000"           # ukuran akun untuk perhitungan Risk (USDT) di sinyal
