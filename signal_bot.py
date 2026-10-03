@@ -75,7 +75,7 @@ SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "10"))
 
 # --- universe ---
 TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
-MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "4000000"))
+MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "5000000"))
 
 # --- indicators ---
 RSI_PERIOD = 14
