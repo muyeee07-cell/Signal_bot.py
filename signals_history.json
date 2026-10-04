@@ -1,41 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "BOME-USDT-SWAP|SHORT|1791042300000|SMC",
-      "symbol": "BOME-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.001003 | OB [0.0010086-0.0010163] | Disp bar 196 | RSI 49.1",
-      "signal_candle_time": 1791042300000,
-      "signal_candle_iso": "2026-10-03T15:45:00+00:00",
-      "created_at": "2026-10-03T16:00:13.323906+00:00",
-      "entry": 0.0010051,
-      "sl": 0.0010181,
-      "tp": 0.0009824,
-      "rr": 1.75,
-      "atr": 5.906641479929809e-06,
-      "sl_atr": 2.196170613716173,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 49.0586209620788,
-      "adx": 0.0,
-      "volume_ratio": 0.3044728057088104,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "ADA-USDT-SWAP|SHORT|1791042300000|SMC",
       "symbol": "ADA-USDT-SWAP",
       "direction": "SHORT",
@@ -3816,23 +3781,68 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "BOME-USDT-SWAP|SHORT|1791042300000|SMC",
+      "symbol": "BOME-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.001003 | OB [0.0010086-0.0010163] | Disp bar 196 | RSI 49.1",
+      "signal_candle_time": 1791042300000,
+      "signal_candle_iso": "2026-10-03T15:45:00+00:00",
+      "created_at": "2026-10-03T16:00:13.323906+00:00",
+      "entry": 0.0010051,
+      "sl": 0.0010181,
+      "tp": 0.0009824,
+      "rr": 1.75,
+      "atr": 5.906641479929809e-06,
+      "sl_atr": 2.196170613716173,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 49.0586209620788,
+      "adx": 0.0,
+      "volume_ratio": 0.3044728057088104,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.0009824,
+      "exit_time": "2026-10-04T11:10:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791109800000,
+  "last_smc_candle": 1791112500000,
   "last_online_day": "2026-10-04",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 43,
+    "scans": 2,
+    "pairs": 87,
     "signals": 1,
     "stages": {
-      "Struktur": 7,
-      "Konfirmasi": 12,
-      "Displacement": 7,
-      "Retest": 7,
-      "Sweep": 9
+      "Struktur": 16,
+      "Konfirmasi": 18,
+      "Displacement": 15,
+      "Retest": 17,
+      "Sweep": 18,
+      "Diblokir": 1,
+      "SL/RR": 1
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "SAND-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 9,
+        "text": "NIGHT-USDT-SWAP → SL/RR: LONG SL 2.80 ATR (perlu 0.35-2.5)"
+      },
       {
         "depth": 6,
         "text": "PEPE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
@@ -3848,14 +3858,6 @@
       {
         "depth": 6,
         "text": "NIGHT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MON-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "TURBO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
