@@ -1,0 +1,56 @@
+name: scan
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"     # tiap 20 menit
+  workflow_dispatch:           # tombol "Run workflow" manual
+
+# Dua run tidak boleh jalan bersamaan
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
+permissions:
+  contents: write              # untuk menyimpan signals_history.json
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          TOP_PAIRS: "50"              # jumlah pair teratas (volume 24 jam)
+          SMC_MAX_OPEN: "5"            # maksimal posisi terbuka bersamaan
+          SMC_MIN_RISK_PCT: "0.004"    # SL minimal 0,4% harga (batas biaya)
+          # SMC_MIN_RISK_PCT_BTC: "0.0015"   # aktifkan untuk membolehkan sinyal BTC dengan SL sempit
+          # ACCOUNT_EQUITY: "1000"           # ukuran akun untuk perhitungan Risk (USDT) di sinyal
+          # RISK_PER_TRADE: "0.004"          # risiko per trade (0.004 = 0,4%)
+        run: python signal_bot.py
+
+      - name: Commit signal history
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f signals_history.json ]; then git add signals_history.json; fi
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan riwayat."
+          else
+            git commit -m "Update signal history"
+            git pull --rebase --autostash origin "${{ github.ref_name }}"
+            git push origin "HEAD:${{ github.ref_name }}"
+          fi
