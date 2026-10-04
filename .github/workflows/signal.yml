@@ -2,7 +2,7 @@ name: scan
 
 on:
   schedule:
-    - cron: "*/15 * * * *"     # tiap 15 menit
+    - cron: "*/20 * * * *"     # tiap 20 menit
   workflow_dispatch:           # tombol "Run workflow" manual
 
 # Dua run tidak boleh jalan bersamaan
@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v7
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -34,7 +34,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           TOP_PAIRS: "50"              # jumlah pair teratas (volume 24 jam)
-          SMC_MAX_OPEN: "8"            # maksimal posisi terbuka bersamaan
+          SMC_MAX_OPEN: "5"            # maksimal posisi terbuka bersamaan
           SMC_MIN_RISK_PCT: "0.004"    # SL minimal 0,4% harga (batas biaya)
           # SMC_MIN_RISK_PCT_BTC: "0.0015"   # aktifkan untuk membolehkan sinyal BTC dengan SL sempit
           # ACCOUNT_EQUITY: "1000"           # ukuran akun untuk perhitungan Risk (USDT) di sinyal
@@ -54,3 +54,4 @@ jobs:
             git pull --rebase --autostash origin "${{ github.ref_name }}"
             git push origin "HEAD:${{ github.ref_name }}"
           fi
+
