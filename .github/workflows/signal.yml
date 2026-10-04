@@ -19,78 +19,44 @@ jobs:
     timeout-minutes: 10
 
     steps:
-
-      # ============================================================
       # 1. CHECKOUT
-      # ============================================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ============================================================
-      # 2. PYTHON
-      # ============================================================
+      # 2. PYTHON (cache pip dihapus: butuh requirements.txt)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
 
-      # ============================================================
       # 3. DEPENDENCIES
-      # ============================================================
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
 
-      # ============================================================
       # 4. VERIFY FILE
-      # ============================================================
       - name: Verify bot files
         run: |
-          echo "======================================"
-          echo " AlphaQuant V5.1"
-          echo "======================================"
-
-          echo "UTC:"
-          date -u
-
-          echo ""
-          echo "Python:"
-          python --version
-
-          echo ""
-          echo "Repository:"
-          pwd
-
-          echo ""
-          echo "Files:"
-          ls -la
-
-          echo ""
-          echo "Checking signal_bot.py..."
-
+          echo "UTC:"; date -u
+          echo "Python:"; python --version
+          echo "Files:"; ls -la
           if [ ! -f "signal_bot.py" ]; then
             echo "ERROR: signal_bot.py not found!"
             exit 1
           fi
-
           echo "signal_bot.py: OK"
 
-      # ============================================================
       # 5. RESTORE SIGNAL HISTORY
-      # ============================================================
       - name: Restore signals history
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: signals_history.json
           key: signals-history-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
             signals-history-${{ github.ref_name }}-
 
-      # ============================================================
       # 6. RUN BOT
-      # ============================================================
       - name: Run AlphaQuant Signal Bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -111,42 +77,13 @@ jobs:
         run: |
           set -e
 
-          echo "======================================"
-          echo " AlphaQuant V5.1 Signal Bot"
-          echo "======================================"
-
-          echo ""
-          echo "Workflow:"
-          echo "${{ github.workflow }}"
-
-          echo ""
-          echo "Repository:"
-          echo "${{ github.repository }}"
-
-          echo ""
-          echo "Branch:"
-          echo "${{ github.ref_name }}"
-
-          echo ""
-          echo "Run ID:"
-          echo "${{ github.run_id }}"
-
-          echo ""
-          echo "UTC:"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Run ID: ${{ github.run_id }}"
           date -u
 
-          # ========================================================
-          # REMOVE EMPTY OPTIONAL VARIABLES
-          # ========================================================
-          # IMPORTANT:
-          # Jika GitHub Variables belum dibuat, nilainya menjadi ""
-          # Python os.getenv("VAR", "default") TIDAK menggunakan
-          # default jika VAR ada tetapi bernilai string kosong.
-          #
-          # Dengan unset, Python akan menerima None dan default
-          # di dalam signal_bot.py akan bekerja.
-          # ========================================================
-
+          # Hapus variabel opsional yang kosong supaya default di Python berlaku
           for var in \
             SMC_MIN_RISK_PCT \
             SMC_MIN_RISK_PCT_BTC \
@@ -163,33 +100,19 @@ jobs:
             fi
           done
 
-          # ========================================================
-          # TELEGRAM VALIDATION
-          # ========================================================
-
-          echo ""
-          echo "Checking Telegram configuration..."
-
+          # Validasi Telegram
           if [ -z "$TELEGRAM_TOKEN" ]; then
             echo "ERROR: TELEGRAM_TOKEN is missing!"
             exit 1
           fi
-
           if [ -z "$CHAT_ID" ]; then
             echo "ERROR: CHAT_ID is missing!"
             exit 1
           fi
-
           echo "TELEGRAM_TOKEN: OK"
           echo "CHAT_ID: OK"
 
-          # ========================================================
-          # OPTIONAL VARIABLES STATUS
-          # ========================================================
-
-          echo ""
-          echo "Optional configuration:"
-
+          # Status variabel opsional
           for var in \
             SMC_MIN_RISK_PCT \
             SMC_MIN_RISK_PCT_BTC \
@@ -208,32 +131,14 @@ jobs:
             fi
           done
 
-          # ========================================================
-          # RUN BOT
-          # ========================================================
-
-          echo ""
-          echo "======================================"
-          echo " Starting signal scanner..."
-          echo "======================================"
-
+          echo "Starting signal scanner..."
           python -u signal_bot.py
+          echo "AlphaQuant scan completed"
 
-          echo ""
-          echo "======================================"
-          echo " AlphaQuant scan completed"
-          echo "======================================"
-
-      # ============================================================
       # 7. CHECK HISTORY
-      # ============================================================
       - name: Check signals history
         if: always()
         run: |
-          echo "======================================"
-          echo " Signals History"
-          echo "======================================"
-
           if [ -f "signals_history.json" ]; then
             echo "signals_history.json: EXISTS"
             ls -lh signals_history.json
@@ -241,12 +146,10 @@ jobs:
             echo "signals_history.json: NOT FOUND"
           fi
 
-      # ============================================================
       # 8. SAVE HISTORY
-      # ============================================================
       - name: Save signals history
         if: always()
         uses: actions/cache/save@v4
         with:
           path: signals_history.json
-          key: signals-history-${{ github.ref_name }}-${{ github.run_id }}
+          key: signals-history-${{ github.ref_name
