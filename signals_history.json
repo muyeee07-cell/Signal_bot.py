@@ -3927,49 +3927,48 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791153900000,
+  "last_smc_candle": 1791155700000,
   "last_online_day": "2026-10-04",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 320,
-    "signals": 3,
+    "scans": 1,
+    "pairs": 45,
+    "signals": 0,
     "stages": {
-      "Konfirmasi": 64,
-      "Displacement": 62,
-      "Sweep": 46,
-      "Struktur": 80,
-      "Retest": 59,
-      "SL/RR": 2,
-      "Volume": 4
+      "Retest": 8,
+      "Struktur": 14,
+      "Sweep": 8,
+      "Konfirmasi": 9,
+      "Displacement": 5,
+      "Volume": 1
     },
     "near": [
       {
-        "depth": 9,
-        "text": "MON-USDT-SWAP → SL/RR: LONG SL 3.47 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 9,
-        "text": "MEME-USDT-SWAP → SL/RR: LONG SL 3.16 ATR (perlu 0.35-2.5)"
-      },
-      {
         "depth": 8,
-        "text": "GMT-USDT-SWAP → Volume: SHORT CHOCH volume 0.55x (min 1.00x, RSI 47.9 di deadzone +0.25)"
+        "text": "STRK-USDT-SWAP → Volume: SHORT CHOCH volume 0.40x (min 0.75x)"
       },
       {
-        "depth": 8,
-        "text": "ATH-USDT-SWAP → Volume: LONG CHOCH volume 0.30x (min 0.75x)"
+        "depth": 6,
+        "text": "SAND-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "SAND-USDT-SWAP → Volume: LONG CHOCH volume 0.42x (min 1.00x, RSI 49.0 di deadzone +0.25)"
+        "depth": 6,
+        "text": "GALA-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "MON-USDT-SWAP → Volume: LONG CHOCH volume 0.17x (min 0.75x)"
+        "depth": 6,
+        "text": "HMSTR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "MEME-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "MON-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1791142000.1777873,
+  "last_report_ts": 1791157354.5420377,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
