@@ -2,10 +2,8 @@ name: AlphaQuant V5.1 Signal Bot
 
 on:
   schedule:
-    # Run every 15 minutes (UTC)
     - cron: "*/15 * * * *"
 
-  # Allow manual execution from GitHub Actions
   workflow_dispatch:
 
 permissions:
@@ -24,13 +22,13 @@ jobs:
     steps:
 
       # ============================================================
-      # 1. CHECKOUT REPOSITORY
+      # 1. CHECKOUT
       # ============================================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # ============================================================
-      # 2. SETUP PYTHON
+      # 2. PYTHON
       # ============================================================
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,7 +37,7 @@ jobs:
           cache: pip
 
       # ============================================================
-      # 3. INSTALL DEPENDENCIES
+      # 3. DEPENDENCIES
       # ============================================================
       - name: Install dependencies
         run: |
@@ -47,16 +45,15 @@ jobs:
           pip install requests
 
       # ============================================================
-      # 4. VERIFY ENVIRONMENT
+      # 4. VERIFY FILE
       # ============================================================
-      - name: Verify repository and Python
+      - name: Verify bot files
         run: |
           echo "======================================"
-          echo " AlphaQuant V5.1 Environment"
+          echo " AlphaQuant V5.1"
           echo "======================================"
 
-          echo ""
-          echo "Current UTC time:"
+          echo "UTC:"
           date -u
 
           echo ""
@@ -93,32 +90,7 @@ jobs:
             signals-history-${{ github.ref_name }}-
 
       # ============================================================
-      # 6. CHECK TELEGRAM CONFIGURATION
-      # ============================================================
-      - name: Check Telegram configuration
-        env:
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: |
-          echo "======================================"
-          echo " Telegram Configuration"
-          echo "======================================"
-
-          if [ -z "$TELEGRAM_TOKEN" ]; then
-            echo "ERROR: TELEGRAM_TOKEN is not configured."
-            exit 1
-          fi
-
-          if [ -z "$CHAT_ID" ]; then
-            echo "ERROR: CHAT_ID is not configured."
-            exit 1
-          fi
-
-          echo "TELEGRAM_TOKEN: OK"
-          echo "CHAT_ID: OK"
-
-      # ============================================================
-      # 7. RUN ALPHAQUANT
+      # 6. RUN BOT
       # ============================================================
       - name: Run AlphaQuant Signal Bot
         env:
@@ -140,7 +112,6 @@ jobs:
         run: |
           set -e
 
-          echo ""
           echo "======================================"
           echo " AlphaQuant V5.1 Signal Bot"
           echo "======================================"
@@ -165,21 +136,97 @@ jobs:
           echo "UTC:"
           date -u
 
+          # ========================================================
+          # REMOVE EMPTY OPTIONAL VARIABLES
+          # ========================================================
+          # IMPORTANT:
+          # Jika GitHub Variables belum dibuat, nilainya menjadi ""
+          # Python os.getenv("VAR", "default") TIDAK menggunakan
+          # default jika VAR ada tetapi bernilai string kosong.
+          #
+          # Dengan unset, Python akan menerima None dan default
+          # di dalam signal_bot.py akan bekerja.
+          # ========================================================
+
+          for var in \
+            SMC_MIN_RISK_PCT \
+            SMC_MIN_RISK_PCT_BTC \
+            SMC_MAX_OPEN \
+            TOP_PAIRS \
+            MIN_VOLUME_USDT \
+            RISK_PER_TRADE \
+            ACCOUNT_EQUITY \
+            FEE_PER_SIDE \
+            REPORT_EVERY_HOURS
+          do
+            if [ -z "${!var}" ]; then
+              unset "$var"
+            fi
+          done
+
+          # ========================================================
+          # TELEGRAM VALIDATION
+          # ========================================================
+
           echo ""
-          echo "Starting signal scanner..."
-          echo "--------------------------------------"
+          echo "Checking Telegram configuration..."
+
+          if [ -z "$TELEGRAM_TOKEN" ]; then
+            echo "ERROR: TELEGRAM_TOKEN is missing!"
+            exit 1
+          fi
+
+          if [ -z "$CHAT_ID" ]; then
+            echo "ERROR: CHAT_ID is missing!"
+            exit 1
+          fi
+
+          echo "TELEGRAM_TOKEN: OK"
+          echo "CHAT_ID: OK"
+
+          # ========================================================
+          # OPTIONAL VARIABLES STATUS
+          # ========================================================
+
+          echo ""
+          echo "Optional configuration:"
+
+          for var in \
+            SMC_MIN_RISK_PCT \
+            SMC_MIN_RISK_PCT_BTC \
+            SMC_MAX_OPEN \
+            TOP_PAIRS \
+            MIN_VOLUME_USDT \
+            RISK_PER_TRADE \
+            ACCOUNT_EQUITY \
+            FEE_PER_SIDE \
+            REPORT_EVERY_HOURS
+          do
+            if [ -n "${!var:-}" ]; then
+              echo "$var: SET"
+            else
+              echo "$var: DEFAULT"
+            fi
+          done
+
+          # ========================================================
+          # RUN BOT
+          # ========================================================
+
+          echo ""
+          echo "======================================"
+          echo " Starting signal scanner..."
+          echo "======================================"
 
           python -u signal_bot.py
 
-          EXIT_CODE=$?
-
-          echo "--------------------------------------"
-          echo "Bot finished with exit code: $EXIT_CODE"
-
-          exit $EXIT_CODE
+          echo ""
+          echo "======================================"
+          echo " AlphaQuant scan completed"
+          echo "======================================"
 
       # ============================================================
-      # 8. DISPLAY HISTORY STATUS
+      # 7. CHECK HISTORY
       # ============================================================
       - name: Check signals history
         if: always()
@@ -189,21 +236,14 @@ jobs:
           echo "======================================"
 
           if [ -f "signals_history.json" ]; then
-            echo "signals_history.json exists."
-
-            echo ""
-            echo "File size:"
+            echo "signals_history.json: EXISTS"
             ls -lh signals_history.json
-
-            echo ""
-            echo "Last modified:"
-            stat signals_history.json
           else
-            echo "No signals_history.json generated."
+            echo "signals_history.json: NOT FOUND"
           fi
 
       # ============================================================
-      # 9. SAVE SIGNAL HISTORY
+      # 8. SAVE HISTORY
       # ============================================================
       - name: Save signals history
         if: always()
