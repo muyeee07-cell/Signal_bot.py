@@ -1,0 +1,84 @@
+name: AlphaQuant V5.1 Signal Bot
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: alphaquant-signal-bot
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    name: SMC Scalp Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Restore signals history
+        uses: actions/cache@v4
+        with:
+          path: signals_history.json
+          key: signals-history-${{ github.run_id }}
+          restore-keys: |
+            signals-history-
+
+      - name: Run signal bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID:        ${{ secrets.CHAT_ID }}
+          SMC_MIN_RISK_PCT:     ${{ vars.SMC_MIN_RISK_PCT || '' }}
+          SMC_MIN_RISK_PCT_BTC: ${{ vars.SMC_MIN_RISK_PCT_BTC || '' }}
+          SMC_MAX_OPEN:         ${{ vars.SMC_MAX_OPEN || '' }}
+          TOP_PAIRS:            ${{ vars.TOP_PAIRS || '' }}
+          MIN_VOLUME_USDT:      ${{ vars.MIN_VOLUME_USDT || '' }}
+          RISK_PER_TRADE:       ${{ vars.RISK_PER_TRADE || '' }}
+          ACCOUNT_EQUITY:       ${{ vars.ACCOUNT_EQUITY || '' }}
+          FEE_PER_SIDE:         ${{ vars.FEE_PER_SIDE || '' }}
+          REPORT_EVERY_HOURS:   ${{ vars.REPORT_EVERY_HOURS || '' }}
+          RUN_FOREVER: "0"
+        run: |
+          for var in SMC_MIN_RISK_PCT SMC_MIN_RISK_PCT_BTC SMC_MAX_OPEN \
+                     TOP_PAIRS MIN_VOLUME_USDT RISK_PER_TRADE \
+                     ACCOUNT_EQUITY FEE_PER_SIDE REPORT_EVERY_HOURS; do
+            val=$(printenv "$var" || true)
+            if [ -z "$val" ]; then unset "$var"; fi
+          done
+          python signal_bot.py
+
+      - name: Save signals history
+        uses: actions/cache@v4
+        if: always()
+        with:
+          path: signals_history.json
+          key: signals-history-${{ github.run_id }}
+
+  keep-alive:
+    name: Keep workflow alive
+    runs-on: ubuntu-latest
+    needs: scan
+    if: github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Commit keepalive
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git commit --allow-empty -m "chore: keep workflow alive [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
