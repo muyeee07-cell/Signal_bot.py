@@ -1,5 +1,5 @@
 """
-ALPHAQUANT V5.1
+ALPHAQUANT V5.2
 SMC Scalp 15m - Telegram signal engine (signal-only) for the top 50 OKX USDT perpetuals
 
 Only one strategy remains: Smart Money Concept scalp on the 15m timeframe.
@@ -10,7 +10,14 @@ Only one strategy remains: Smart Money Concept scalp on the 15m timeframe.
   4. Order block = last opposing candle before the displacement
   5. Retest of the order block AFTER the displacement + confirmation candle
      (must be the latest candle; entry = its close)
-  6. SL beyond OB / swept level / sweep wick, TP at SMC_RR
+  6. SL beyond OB / swept level / sweep wick, TP at TARGET_RR
+
+V5.2 changes (tighter filters)
+- Volume gate on the signal candle: BOS >= MIN_VOLUME_RATIO_BOS, CHOCH >= MIN_VOLUME_RATIO_CHOCH
+- RSI deadzone (47-50): mode PENALTY = extra volume required, BLOCK = rejected, OFF = ignored
+- Crowding: max MAX_ACTIVE_SMC_PER_DIRECTION open positions per direction and
+  max MAX_NEW_SMC_PER_CANDLE new signals per candle (best-ranked pairs first)
+- TARGET_RR replaces SMC_RR
 
 V5.1 changes
 - Trades of the removed strategies (Breakout, Mean Rev, ...) are moved to
@@ -58,7 +65,26 @@ SMC_SYMBOL = "BTC-USDT-SWAP"          # reference symbol for the "new 15m candle
 SMC_HISTORY_BARS = 200
 SMC_MIN_BARS = 80
 SMC_SWING = 3
-SMC_RR = 1.75
+
+# ---- CORE ----
+TARGET_RR = float(os.getenv("TARGET_RR", "1.75"))
+
+# ---- VOLUME: volume of the signal candle / average volume of the previous candles ----
+MIN_VOLUME_RATIO_BOS = float(os.getenv("MIN_VOLUME_RATIO_BOS", "0.50"))
+MIN_VOLUME_RATIO_CHOCH = float(os.getenv("MIN_VOLUME_RATIO_CHOCH", "0.75"))
+
+# ---- POSITION CROWDING (0 = no limit) ----
+MAX_ACTIVE_SMC_PER_DIRECTION = int(os.getenv("MAX_ACTIVE_SMC_PER_DIRECTION", "3"))
+MAX_NEW_SMC_PER_CANDLE = int(os.getenv("MAX_NEW_SMC_PER_CANDLE", "2"))
+
+# ---- RSI deadzone: RSI of the signal candle between LOW and HIGH = undecided momentum ----
+RSI_DEADZONE_LOW = float(os.getenv("RSI_DEADZONE_LOW", "47"))
+RSI_DEADZONE_HIGH = float(os.getenv("RSI_DEADZONE_HIGH", "50"))
+# OFF     : ignore the deadzone
+# BLOCK   : reject signals whose RSI is inside the deadzone
+# PENALTY : allow them, but they need extra volume (RSI_DEADZONE_EXTRA_VOLUME added to the minimum)
+RSI_DEADZONE_MODE = os.getenv("RSI_DEADZONE_MODE", "PENALTY").strip().upper()
+RSI_DEADZONE_EXTRA_VOLUME = float(os.getenv("RSI_DEADZONE_EXTRA_VOLUME", "0.25"))
 SMC_MIN_SL_ATR = 0.35
 SMC_MAX_SL_ATR = 2.50
 SMC_DISP_BODY_MIN = 0.55
@@ -71,11 +97,11 @@ SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))   # 0 disables 
 # Separate cost gate for BTC only (BTC moves little relative to its price, so the
 # global 0.4% gate rejects almost every BTC signal). Negative = use SMC_MIN_RISK_PCT.
 SMC_MIN_RISK_PCT_BTC = float(os.getenv("SMC_MIN_RISK_PCT_BTC", "-1"))
-SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "10"))
+SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "5"))
 
 # --- universe ---
 TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
-MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "5000000"))
+MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
 RSI_PERIOD = 14
@@ -103,9 +129,9 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-log = logging.getLogger("V5.1")
+log = logging.getLogger("V5.2")
 S = requests.Session()
-S.headers.update({"User-Agent": "ALPHAQUANT-V5.1"})
+S.headers.update({"User-Agent": "ALPHAQUANT-V5.2"})
 TELEGRAM = bool(TOKEN and CHAT_ID)
 
 SETUP_NAME = {"SMC_SCALP": "SMC Scalp"}
@@ -378,7 +404,7 @@ def tick_round(x, tick):
 
 SMC_STAGES = [
     "Data", "Struktur", "Sweep", "Displacement", "OrderBlock",
-    "Retest", "Konfirmasi", "SL/RR", "Diblokir"
+    "Retest", "Konfirmasi", "RSI", "Volume", "SL/RR", "Diblokir"
 ]
 
 CUR_SETUP = "SMC_SCALP"
@@ -545,6 +571,29 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
 
     close = cs[-1][4]
 
+    # --- quality gates on the confirmation candle: RSI deadzone, then volume ---
+    vr = volume_ratio(cs, VOL_PERIOD) or 0.0
+    kind = event or "BOS"
+    need_vol = MIN_VOLUME_RATIO_CHOCH if kind == "CHOCH" else MIN_VOLUME_RATIO_BOS
+    in_dead = RSI_DEADZONE_LOW <= rs[-1] <= RSI_DEADZONE_HIGH
+    penalised = False
+
+    if in_dead and RSI_DEADZONE_MODE == "BLOCK":
+        return (
+            "RSI",
+            f"{side} RSI {rs[-1]:.1f} di deadzone {RSI_DEADZONE_LOW:g}-{RSI_DEADZONE_HIGH:g} (mode BLOCK)"
+        )
+    if in_dead and RSI_DEADZONE_MODE == "PENALTY":
+        need_vol += RSI_DEADZONE_EXTRA_VOLUME
+        penalised = True
+
+    if vr < need_vol:
+        extra = f", RSI {rs[-1]:.1f} di deadzone +{RSI_DEADZONE_EXTRA_VOLUME:g}" if penalised else ""
+        return (
+            "Volume",
+            f"{side} {kind} volume {vr:.2f}x (min {need_vol:.2f}x{extra})"
+        )
+
     # SL: beyond the OB extreme, the swept level and the sweep wick
     if side == "LONG":
         sweep_ext = cs[sweep_idx][3]
@@ -575,7 +624,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
             f"{side} SL {risk_pct * 100:.2f}% (min {min_risk * 100:.2f}%, fee memakan R)"
         )
 
-    tp_raw = close + SMC_RR * risk if side == "LONG" else close - SMC_RR * risk
+    tp_raw = close + TARGET_RR * risk if side == "LONG" else close - TARGET_RR * risk
 
     tick = meta.get(inst, {}).get("tick", 0.00000001)
     entry = tick_round(close, tick)
@@ -586,7 +635,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         f"SMC {event or 'BOS'} {bias} | "
         f"Sweep {'low' if side == 'LONG' else 'high'} @ {swept_level:.8g} | "
         f"OB [{ob_lo:.8g}-{ob_hi:.8g}] | "
-        f"Disp bar {disp_idx} | RSI {rs[-1]:.1f}"
+        f"Disp bar {disp_idx} | RSI {rs[-1]:.1f} | Vol {vr:.2f}x"
     )
 
     return {
@@ -602,14 +651,15 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         "entry": entry,
         "sl": sl,
         "tp": tp,
-        "rr": SMC_RR,
+        "rr": TARGET_RR,
         "atr": a,
         "sl_atr": sl_atr,
         "ema50": 0.0,
         "ema200": 0.0,
         "rsi": rs[-1],
         "adx": 0.0,
-        "volume_ratio": volume_ratio(cs, VOL_PERIOD) or 0.0,
+        "volume_ratio": vr,
+        "rsi_deadzone": bool(in_dead),
         "regime": bias or "-",
         "structure": event or "-",
         "bos": event or "NONE",
@@ -634,7 +684,7 @@ def build_smc_scalp(inst, cs, meta):
       4. Order block = last opposing candle before the displacement
       5. Price retests the OB AFTER the displacement and prints a
          confirmation candle (must be the latest candle)
-      6. Entry at close, SL beyond OB / swept level / sweep wick, TP at SMC_RR
+      6. Entry at close, SL beyond OB / swept level / sweep wick, TP at TARGET_RR
     Both directions are evaluated; the first valid one wins.
     """
     global CUR_SETUP
@@ -896,7 +946,7 @@ def stats(h):
         note = "\n\n<i>Kurang dari 30 trade: belum bisa disimpulkan.</i>"
 
     tg(
-        "<b>📊 V5.1 PERFORMANCE</b>\n"
+        "<b>📊 V5.2 PERFORMANCE</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"Trades        : {len(ts)}\n"
         f"Wins          : {len(wins)}\n"
@@ -926,7 +976,7 @@ def signal_message(s):
     )
 
     return (
-        "<b>🚨 ALPHAQUANT V5.1 SIGNAL</b>\n"
+        "<b>🚨 ALPHAQUANT V5.2 SIGNAL</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"<b>{s['symbol']}</b> · <b>{s['direction']}</b>\n" +
         head +
@@ -1012,9 +1062,20 @@ def scan_smc(h):
     CUR_SETUP = "SMC_SCALP"
     created, scanned = 0, 0
 
+    def n_dir(d):
+        return sum(1 for x in h["open"] if x.get("direction") == d)
+
     for inst in pairs:
         if n_open(h) >= SMC_MAX_OPEN:
             log.info("Open scalp cap (%s) reached - stopping the scan.", SMC_MAX_OPEN)
+            break
+        if MAX_NEW_SMC_PER_CANDLE > 0 and created >= MAX_NEW_SMC_PER_CANDLE:
+            log.info("New-signal limit per candle (%s) reached - stopping the scan.", MAX_NEW_SMC_PER_CANDLE)
+            break
+        if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
+                and n_dir("LONG") >= MAX_ACTIVE_SMC_PER_DIRECTION
+                and n_dir("SHORT") >= MAX_ACTIVE_SMC_PER_DIRECTION):
+            log.info("Both directions are at the limit (%s) - stopping the scan.", MAX_ACTIVE_SMC_PER_DIRECTION)
             break
 
         # Skip pairs that already have a position / are cooling down BEFORE
@@ -1042,6 +1103,13 @@ def scan_smc(h):
                 _rej(inst, "Diblokir", f"{s['direction']} duplikat/cooldown/posisi open")
                 continue
 
+            if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
+                    and n_dir(s["direction"]) >= MAX_ACTIVE_SMC_PER_DIRECTION):
+                _rej(inst, "Diblokir",
+                     f"{s['direction']} sudah {n_dir(s['direction'])} posisi aktif "
+                     f"(maks {MAX_ACTIVE_SMC_PER_DIRECTION})")
+                continue
+
             h["open"].append(s)
             save_history(h)
             created += 1
@@ -1067,7 +1135,7 @@ def main():
     global TELEGRAM
 
     log.info("==========================================")
-    log.info("ALPHAQUANT V5.1 STARTING")
+    log.info("ALPHAQUANT V5.2 STARTING")
     log.info("==========================================")
 
     if not TOKEN or not CHAT_ID:
@@ -1096,7 +1164,7 @@ def main():
     log.info(
         "Config | SMC@%s RR=1:%.2f | Pairs=%s | MaxOpen=%s | MinRisk=%.2f%% (BTC %s) | "
         "Monitor=%s | History=%s | Telegram=%s | RunForever=%s",
-        SMC_TF, SMC_RR, TOP_PAIRS, SMC_MAX_OPEN, SMC_MIN_RISK_PCT * 100,
+        SMC_TF, TARGET_RR, TOP_PAIRS, SMC_MAX_OPEN, SMC_MIN_RISK_PCT * 100,
         f"{SMC_MIN_RISK_PCT_BTC * 100:.2f}%" if SMC_MIN_RISK_PCT_BTC >= 0 else "= sama",
         SMC_MONITOR_TF, HISTORY_FILE, "ON" if TELEGRAM else "OFF", RUN_FOREVER
     )
@@ -1105,11 +1173,12 @@ def main():
     if TELEGRAM and h.get("last_online_day") != today:
         h["last_online_day"] = today
         tg(
-            "<b>🟢 ALPHAQUANT V5.1 ONLINE</b>\n"
+            "<b>🟢 ALPHAQUANT V5.2 ONLINE</b>\n"
             "━━━━━━━━━━━━━━━━━━\n"
             f"SMC Scalp 15m · top {TOP_PAIRS} pair\n"
             "Sweep · Order Block · Displacement · Retest\n"
-            f"Maks {SMC_MAX_OPEN} posisi · SL min {SMC_MIN_RISK_PCT * 100:.2f}% harga\n"
+            f"Maks {SMC_MAX_OPEN} posisi ({MAX_ACTIVE_SMC_PER_DIRECTION} per arah, "
+            f"{MAX_NEW_SMC_PER_CANDLE} baru per candle) · SL min {SMC_MIN_RISK_PCT * 100:.2f}% harga\n"
             "Signal-only"
         )
 
@@ -1157,4 +1226,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
