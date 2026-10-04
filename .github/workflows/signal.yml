@@ -2,7 +2,7 @@ name: scan
 
 on:
   schedule:
-    - cron: "*/20 * * * *"     # tiap 20 menit
+     - cron: "*/15 * * * *"     # tiap 20 menit
   workflow_dispatch:           # tombol "Run workflow" manual
 
 # Dua run tidak boleh jalan bersamaan
