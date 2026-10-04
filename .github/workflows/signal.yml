@@ -1,4 +1,4 @@
-name: AlphaQuant V5.1 Signal Bot
+name: Signal Bot
 
 on:
   schedule:
