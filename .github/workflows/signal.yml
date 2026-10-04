@@ -1,4 +1,4 @@
-name: Signal Bot
+name: AlphaQuant V5.1 Signal Bot
 
 on:
   schedule:
@@ -38,19 +38,28 @@ jobs:
 
       - name: Run signal bot
         env:
-          TELEGRAM_TOKEN:       ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID:              ${{ secrets.CHAT_ID }}
-          SMC_MIN_RISK_PCT:     ${{ vars.SMC_MIN_RISK_PCT }}
-          SMC_MIN_RISK_PCT_BTC: ${{ vars.SMC_MIN_RISK_PCT_BTC }}
-          SMC_MAX_OPEN:         ${{ vars.SMC_MAX_OPEN }}
-          TOP_PAIRS:            ${{ vars.TOP_PAIRS }}
-          MIN_VOLUME_USDT:      ${{ vars.MIN_VOLUME_USDT }}
-          RISK_PER_TRADE:       ${{ vars.RISK_PER_TRADE }}
-          ACCOUNT_EQUITY:       ${{ vars.ACCOUNT_EQUITY }}
-          FEE_PER_SIDE:         ${{ vars.FEE_PER_SIDE }}
-          REPORT_EVERY_HOURS:   ${{ vars.REPORT_EVERY_HOURS }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID:        ${{ secrets.CHAT_ID }}
+          SMC_MIN_RISK_PCT:     ${{ vars.SMC_MIN_RISK_PCT || '' }}
+          SMC_MIN_RISK_PCT_BTC: ${{ vars.SMC_MIN_RISK_PCT_BTC || '' }}
+          SMC_MAX_OPEN:         ${{ vars.SMC_MAX_OPEN || '' }}
+          TOP_PAIRS:            ${{ vars.TOP_PAIRS || '' }}
+          MIN_VOLUME_USDT:      ${{ vars.MIN_VOLUME_USDT || '' }}
+          RISK_PER_TRADE:       ${{ vars.RISK_PER_TRADE || '' }}
+          ACCOUNT_EQUITY:       ${{ vars.ACCOUNT_EQUITY || '' }}
+          FEE_PER_SIDE:         ${{ vars.FEE_PER_SIDE || '' }}
+          REPORT_EVERY_HOURS:   ${{ vars.REPORT_EVERY_HOURS || '' }}
           RUN_FOREVER: "0"
-        run: python signal_bot.py
+        run: |
+          for var in SMC_MIN_RISK_PCT SMC_MIN_RISK_PCT_BTC SMC_MAX_OPEN \
+                     TOP_PAIRS MIN_VOLUME_USDT RISK_PER_TRADE \
+                     ACCOUNT_EQUITY FEE_PER_SIDE REPORT_EVERY_HOURS; do
+            val=$(printenv "$var" || true)
+            if [ -z "$val" ]; then
+              unset "$var"
+            fi
+          done
+          python signal_bot.py
 
       - name: Save signals history
         uses: actions/cache@v4
