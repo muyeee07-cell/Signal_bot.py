@@ -1,45 +1,68 @@
-name: scan
+name: AlphaQuant V5.1 Signal Bot
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # tiap jam, sesuaikan sendiri
-  workflow_dispatch: {}     # supaya bisa di-trigger manual dari tab Actions
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
 
-permissions:
-  contents: write   # wajib, supaya job ini boleh commit & push balik ke repo
-
-# Mencegah dua run jalan bersamaan dan rebutan push ke branch yang sama
 concurrency:
-  group: scan
+  group: alphaquant-signal-bot
   cancel-in-progress: false
 
 jobs:
   scan:
+    name: SMC Scalp Scan
     runs-on: ubuntu-latest
+    timeout-minutes: 12
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
-        run: pip install requests pandas numpy
+        run: pip install requests
 
-      - name: Run bot
+      - name: Restore signals history
+        uses: actions/cache@v4
+        with:
+          path: signals_history.json
+          key: signals-history-${{ github.run_id }}
+          restore-keys: |
+            signals-history-
+
+      - name: Run signal bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-          SMC_MIN_RISK_PCT_BTC: "0.0015"
-        run: python signal_bot.py
-
-      - name: Commit signal history
+          CHAT_ID:        ${{ secrets.CHAT_ID }}
+          SMC_MIN_RISK_PCT:     ${{ vars.SMC_MIN_RISK_PCT || '' }}
+          SMC_MIN_RISK_PCT_BTC: ${{ vars.SMC_MIN_RISK_PCT_BTC || '' }}
+          SMC_MAX_OPEN:         ${{ vars.SMC_MAX_OPEN || '' }}
+          TOP_PAIRS:            ${{ vars.TOP_PAIRS || '' }}
+          MIN_VOLUME_USDT:      ${{ vars.MIN_VOLUME_USDT || '' }}
+          RISK_PER_TRADE:       ${{ vars.RISK_PER_TRADE || '' }}
+          ACCOUNT_EQUITY:       ${{ vars.ACCOUNT_EQUITY || '' }}
+          FEE_PER_SIDE:         ${{ vars.FEE_PER_SIDE || '' }}
+          REPORT_EVERY_HOURS:   ${{ vars.REPORT_EVERY_HOURS || '' }}
+          RUN_FOREVER: "0"
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add signals_history.json
-          git diff --staged --quiet || git commit -m "update signal history"
-          git pull --rebase origin main
-          git push
+          for var in SMC_MIN_RISK_PCT SMC_MIN_RISK_PCT_BTC SMC_MAX_OPEN \
+                     TOP_PAIRS MIN_VOLUME_USDT RISK_PER_TRADE \
+                     ACCOUNT_EQUITY FEE_PER_SIDE REPORT_EVERY_HOURS; do
+            val=$(printenv "$var" || true)
+            if [ -z "$val" ]; then unset "$var"; fi
+          done
+          python signal_bot.py
+
+      - name: Save signals history
+        uses: actions/cache@v4
+        if: always()
+        with:
+          path: signals_history.json
+          key: signals-history-${{ github.run_id }}
+
