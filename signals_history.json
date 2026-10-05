@@ -4106,21 +4106,26 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791208800000,
+  "last_smc_candle": 1791210600000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 240,
+    "scans": 6,
+    "pairs": 288,
     "signals": 0,
     "stages": {
-      "Sweep": 44,
-      "Struktur": 150,
-      "Konfirmasi": 10,
-      "Displacement": 25,
-      "Retest": 10,
-      "Volume": 1
+      "Sweep": 50,
+      "Struktur": 175,
+      "Konfirmasi": 14,
+      "Displacement": 33,
+      "Retest": 14,
+      "Volume": 1,
+      "SL/RR": 1
     },
     "near": [
+      {
+        "depth": 9,
+        "text": "ARB-USDT-SWAP → SL/RR: SHORT SL 3.50 ATR (perlu 0.35-2.5)"
+      },
       {
         "depth": 8,
         "text": "ONE-USDT-SWAP → Volume: LONG BOS volume 0.48x (min 0.50x)"
@@ -4140,10 +4145,6 @@
       {
         "depth": 6,
         "text": "FLOKI-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ZIL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
