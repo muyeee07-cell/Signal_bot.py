@@ -456,8 +456,12 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
     if bias is None:
         return "Struktur", "bias struktur tidak jelas"
 
-    if bias != ("BULL" if side == "LONG" else "BEAR") and event != "CHOCH":
-        return "Struktur", f"sweep {side} tapi bias {bias} (bukan CHOCH)"
+    if bias != ("BULL" if side == "LONG" else "BEAR"):
+        return "Struktur", f"sweep {side} tapi bias {bias} (CHOCH dinonaktifkan)"
+
+    # Blokir CHOCH — hanya BOS yang diizinkan
+    if event == "CHOCH":
+        return "Struktur", f"{side} CHOCH dinonaktifkan, hanya BOS"
 
     # Displacement after the sweep
     disp_idx = None
@@ -1129,3 +1133,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
