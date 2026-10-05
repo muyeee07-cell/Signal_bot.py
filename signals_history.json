@@ -4143,20 +4143,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791218700000,
+  "last_smc_candle": 1791221400000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 96,
+    "scans": 3,
+    "pairs": 145,
     "signals": 0,
     "stages": {
-      "Struktur": 56,
-      "Sweep": 17,
-      "Retest": 13,
-      "Displacement": 6,
-      "Konfirmasi": 4
+      "Struktur": 88,
+      "Sweep": 24,
+      "Retest": 18,
+      "Displacement": 9,
+      "Konfirmasi": 5,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "FOGO-USDT-SWAP → Volume: SHORT BOS volume 0.20x (min 0.50x)"
+      },
       {
         "depth": 6,
         "text": "ONE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
@@ -4174,12 +4179,8 @@
         "text": "IOST-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "PENGU-USDT-SWAP → Retest: SHORT belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "MUBARAK-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "IOST-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
