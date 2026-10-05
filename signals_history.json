@@ -4179,20 +4179,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791240300000,
+  "last_smc_candle": 1791242100000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 196,
+    "scans": 5,
+    "pairs": 244,
     "signals": 1,
     "stages": {
-      "Sweep": 77,
-      "Struktur": 78,
-      "Displacement": 21,
-      "Retest": 11,
-      "Konfirmasi": 8
+      "Sweep": 94,
+      "Struktur": 100,
+      "Displacement": 27,
+      "Retest": 12,
+      "Konfirmasi": 9,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "PARTI-USDT-SWAP → Volume: LONG BOS volume 0.30x (min 0.75x, RSI 47.8 di deadzone +0.25)"
+      },
       {
         "depth": 6,
         "text": "MON-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
@@ -4212,10 +4217,6 @@
       {
         "depth": 6,
         "text": "PARTI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ZIL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
       }
     ]
   },
