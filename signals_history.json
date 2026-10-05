@@ -72,28 +72,28 @@
       "monitor_tf_ms": 900000
     },
     {
-      "signal_id": "S-USDT-SWAP|LONG|1791152100000|SMC",
-      "symbol": "S-USDT-SWAP",
+      "signal_id": "GALA-USDT-SWAP|LONG|1791167400000|SMC",
+      "symbol": "GALA-USDT-SWAP",
       "direction": "LONG",
       "timeframe": "15m",
       "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BULL | Sweep low @ 0.04031 | OB [0.03984-0.04033] | Disp bar 198 | RSI 44.4 | Vol 1.60x",
-      "signal_candle_time": 1791152100000,
-      "signal_candle_iso": "2026-10-04T22:15:00+00:00",
-      "created_at": "2026-10-04T22:43:10.041381+00:00",
-      "entry": 0.0403,
-      "sl": 0.03977,
-      "tp": 0.04123,
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.002522 | OB [0.002512-0.002538] | Disp bar 197 | RSI 51.2 | Vol 2.01x",
+      "signal_candle_time": 1791167400000,
+      "signal_candle_iso": "2026-10-05T02:30:00+00:00",
+      "created_at": "2026-10-05T02:46:08.234061+00:00",
+      "entry": 0.002531,
+      "sl": 0.002507,
+      "tp": 0.002574,
       "rr": 1.75,
-      "atr": 0.00023125014718865567,
-      "sl_atr": 2.2891879230880328,
+      "atr": 1.777532551639404e-05,
+      "sl_atr": 1.3688974433956866,
       "ema50": 0.0,
       "ema200": 0.0,
-      "rsi": 44.38473631597374,
+      "rsi": 51.2319153733721,
       "adx": 0.0,
-      "volume_ratio": 1.6008780923203108,
+      "volume_ratio": 2.007526960451032,
       "rsi_deadzone": false,
-      "regime": "BULL",
+      "regime": "BEAR",
       "structure": "CHOCH",
       "bos": "CHOCH",
       "pullback": null,
@@ -3924,26 +3924,71 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "S-USDT-SWAP|LONG|1791152100000|SMC",
+      "symbol": "S-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep low @ 0.04031 | OB [0.03984-0.04033] | Disp bar 198 | RSI 44.4 | Vol 1.60x",
+      "signal_candle_time": 1791152100000,
+      "signal_candle_iso": "2026-10-04T22:15:00+00:00",
+      "created_at": "2026-10-04T22:43:10.041381+00:00",
+      "entry": 0.0403,
+      "sl": 0.03977,
+      "tp": 0.04123,
+      "rr": 1.75,
+      "atr": 0.00023125014718865567,
+      "sl_atr": 2.2891879230880328,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 44.38473631597374,
+      "adx": 0.0,
+      "volume_ratio": 1.6008780923203108,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.04123,
+      "exit_time": "2026-10-05T02:40:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791164700000,
+  "last_smc_candle": 1791167400000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 277,
-    "signals": 0,
+    "scans": 7,
+    "pairs": 326,
+    "signals": 1,
     "stages": {
-      "Retest": 39,
-      "Struktur": 57,
-      "Sweep": 39,
-      "Konfirmasi": 31,
-      "Displacement": 24,
+      "Retest": 50,
+      "Struktur": 73,
+      "Sweep": 47,
+      "Konfirmasi": 36,
+      "Displacement": 30,
       "Volume": 1,
       "SL/RR": 1,
-      "Data": 85
+      "Data": 85,
+      "Diblokir": 2
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "IOTA-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 10,
+        "text": "ARB-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+      },
       {
         "depth": 9,
         "text": "WLD-USDT-SWAP → SL/RR: LONG SL 2.68 ATR (perlu 0.35-2.5)"
@@ -3959,14 +4004,6 @@
       {
         "depth": 6,
         "text": "GALA-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "HMSTR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MEME-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
