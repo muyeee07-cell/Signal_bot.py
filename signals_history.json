@@ -4142,18 +4142,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791235800000,
+  "last_smc_candle": 1791236700000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 49,
+    "scans": 2,
+    "pairs": 98,
     "signals": 0,
     "stages": {
-      "Sweep": 18,
-      "Struktur": 20,
-      "Displacement": 6,
-      "Retest": 3,
-      "Konfirmasi": 2
+      "Sweep": 37,
+      "Struktur": 40,
+      "Displacement": 11,
+      "Retest": 6,
+      "Konfirmasi": 4
     },
     "near": [
       {
@@ -4165,20 +4165,20 @@
         "text": "PARTI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
+        "depth": 6,
+        "text": "PARTI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "ZIL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
         "depth": 5,
         "text": "GALA-USDT-SWAP → Retest: LONG belum retest order block"
       },
       {
         "depth": 5,
         "text": "ENA-USDT-SWAP → Retest: SHORT order block ditembus (close di atas OB)"
-      },
-      {
-        "depth": 5,
-        "text": "ATH-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 3,
-        "text": "HMSTR-USDT-SWAP → Displacement: SHORT tidak ada displacement setelah sweep"
       }
     ]
   },
