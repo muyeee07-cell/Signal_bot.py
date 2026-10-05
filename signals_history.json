@@ -35,6 +35,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "RESOLV-USDT-SWAP|SHORT|1791181800000|SMC",
+      "symbol": "RESOLV-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.01932 | OB [0.01936-0.01956] | Disp bar 194 | RSI 48.5 | Vol 1.11x",
+      "signal_candle_time": 1791181800000,
+      "signal_candle_iso": "2026-10-05T06:30:00+00:00",
+      "created_at": "2026-10-05T06:55:47.208530+00:00",
+      "entry": 0.0193,
+      "sl": 0.01962,
+      "tp": 0.01874,
+      "rr": 1.75,
+      "atr": 0.00019049122878947311,
+      "sl_atr": 1.6648922401951884,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 48.475095425387494,
+      "adx": 0.0,
+      "volume_ratio": 1.1072407414209633,
+      "rsi_deadzone": true,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -4035,19 +4071,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791180000000,
+  "last_smc_candle": 1791181800000,
   "last_online_day": "2026-10-05",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 243,
-    "signals": 2,
+    "scans": 6,
+    "pairs": 290,
+    "signals": 3,
     "stages": {
-      "Struktur": 57,
-      "Sweep": 18,
-      "Displacement": 67,
-      "Retest": 60,
-      "Konfirmasi": 37,
-      "Volume": 2
+      "Struktur": 66,
+      "Sweep": 22,
+      "Displacement": 77,
+      "Retest": 74,
+      "Konfirmasi": 45,
+      "Volume": 3
     },
     "near": [
       {
@@ -4057,6 +4093,10 @@
       {
         "depth": 8,
         "text": "IOST-USDT-SWAP → Volume: LONG CHOCH volume 0.32x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "NIGHT-USDT-SWAP → Volume: SHORT CHOCH volume 0.70x (min 0.75x)"
       },
       {
         "depth": 6,
@@ -4069,10 +4109,6 @@
       {
         "depth": 6,
         "text": "WLD-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "GMT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
