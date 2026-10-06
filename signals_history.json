@@ -1,5 +1,42 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "CHIP-USDT-SWAP|LONG|1791268200000|SMC",
+      "symbol": "CHIP-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.0528 | OB [0.05254-0.05332] | Disp bar 198 | RSI 59.7 | Vol 2.85x",
+      "signal_candle_time": 1791268200000,
+      "signal_candle_iso": "2026-10-06T06:30:00+00:00",
+      "created_at": "2026-10-06T06:51:15.898476+00:00",
+      "entry": 0.05424,
+      "sl": 0.05229,
+      "tp": 0.05764,
+      "rr": 1.75,
+      "atr": 0.0008174832819272108,
+      "sl_atr": 2.3795532307306066,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 59.660182322434416,
+      "adx": 0.0,
+      "volume_ratio": 2.8473709860413114,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -4214,23 +4251,27 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791266400000,
+  "last_smc_candle": 1791268200000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 49,
-    "signals": 0,
+    "scans": 2,
+    "pairs": 98,
+    "signals": 1,
     "stages": {
-      "Sweep": 25,
-      "Struktur": 14,
-      "Displacement": 3,
-      "Retest": 6,
-      "Konfirmasi": 1
+      "Sweep": 46,
+      "Struktur": 32,
+      "Displacement": 6,
+      "Retest": 11,
+      "Konfirmasi": 2
     },
     "near": [
       {
         "depth": 6,
         "text": "CT-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "CT-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
       },
       {
         "depth": 5,
@@ -4247,10 +4288,6 @@
       {
         "depth": 5,
         "text": "CP-USDT-SWAP → Retest: SHORT belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "ZIL-USDT-SWAP → Retest: SHORT belum retest order block"
       }
     ]
   },
