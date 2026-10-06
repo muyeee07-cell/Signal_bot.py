@@ -37,6 +37,7 @@ jobs:
           TOP_PAIRS: "50"
           SMC_MAX_OPEN: "5"
           SMC_MIN_RISK_PCT: "0.004"
+          SMC_MIN_RISK_PCT_BTC: "0.0015"
         run: python signal_bot.py
 
       - name: Commit signal history
