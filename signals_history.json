@@ -4251,18 +4251,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791270000000,
+  "last_smc_candle": 1791271800000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 146,
+    "scans": 4,
+    "pairs": 194,
     "signals": 1,
     "stages": {
-      "Sweep": 68,
-      "Struktur": 53,
+      "Sweep": 88,
+      "Struktur": 76,
       "Displacement": 6,
-      "Retest": 14,
-      "Konfirmasi": 4
+      "Retest": 16,
+      "Konfirmasi": 7
     },
     "near": [
       {
@@ -4282,12 +4282,12 @@
         "text": "CT-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "GALA-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "GALA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "PEOPLE-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "ZIL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
