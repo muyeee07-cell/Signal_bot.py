@@ -4323,20 +4323,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791300600000,
+  "last_smc_candle": 1791302400000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 96,
+    "scans": 3,
+    "pairs": 145,
     "signals": 0,
     "stages": {
-      "Struktur": 54,
-      "Displacement": 19,
-      "Konfirmasi": 4,
-      "Sweep": 14,
-      "Retest": 5
+      "Struktur": 79,
+      "Displacement": 25,
+      "Konfirmasi": 7,
+      "Sweep": 19,
+      "Retest": 14,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "PARTI-USDT-SWAP → Volume: LONG BOS volume 0.28x (min 0.50x)"
+      },
       {
         "depth": 6,
         "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
@@ -4354,12 +4359,8 @@
         "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "STRK-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "ENA-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       }
     ]
   },
