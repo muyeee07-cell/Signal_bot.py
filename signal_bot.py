@@ -38,11 +38,7 @@ signal as unproven until backtest.py shows an edge on the pairs you actually sca
 
 from __future__ import annotations
 
-import os
-import json
-import time
-import math
-import logging
+import os, json, time, math, logging
 from datetime import datetime, timezone
 import requests
 
@@ -63,9 +59,9 @@ CHAT_ID = env_first("CHAT_ID", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT")
 # --- SMC scalp ---
 SMC_TF = "15m"
 SMC_TF_MS = 15 * 60_000
-SMC_MONITOR_TF = "5m"
+SMC_MONITOR_TF = "5m"                 # finer candles to resolve TP/SL of open scalps
 SMC_MONITOR_MS = 5 * 60_000
-SMC_SYMBOL = "BTC-USDT-SWAP"
+SMC_SYMBOL = "BTC-USDT-SWAP"          # reference symbol for the "new 15m candle" gate
 SMC_HISTORY_BARS = 200
 SMC_MIN_BARS = 80
 SMC_SWING = 3
@@ -73,7 +69,7 @@ SMC_SWING = 3
 # ---- CORE ----
 TARGET_RR = float(os.getenv("TARGET_RR", "1.75"))
 
-# ---- VOLUME ----
+# ---- VOLUME: volume of the signal candle / average volume of the previous candles ----
 MIN_VOLUME_RATIO_BOS = float(os.getenv("MIN_VOLUME_RATIO_BOS", "0.50"))
 MIN_VOLUME_RATIO_CHOCH = float(os.getenv("MIN_VOLUME_RATIO_CHOCH", "0.75"))
 
@@ -81,12 +77,14 @@ MIN_VOLUME_RATIO_CHOCH = float(os.getenv("MIN_VOLUME_RATIO_CHOCH", "0.75"))
 MAX_ACTIVE_SMC_PER_DIRECTION = int(os.getenv("MAX_ACTIVE_SMC_PER_DIRECTION", "3"))
 MAX_NEW_SMC_PER_CANDLE = int(os.getenv("MAX_NEW_SMC_PER_CANDLE", "2"))
 
-# ---- RSI deadzone ----
+# ---- RSI deadzone: RSI of the signal candle between LOW and HIGH = undecided momentum ----
 RSI_DEADZONE_LOW = float(os.getenv("RSI_DEADZONE_LOW", "47"))
 RSI_DEADZONE_HIGH = float(os.getenv("RSI_DEADZONE_HIGH", "50"))
+# OFF     : ignore the deadzone
+# BLOCK   : reject signals whose RSI is inside the deadzone
+# PENALTY : allow them, but they need extra volume (RSI_DEADZONE_EXTRA_VOLUME added to the minimum)
 RSI_DEADZONE_MODE = os.getenv("RSI_DEADZONE_MODE", "PENALTY").strip().upper()
 RSI_DEADZONE_EXTRA_VOLUME = float(os.getenv("RSI_DEADZONE_EXTRA_VOLUME", "0.25"))
-
 SMC_MIN_SL_ATR = 0.35
 SMC_MAX_SL_ATR = 2.50
 SMC_DISP_BODY_MIN = 0.55
@@ -95,12 +93,14 @@ SMC_OB_LOOKBACK = 12
 SMC_SWEEP_TOL_ATR = 0.15
 SMC_CONFIRM_BARS = 1
 SMC_COOLDOWN_HOURS = 4
-SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))
+SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))   # 0 disables the cost gate
+# Separate cost gate for BTC only (BTC moves little relative to its price, so the
+# global 0.4% gate rejects almost every BTC signal). Negative = use SMC_MIN_RISK_PCT.
 SMC_MIN_RISK_PCT_BTC = float(os.getenv("SMC_MIN_RISK_PCT_BTC", "-1"))
-SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "10"))
+SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "5"))
 
 # --- universe ---
-TOP_PAIRS = int(os.getenv("TOP_PAIRS", "100"))
+TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
 MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
@@ -112,18 +112,18 @@ SL_ATR_BUFFER = 0.30
 # --- risk / reporting ---
 RISK_PER_TRADE = float(os.getenv("RISK_PER_TRADE", "0.004"))
 ACCOUNT_EQUITY = float(os.getenv("ACCOUNT_EQUITY", "1000"))
-FEE_PER_SIDE = float(os.getenv("FEE_PER_SIDE", "0.0005"))
+FEE_PER_SIDE = float(os.getenv("FEE_PER_SIDE", "0.0005"))          # taker 0.05%, for the fee estimate
 REPORT_EVERY_HOURS = float(os.getenv("REPORT_EVERY_HOURS", "4"))
 
 MONITOR_MAX_BARS = 1400
-RR = 2.0
+RR = 2.0                              # fallback when a stored trade has no "rr"
 
 SCAN_INTERVAL = 300
 RUN_FOREVER = os.getenv("RUN_FOREVER", "0").strip() == "1"
 HISTORY_FILE = os.getenv("SIGNAL_HISTORY_FILE", "signals_history.json")
 TIMEOUT = 15
 RETRIES = 3
-MIN_REQUEST_GAP = 0.09
+MIN_REQUEST_GAP = 0.09                # OKX public limit is 20 requests / 2 s per IP
 
 logging.basicConfig(
     level=logging.INFO,
@@ -138,34 +138,45 @@ SETUP_NAME = {"SMC_SCALP": "SMC Scalp"}
 
 # ================= HELPERS =================
 
-def iso(ms: int) -> str:
-    return datetime.fromtimestamp(ms / 1000, tz=timezone.utc).isoformat()
 
-def now() -> str:
+def iso(ms):
+    return datetime.fromtimestamp(
+        ms / 1000, tz=timezone.utc
+    ).isoformat()
+
+def now():
     return datetime.now(timezone.utc).isoformat()
 
 _LAST_REQ = [0.0]
 
-def api(path: str, params: dict | None = None) -> dict | None:
+def api(path, params=None):
     for attempt in range(RETRIES):
         wait = MIN_REQUEST_GAP - (time.time() - _LAST_REQ[0])
         if wait > 0:
             time.sleep(wait)
         _LAST_REQ[0] = time.time()
         try:
-            r = S.get(OKX + path, params=params, timeout=TIMEOUT)
+            r = S.get(
+                OKX + path,
+                params=params,
+                timeout=TIMEOUT
+            )
             r.raise_for_status()
             d = r.json()
             if d.get("code") == "0":
                 return d
             log.warning("OKX error: %s", d)
         except Exception as e:
-            log.warning("Request failed %s/%s: %s", attempt + 1, RETRIES, e)
+            log.warning(
+                "Request failed %s/%s: %s",
+                attempt + 1, RETRIES, e
+            )
         if attempt + 1 < RETRIES:
             time.sleep(1.5)
     return None
 
-def tg(text: str) -> bool:
+
+def tg(text):
     if not TELEGRAM:
         return False
     try:
@@ -185,7 +196,7 @@ def tg(text: str) -> bool:
         log.error("Telegram error: %s", e)
         return False
 
-def load_history() -> dict:
+def load_history():
     if not os.path.exists(HISTORY_FILE):
         return {"open": [], "closed": []}
     try:
@@ -193,12 +204,18 @@ def load_history() -> dict:
             d = json.load(f)
         d.setdefault("open", [])
         d.setdefault("closed", [])
+        # last_scan_candle / last_smc_candle are optional keys preserved as-is
         return d
     except Exception as e:
         log.error("History load failed: %s", e)
         return {"open": [], "closed": []}
 
-def archive_legacy(h: dict) -> int:
+def archive_legacy(h):
+    """
+    Move trades of removed strategies (Breakout, Mean Rev, ...) out of open/closed.
+    They are kept under h["archive"] (not deleted) but are never monitored,
+    reported or counted again. Returns how many trades were moved.
+    """
     moved = 0
     for key in ("open", "closed"):
         keep, drop = [], []
@@ -210,7 +227,7 @@ def archive_legacy(h: dict) -> int:
             moved += len(drop)
     return moved
 
-def save_history(h: dict) -> None:
+def save_history(h):
     tmp = HISTORY_FILE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(h, f, indent=2, ensure_ascii=False)
@@ -218,7 +235,7 @@ def save_history(h: dict) -> None:
 
 # ================= MARKET DATA =================
 
-def top_pairs() -> list[str]:
+def top_pairs():
     d = api("/api/v5/market/tickers", {"instType": "SWAP"})
     if not d:
         return []
@@ -236,7 +253,8 @@ def top_pairs() -> list[str]:
     a.sort(key=lambda x: x[1], reverse=True)
     return [x[0] for x in a[:TOP_PAIRS]]
 
-def instruments() -> dict:
+
+def instruments():
     d = api("/api/v5/public/instruments", {"instType": "SWAP"})
     out = {}
     if not d:
@@ -245,25 +263,35 @@ def instruments() -> dict:
         inst = x.get("instId", "")
         if inst.endswith("-USDT-SWAP"):
             try:
-                out[inst] = {"tick": float(x.get("tickSz", "0.00000001"))}
-            except Exception:
+                out[inst] = {
+                    "tick": float(x.get("tickSz", "0.00000001"))
+                }
+            except:
                 pass
     return out
 
-def price(inst: str) -> float | None:
+def price(inst):
     d = api("/api/v5/market/ticker", {"instId": inst})
     try:
         return float(d["data"][0]["last"])
-    except Exception:
+    except:
         return None
 
-def candles(inst: str, bar: str, needed: int) -> list:
+def candles(inst, bar, needed):
+    """
+    OKX pagination using `after`.
+    Returns confirmed candles oldest -> newest.
+    """
     found = {}
     cursor = None
     max_requests = math.ceil(needed / 100) + 6
 
     for _ in range(max_requests):
-        p = {"instId": inst, "bar": bar, "limit": "100"}
+        p = {
+            "instId": inst,
+            "bar": bar,
+            "limit": "100"
+        }
         if cursor is not None:
             p["after"] = str(cursor)
 
@@ -276,12 +304,16 @@ def candles(inst: str, bar: str, needed: int) -> list:
             break
 
         oldest = None
+
         for x in rows:
             try:
                 ts = int(x[0])
                 oldest = ts if oldest is None else min(oldest, ts)
-                if int(x[8]) != 1:  # only confirmed candles
+
+                # x[8] == 1 means confirmed candle.
+                if int(x[8]) != 1:
                     continue
+
                 found[ts] = [
                     ts,
                     float(x[1]),  # open
@@ -290,26 +322,29 @@ def candles(inst: str, bar: str, needed: int) -> list:
                     float(x[4]),  # close
                     float(x[5])   # volume
                 ]
-            except Exception:
+            except:
                 continue
 
         if len(found) >= needed:
             break
+
         if oldest is None or oldest == cursor:
             break
+
         cursor = oldest
         time.sleep(0.12)
 
     out = sorted(found.values(), key=lambda x: x[0])
     return out[-needed:]
 
-def latest_candle_ts(bar: str = SMC_TF, inst: str = SMC_SYMBOL) -> int | None:
+def latest_candle_ts(bar=SMC_TF, inst=SMC_SYMBOL):
+    """Open time of the newest confirmed candle (BTC as the reference clock)."""
     cs = candles(inst, bar, 3)
     return cs[-1][0] if cs else None
 
 # ================= INDICATORS =================
 
-def rma(v: list, n: int) -> list:
+def rma(v, n):
     out = [None] * len(v)
     if len(v) < n:
         return out
@@ -320,22 +355,26 @@ def rma(v: list, n: int) -> list:
         out[i] = x
     return out
 
-def atr(cs: list, n: int = 14) -> list:
+def atr(cs, n=14):
     tr = []
     for i, c in enumerate(cs):
         if i == 0:
             tr.append(c[2] - c[3])
         else:
-            pc = cs[i - 1][4]
-            tr.append(max(c[2] - c[3], abs(c[2] - pc), abs(c[3] - pc)))
+            pc = cs[i-1][4]
+            tr.append(max(
+                c[2] - c[3],
+                abs(c[2] - pc),
+                abs(c[3] - pc)
+            ))
     return rma(tr, n)
 
-def rsi(cs: list, n: int = 14) -> list:
+def rsi(cs, n=14):
     closes = [x[4] for x in cs]
     gains = [0.0]
     losses = [0.0]
     for i in range(1, len(closes)):
-        ch = closes[i] - closes[i - 1]
+        ch = closes[i] - closes[i-1]
         gains.append(max(ch, 0))
         losses.append(max(-ch, 0))
     ag, al = rma(gains, n), rma(losses, n)
@@ -350,17 +389,16 @@ def rsi(cs: list, n: int = 14) -> list:
             out[i] = 100 - 100 / (1 + rs)
     return out
 
-def volume_ratio(cs: list, n: int = 20) -> float | None:
-    """Current volume / average of the previous n candles (excludes current)."""
-    if len(cs) < n + 1:
+def volume_ratio(cs, n=20):
+    if len(cs) < n:
         return None
-    avg = sum(x[5] for x in cs[-n - 1:-1]) / n
-    return cs[-1][5] / avg if avg > 0 else None
+    avg = sum(x[5] for x in cs[-n:]) / n
+    return cs[-1][5] / avg if avg else None
 
-def tick_round(x: float, tick: float) -> float:
+def tick_round(x, tick):
     if tick <= 0:
         return x
-    return round(round(x / tick) * tick, 12)
+    return round(round(x/tick)*tick, 12)
 
 # ================= REJECT TRACKING =================
 
@@ -370,22 +408,26 @@ SMC_STAGES = [
 ]
 
 CUR_SETUP = "SMC_SCALP"
-REJECTS: dict = {}
 
-def _p(x) -> str:
+# (setup, stage) -> [(pair, detail)], reset at the start of every scan.
+REJECTS = {}
+
+def _p(x):
     return f"{x:.8g}"
 
-def _safe(text) -> str:
+
+def _safe(text):
     return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
-def _rej(inst: str, stage: str, detail: str = "", setup: str | None = None):
+def _rej(inst, stage, detail="", setup=None):
     key = (setup or CUR_SETUP, stage)
     REJECTS.setdefault(key, []).append((inst, _safe(detail)))
     return None
 
 # ================= SMC SCALP (15m) =================
 
-def _smc_swings(cs: list, swing: int = SMC_SWING):
+def _smc_swings(cs, swing=SMC_SWING):
+    """Fractal swing highs/lows. Returns lists of (index, price)."""
     highs, lows = [], []
     for i in range(swing, len(cs) - swing):
         h, l = cs[i][2], cs[i][3]
@@ -398,6 +440,11 @@ def _smc_swings(cs: list, swing: int = SMC_SWING):
     return highs, lows
 
 def _smc_structure(highs, lows):
+    """
+    Determine last structural bias from swing sequence.
+    Returns: bias ('BULL'|'BEAR'|None), event ('BOS'|'CHOCH'|None),
+             last_sh, last_sl
+    """
     if len(highs) < 2 or len(lows) < 2:
         return None, None, None, None
 
@@ -405,6 +452,8 @@ def _smc_structure(highs, lows):
     sl1, sl0 = lows[-2], lows[-1]
     last_sh, last_sl = sh0, sl0
 
+    # Most recent swing event determines bias.
+    # Higher high + higher low = bull structure; opposite = bear.
     hh = sh0[1] > sh1[1]
     hl = sl0[1] > sl1[1]
     lh = sh0[1] < sh1[1]
@@ -414,7 +463,9 @@ def _smc_structure(highs, lows):
         return "BULL", "BOS", last_sh, last_sl
     if lh and ll:
         return "BEAR", "BOS", last_sh, last_sl
+    # CHOCH: only one side of structure flips
     if hh and ll:
+        # conflict – use the more recent swing
         if sh0[0] > sl0[0]:
             return "BULL", "CHOCH", last_sh, last_sl
         return "BEAR", "CHOCH", last_sh, last_sl
@@ -424,7 +475,14 @@ def _smc_structure(highs, lows):
         return "BULL", "CHOCH", last_sh, last_sl
     return None, None, last_sh, last_sl
 
-def _find_order_block(cs: list, side: str, start_i: int, end_i: int):
+def _find_order_block(cs, side, start_i, end_i):
+    """
+    Order block = last opposing candle before the impulse that caused the
+    structure break / sweep recovery.
+    LONG  → last bearish candle (close < open) in [start_i, end_i)
+    SHORT → last bullish candle
+    Returns (index, high, low) or None.
+    """
     if start_i < 0:
         start_i = 0
     end_i = min(end_i, len(cs))
@@ -436,7 +494,8 @@ def _find_order_block(cs: list, side: str, start_i: int, end_i: int):
             return i, cs[i][2], cs[i][3]
     return None
 
-def _is_displacement(c, atr_v, side: str) -> bool:
+def _is_displacement(c, atr_v, side):
+    """Strong impulse candle in the trade direction."""
     o, hi, lo, cl = c[1], c[2], c[3], c[4]
     rng = hi - lo
     if rng <= 0 or not atr_v:
@@ -450,20 +509,22 @@ def _is_displacement(c, atr_v, side: str) -> bool:
     return cl < o
 
 def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_level):
+    """
+    Run steps 2-6 for ONE sweep candidate.
+    Returns a signal dict, or (stage, detail) describing why it failed.
+    """
+    # Structure is judged on swings that existed BEFORE the sweep. The sweep
+    # candle's own wick later becomes a swing low/high and must not flip the bias.
     pre_h = [x for x in highs if x[0] < sweep_idx]
     pre_l = [x for x in lows if x[0] < sweep_idx]
     bias, event, _, _ = _smc_structure(pre_h, pre_l)
     if bias is None:
         return "Struktur", "bias struktur tidak jelas"
 
-    if bias != ("BULL" if side == "LONG" else "BEAR"):
-        return "Struktur", f"sweep {side} tapi bias {bias} (CHOCH dinonaktifkan)"
+    if bias != ("BULL" if side == "LONG" else "BEAR") and event != "CHOCH":
+        return "Struktur", f"sweep {side} tapi bias {bias} (bukan CHOCH)"
 
-    # Blokir CHOCH — hanya BOS yang diizinkan
-    if event == "CHOCH":
-        return "Struktur", f"{side} CHOCH dinonaktifkan, hanya BOS"
-
-    # Displacement after the sweep
+    # --- Displacement after the sweep ---
     disp_idx = None
     for i in range(sweep_idx, min(sweep_idx + 6, len(cs))):
         if _is_displacement(cs[i], a, side):
@@ -472,13 +533,13 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
     if disp_idx is None:
         return "Displacement", f"{side} tidak ada displacement setelah sweep"
 
-    # Order block
+    # --- Order block: last opposing candle before displacement ---
     ob = _find_order_block(cs, side, max(0, disp_idx - SMC_OB_LOOKBACK), disp_idx)
     if ob is None:
         return "OrderBlock", f"{side} order block tidak ditemukan"
     ob_i, ob_hi, ob_lo = ob
 
-    # Retest + confirmation
+    # --- Retest of the order block AFTER the displacement candle ---
     confirm_idx = None
     mid_ob = (ob_hi + ob_lo) / 2
     for i in range(max(ob_i + 1, disp_idx + 1, len(cs) - 8), len(cs)):
@@ -501,6 +562,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
     if confirm_idx is None:
         return "Retest", f"{side} belum retest order block"
 
+    # Confirmation must be the latest candle (entry = its close)
     if confirm_idx < len(cs) - SMC_CONFIRM_BARS:
         return (
             "Konfirmasi",
@@ -509,7 +571,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
 
     close = cs[-1][4]
 
-    # Quality gates
+    # --- quality gates on the confirmation candle: RSI deadzone, then volume ---
     vr = volume_ratio(cs, VOL_PERIOD) or 0.0
     kind = event or "BOS"
     need_vol = MIN_VOLUME_RATIO_CHOCH if kind == "CHOCH" else MIN_VOLUME_RATIO_BOS
@@ -532,7 +594,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
             f"{side} {kind} volume {vr:.2f}x (min {need_vol:.2f}x{extra})"
         )
 
-    # SL calculation
+    # SL: beyond the OB extreme, the swept level and the sweep wick
     if side == "LONG":
         sweep_ext = cs[sweep_idx][3]
         sl_raw = min(ob_lo, swept_level, sweep_ext) - SL_ATR_BUFFER * a
@@ -552,6 +614,7 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
             f"{side} SL {sl_atr:.2f} ATR (perlu {SMC_MIN_SL_ATR}-{SMC_MAX_SL_ATR})"
         )
 
+    # Cost gate: with ~0.10% round-trip taker fees, a tiny SL makes fees eat the R.
     risk_pct = risk / close
     min_risk = SMC_MIN_RISK_PCT_BTC if (inst == SMC_SYMBOL and SMC_MIN_RISK_PCT_BTC >= 0) \
         else SMC_MIN_RISK_PCT
@@ -612,7 +675,18 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         "monitor_tf_ms": SMC_TF_MS,
     }
 
-def build_smc_scalp(inst: str, cs: list, meta: dict):
+def build_smc_scalp(inst, cs, meta):
+    """
+    15m Smart Money Concept scalp, any USDT perpetual (long; short is mirrored):
+      1. Liquidity sweep of a recent swing (wick through, close back inside)
+      2. Structure BEFORE the sweep agrees with the trade (BOS/CHOCH)
+      3. Displacement candle after the sweep
+      4. Order block = last opposing candle before the displacement
+      5. Price retests the OB AFTER the displacement and prints a
+         confirmation candle (must be the latest candle)
+      6. Entry at close, SL beyond OB / swept level / sweep wick, TP at TARGET_RR
+    Both directions are evaluated; the first valid one wins.
+    """
     global CUR_SETUP
     CUR_SETUP = "SMC_SCALP"
 
@@ -632,7 +706,7 @@ def build_smc_scalp(inst: str, cs: list, meta: dict):
     if len(highs) < 2 or len(lows) < 2:
         return _rej(inst, "Struktur", "swing high/low kurang dari 2")
 
-    # Sweep candidates (last 15 bars), newest first
+    # --- Sweep candidates (last 15 bars), newest first, both directions ---
     cands = []
     for side in ("LONG", "SHORT"):
         pool = lows if side == "LONG" else highs
@@ -666,7 +740,8 @@ def build_smc_scalp(inst: str, cs: list, meta: dict):
 
 # ================= DEDUPE =================
 
-def symbol_blocked(h: dict, inst: str) -> bool:
+def symbol_blocked(h, inst):
+    """True if `inst` already has an open trade, or is cooling down after a close."""
     if any(x.get("symbol") == inst for x in h["open"]):
         return True
     cutoff = time.time() - SMC_COOLDOWN_HOURS * 3600
@@ -680,18 +755,19 @@ def symbol_blocked(h: dict, inst: str) -> bool:
             pass
     return False
 
-def blocked(h: dict, sig: dict) -> bool:
+def blocked(h, sig):
     sid = sig["signal_id"]
     if any(x.get("signal_id") == sid for x in h["open"] + h["closed"]):
         return True
     return symbol_blocked(h, sig["symbol"])
 
-def n_open(h: dict) -> int:
+def n_open(h):
     return len(h["open"])
 
 # ================= MONITOR =================
 
-def monitor(trade: dict):
+def monitor(trade):
+    # Entry = close of the signal candle: monitoring starts when that candle ENDS.
     start = trade.get("signal_candle_time", 0) + SMC_TF_MS
     mon_tf, mon_ms = SMC_MONITOR_TF, SMC_MONITOR_MS
 
@@ -699,7 +775,8 @@ def monitor(trade: dict):
     needed = max(60, age_ms // mon_ms + 24)
     if needed > MONITOR_MAX_BARS:
         log.warning(
-            "Monitor %s: trade age needs %s %s bars, capped at %s",
+            "Monitor %s: trade age needs %s %s bars, capped at %s "
+            "(older TP/SL hits may be missed)",
             trade["symbol"], needed, mon_tf, MONITOR_MAX_BARS
         )
         needed = MONITOR_MAX_BARS
@@ -717,6 +794,7 @@ def monitor(trade: dict):
         else:
             hit_sl, hit_tp = hi >= sl, lo <= tp
 
+        # Same monitor candle touches both: conservative SL first.
         if hit_sl and hit_tp:
             exit_price, r, result = sl, -1.0, "LOSS"
         elif hit_tp:
@@ -737,11 +815,12 @@ def monitor(trade: dict):
         return t
     return None
 
-def check_open(h: dict) -> int:
+def check_open(h):
     if not h["open"]:
         return 0
 
     remain, closed = [], []
+
     for t in h["open"]:
         try:
             result = monitor(t)
@@ -769,22 +848,26 @@ def check_open(h: dict) -> int:
             f"Result: <b>{t['result_r']:+.2f}R</b>\n"
             f"Closed: {t['exit_time']}"
         )
+
     return len(closed)
 
 # ================= REPORT =================
 
-def float_r(t: dict, p: float) -> float:
-    risk = abs(t["entry"] - t["sl"])
-    if risk <= 0:
-        return 0.0
-    return ((p - t["entry"]) / risk if t["direction"] == "LONG"
-            else (t["entry"] - p) / risk)
 
-def running_report(h: dict) -> None:
+def float_r(t, p):
+    risk = abs(t["entry"]-t["sl"])
+    if risk <= 0:
+        return 0
+    return ((p-t["entry"])/risk
+            if t["direction"]=="LONG"
+            else (t["entry"]-p)/risk)
+
+def running_report(h):
     if not h["open"]:
         return
 
     blocks, rs = [], []
+
     for t in h["open"]:
         p = price(t["symbol"])
         if p is None:
@@ -822,7 +905,8 @@ def running_report(h: dict) -> None:
         "⚠️ Floating R is unrealized."
     )
 
-def fee_r_of(x: dict) -> float:
+def fee_r_of(x):
+    """Estimated round-trip taker fee of a trade, in R."""
     try:
         entry = float(x["entry"])
         risk = abs(entry - float(x["sl"]))
@@ -830,7 +914,7 @@ def fee_r_of(x: dict) -> float:
     except Exception:
         return 0.0
 
-def stats(h: dict) -> None:
+def stats(h):
     ts = h["closed"]
     if not ts:
         return
@@ -842,7 +926,7 @@ def stats(h: dict) -> None:
     gl = abs(sum(min(float(x.get("result_r", 0)), 0) for x in ts))
     pf = gp / gl if gl else float("inf")
 
-    eq = peak = dd = 0.0
+    eq = peak = dd = 0
     for x in ts:
         eq += float(x.get("result_r", 0))
         peak = max(peak, eq)
@@ -879,7 +963,7 @@ def stats(h: dict) -> None:
 
 # ================= SIGNAL MESSAGE =================
 
-def signal_message(s: dict) -> str:
+def signal_message(s):
     setup = s.get("setup", "SMC_SCALP")
     risk = abs(s["entry"] - s["sl"])
     fee_r = (2 * FEE_PER_SIDE * s["entry"] / risk) if risk > 0 else 0.0
@@ -912,9 +996,10 @@ def signal_message(s: dict) -> str:
 
 # ================= SCAN =================
 
-def _tally(h: dict, scanned: int, created: int, rows: dict) -> None:
+def _tally(h, scanned, created, rows):
+    """Accumulate the scan funnel in the history file until the next report."""
     d = h.get("smc_rej")
-    if not d or "pairs" not in d:
+    if not d or "pairs" not in d:           # empty, or left over from V4.x (different format)
         d = {"scans": 0, "pairs": 0, "signals": 0, "stages": {}, "near": []}
     d["scans"] += 1
     d["pairs"] += scanned
@@ -930,7 +1015,7 @@ def _tally(h: dict, scanned: int, created: int, rows: dict) -> None:
     d["near"] = sorted(d["near"], key=lambda x: -x["depth"])[:6]
     h["smc_rej"] = d
 
-def smc_report_text(h: dict) -> str:
+def smc_report_text(h):
     d = h.get("smc_rej")
     if not d or "pairs" not in d or not d.get("scans"):
         return ""
@@ -948,7 +1033,11 @@ def smc_report_text(h: dict) -> str:
         text += "\n\n<b>Paling dekat lolos</b>\n" + "\n".join(x["text"] for x in d["near"][:4])
     return text
 
-def scan_smc(h: dict) -> int:
+def scan_smc(h):
+    """
+    Scan the top pairs for an SMC scalp on every NEW 15m candle.
+    Returns the number of new signals.
+    """
     global CUR_SETUP
 
     ref = latest_candle_ts()
@@ -973,7 +1062,7 @@ def scan_smc(h: dict) -> int:
     CUR_SETUP = "SMC_SCALP"
     created, scanned = 0, 0
 
-    def n_dir(d: str) -> int:
+    def n_dir(d):
         return sum(1 for x in h["open"] if x.get("direction") == d)
 
     for inst in pairs:
@@ -989,6 +1078,8 @@ def scan_smc(h: dict) -> int:
             log.info("Both directions are at the limit (%s) - stopping the scan.", MAX_ACTIVE_SMC_PER_DIRECTION)
             break
 
+        # Skip pairs that already have a position / are cooling down BEFORE
+        # spending API calls on them.
         if symbol_blocked(h, inst):
             continue
 
@@ -999,6 +1090,7 @@ def scan_smc(h: dict) -> int:
                 _rej(inst, "Data", f"hanya {len(cs)} candle")
                 continue
 
+            # Stale data (no trades in the latest bar): never signal on an old candle.
             if ref is not None and cs[-1][0] != ref:
                 _rej(inst, "Data", "candle terakhir tidak sinkron")
                 continue
@@ -1065,7 +1157,7 @@ def main():
     h = load_history()
     moved = archive_legacy(h)
     if moved:
-        log.info("Archived %s trades of removed strategies.", moved)
+        log.info("Archived %s trades of removed strategies (Breakout / Mean Rev / ...).", moved)
         save_history(h)
 
     log.info("Open trades: %s | Closed trades: %s", len(h["open"]), len(h["closed"]))
@@ -1097,6 +1189,7 @@ def main():
             log.info("Starting engine cycle...")
             closed_n = check_open(h)
 
+            # Periodic report: every REPORT_EVERY_HOURS, or right after a trade closed.
             due = (time.time() - float(h.get("last_report_ts", 0))) >= REPORT_EVERY_HOURS * 3600
             if due:
                 running_report(h)
@@ -1133,4 +1226,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
