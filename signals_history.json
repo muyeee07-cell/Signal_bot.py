@@ -4323,18 +4323,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791298800000,
+  "last_smc_candle": 1791300600000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 48,
+    "scans": 2,
+    "pairs": 96,
     "signals": 0,
     "stages": {
-      "Struktur": 30,
-      "Displacement": 8,
-      "Konfirmasi": 2,
-      "Sweep": 6,
-      "Retest": 2
+      "Struktur": 54,
+      "Displacement": 19,
+      "Konfirmasi": 4,
+      "Sweep": 14,
+      "Retest": 5
     },
     "near": [
       {
@@ -4346,20 +4346,20 @@
         "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
       },
       {
+        "depth": 6,
+        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "HUMA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
         "depth": 5,
         "text": "STRK-USDT-SWAP → Retest: LONG belum retest order block"
       },
       {
         "depth": 5,
         "text": "ENA-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 3,
-        "text": "PEPE-USDT-SWAP → Displacement: SHORT tidak ada displacement setelah sweep"
-      },
-      {
-        "depth": 3,
-        "text": "BONK-USDT-SWAP → Displacement: LONG tidak ada displacement setelah sweep"
       }
     ]
   },
