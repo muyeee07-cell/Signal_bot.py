@@ -1,5 +1,42 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "MUBARAK-USDT-SWAP|LONG|1791254700000|SMC",
+      "symbol": "MUBARAK-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.073878 | OB [0.074157-0.074665] | Disp bar 194 | RSI 50.9 | Vol 0.80x",
+      "signal_candle_time": 1791254700000,
+      "signal_candle_iso": "2026-10-06T02:45:00+00:00",
+      "created_at": "2026-10-06T03:14:14.689650+00:00",
+      "entry": 0.074967,
+      "sl": 0.073336,
+      "tp": 0.077822,
+      "rr": 1.75,
+      "atr": 0.0008538439367387532,
+      "sl_atr": 1.9103645418526891,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 50.896834679723,
+      "adx": 0.0,
+      "volume_ratio": 0.7967871403776183,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -4178,17 +4215,17 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791253800000,
+  "last_smc_candle": 1791254700000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 98,
-    "signals": 0,
+    "scans": 3,
+    "pairs": 147,
+    "signals": 1,
     "stages": {
-      "Struktur": 61,
-      "Displacement": 11,
-      "Retest": 11,
-      "Sweep": 14,
+      "Struktur": 84,
+      "Displacement": 18,
+      "Retest": 16,
+      "Sweep": 27,
       "Konfirmasi": 1
     },
     "near": [
