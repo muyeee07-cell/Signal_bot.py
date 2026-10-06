@@ -1,42 +1,5 @@
 {
-  "open": [
-    {
-      "signal_id": "FOGO-USDT-SWAP|SHORT|1791305100000|SMC",
-      "symbol": "FOGO-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.00543 | OB [0.005428-0.00545] | Disp bar 195 | RSI 51.6 | Vol 1.03x",
-      "signal_candle_time": 1791305100000,
-      "signal_candle_iso": "2026-10-06T16:45:00+00:00",
-      "created_at": "2026-10-06T17:13:33.810683+00:00",
-      "entry": 0.00542,
-      "sl": 0.005469,
-      "tp": 0.005334,
-      "rr": 1.75,
-      "atr": 3.1200360893576396e-05,
-      "sl_atr": 1.5820364526051,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 51.60708666935699,
-      "adx": 0.0,
-      "volume_ratio": 1.033847075363208,
-      "rsi_deadzone": false,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    }
-  ],
+  "open": [],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -4356,22 +4319,64 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "FOGO-USDT-SWAP|SHORT|1791305100000|SMC",
+      "symbol": "FOGO-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.00543 | OB [0.005428-0.00545] | Disp bar 195 | RSI 51.6 | Vol 1.03x",
+      "signal_candle_time": 1791305100000,
+      "signal_candle_iso": "2026-10-06T16:45:00+00:00",
+      "created_at": "2026-10-06T17:13:33.810683+00:00",
+      "entry": 0.00542,
+      "sl": 0.005469,
+      "tp": 0.005334,
+      "rr": 1.75,
+      "atr": 3.1200360893576396e-05,
+      "sl_atr": 1.5820364526051,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 51.60708666935699,
+      "adx": 0.0,
+      "volume_ratio": 1.033847075363208,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.005334,
+      "exit_time": "2026-10-06T20:00:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791314100000,
+  "last_smc_candle": 1791315900000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 49,
+    "scans": 2,
+    "pairs": 98,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 4,
-      "Struktur": 32,
-      "Sweep": 9,
-      "Displacement": 4
+      "Konfirmasi": 7,
+      "Struktur": 62,
+      "Sweep": 19,
+      "Displacement": 8,
+      "Retest": 1,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "LINEA-USDT-SWAP → Volume: LONG BOS volume 0.09x (min 0.50x)"
+      },
       {
         "depth": 6,
         "text": "SATS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
@@ -4389,12 +4394,8 @@
         "text": "LINEA-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 3,
-        "text": "BOME-USDT-SWAP → Displacement: LONG tidak ada displacement setelah sweep"
-      },
-      {
-        "depth": 3,
-        "text": "DOGE-USDT-SWAP → Displacement: LONG tidak ada displacement setelah sweep"
+        "depth": 6,
+        "text": "SATS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
