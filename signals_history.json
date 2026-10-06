@@ -1,5 +1,42 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "FOGO-USDT-SWAP|SHORT|1791305100000|SMC",
+      "symbol": "FOGO-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.00543 | OB [0.005428-0.00545] | Disp bar 195 | RSI 51.6 | Vol 1.03x",
+      "signal_candle_time": 1791305100000,
+      "signal_candle_iso": "2026-10-06T16:45:00+00:00",
+      "created_at": "2026-10-06T17:13:33.810683+00:00",
+      "entry": 0.00542,
+      "sl": 0.005469,
+      "tp": 0.005334,
+      "rr": 1.75,
+      "atr": 3.1200360893576396e-05,
+      "sl_atr": 1.5820364526051,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 51.60708666935699,
+      "adx": 0.0,
+      "volume_ratio": 1.033847075363208,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -4322,18 +4359,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791304200000,
+  "last_smc_candle": 1791305100000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 194,
-    "signals": 0,
+    "scans": 5,
+    "pairs": 243,
+    "signals": 1,
     "stages": {
-      "Struktur": 102,
-      "Displacement": 32,
-      "Konfirmasi": 12,
-      "Sweep": 24,
-      "Retest": 23,
+      "Struktur": 125,
+      "Displacement": 38,
+      "Konfirmasi": 17,
+      "Sweep": 29,
+      "Retest": 32,
       "Volume": 1
     },
     "near": [
