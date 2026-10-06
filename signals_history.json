@@ -4215,23 +4215,27 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791257400000,
+  "last_smc_candle": 1791259200000,
   "last_online_day": "2026-10-06",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 195,
+    "scans": 5,
+    "pairs": 244,
     "signals": 1,
     "stages": {
-      "Struktur": 107,
-      "Displacement": 23,
-      "Retest": 21,
-      "Sweep": 42,
-      "Konfirmasi": 1
+      "Struktur": 126,
+      "Displacement": 29,
+      "Retest": 23,
+      "Sweep": 63,
+      "Konfirmasi": 2
     },
     "near": [
       {
         "depth": 6,
         "text": "DOGE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "ATH-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
         "depth": 5,
@@ -4248,10 +4252,6 @@
       {
         "depth": 5,
         "text": "ATH-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "AEON-USDT-SWAP → Retest: LONG belum retest order block"
       }
     ]
   },
