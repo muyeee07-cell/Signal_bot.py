@@ -1,42 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "AKE-USDT-SWAP|SHORT|1791376200000|SMC",
-      "symbol": "AKE-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BULL | Sweep high @ 0.0284 | OB [0.02822-0.02848] | Disp bar 187 | RSI 49.3 | Vol 1.42x",
-      "signal_candle_time": 1791376200000,
-      "signal_candle_iso": "2026-10-07T12:30:00+00:00",
-      "created_at": "2026-10-07T12:53:14.348832+00:00",
-      "entry": 0.02814,
-      "sl": 0.02857,
-      "tp": 0.02739,
-      "rr": 1.75,
-      "atr": 0.00028882306739510486,
-      "sl_atr": 1.477191292463102,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 49.31568713141231,
-      "adx": 0.0,
-      "volume_ratio": 1.4211102522674868,
-      "rsi_deadzone": true,
-      "regime": "BULL",
-      "structure": "CHOCH",
-      "bos": "CHOCH",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "ARB-USDT-SWAP|LONG|1791388800000|SMC",
       "symbol": "ARB-USDT-SWAP",
       "direction": "LONG",
@@ -4860,53 +4824,87 @@
       "result_r": 1.75,
       "result": "WIN",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "AKE-USDT-SWAP|SHORT|1791376200000|SMC",
+      "symbol": "AKE-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.0284 | OB [0.02822-0.02848] | Disp bar 187 | RSI 49.3 | Vol 1.42x",
+      "signal_candle_time": 1791376200000,
+      "signal_candle_iso": "2026-10-07T12:30:00+00:00",
+      "created_at": "2026-10-07T12:53:14.348832+00:00",
+      "entry": 0.02814,
+      "sl": 0.02857,
+      "tp": 0.02739,
+      "rr": 1.75,
+      "atr": 0.00028882306739510486,
+      "sl_atr": 1.477191292463102,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 49.31568713141231,
+      "adx": 0.0,
+      "volume_ratio": 1.4211102522674868,
+      "rsi_deadzone": true,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.02739,
+      "exit_time": "2026-10-07T16:55:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791390600000,
+  "last_smc_candle": 1791392400000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 8,
-    "pairs": 352,
-    "signals": 5,
+    "scans": 1,
+    "pairs": 44,
+    "signals": 0,
     "stages": {
-      "Retest": 51,
-      "Displacement": 81,
-      "Konfirmasi": 30,
-      "Struktur": 134,
-      "Sweep": 46,
-      "Diblokir": 1,
-      "SL/RR": 2,
-      "Volume": 2
+      "Konfirmasi": 5,
+      "Struktur": 16,
+      "Sweep": 6,
+      "Retest": 6,
+      "Displacement": 8,
+      "Volume": 3
     },
     "near": [
       {
-        "depth": 10,
-        "text": "WLD-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 9,
-        "text": "ADA-USDT-SWAP → SL/RR: SHORT SL 2.88 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 9,
-        "text": "ONE-USDT-SWAP → SL/RR: SHORT SL 3.08 ATR (perlu 0.35-2.5)"
+        "depth": 8,
+        "text": "PENGU-USDT-SWAP → Volume: LONG CHOCH volume 0.49x (min 0.75x)"
       },
       {
         "depth": 8,
-        "text": "RLS-USDT-SWAP → Volume: SHORT CHOCH volume 0.11x (min 1.00x, RSI 49.9 di deadzone +0.25)"
+        "text": "NIGHT-USDT-SWAP → Volume: LONG CHOCH volume 0.40x (min 1.00x, RSI 48.7 di deadzone +0.25)"
       },
       {
         "depth": 8,
-        "text": "RVN-USDT-SWAP → Volume: LONG CHOCH volume 0.25x (min 0.75x)"
+        "text": "SPACE-USDT-SWAP → Volume: LONG CHOCH volume 0.25x (min 0.75x)"
       },
       {
         "depth": 6,
-        "text": "BONK-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
+        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "RSR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1791379110.7122157,
+  "last_report_ts": 1791393647.193099,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
