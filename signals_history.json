@@ -1,5 +1,78 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "CP-USDT-SWAP|LONG|1791367200000|SMC",
+      "symbol": "CP-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep low @ 0.01138 | OB [0.01135-0.01144] | Disp bar 198 | RSI 45.9 | Vol 1.73x",
+      "signal_candle_time": 1791367200000,
+      "signal_candle_iso": "2026-10-07T10:00:00+00:00",
+      "created_at": "2026-10-07T10:15:43.421045+00:00",
+      "entry": 0.01145,
+      "sl": 0.01133,
+      "tp": 0.01167,
+      "rr": 1.75,
+      "atr": 7.88916746672759e-05,
+      "sl_atr": 1.5675608728265267,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 45.91404171225948,
+      "adx": 0.0,
+      "volume_ratio": 1.728464308909488,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "AEON-USDT-SWAP|LONG|1791367200000|SMC",
+      "symbol": "AEON-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.06961 | OB [0.06919-0.07003] | Disp bar 198 | RSI 62.6 | Vol 2.51x",
+      "signal_candle_time": 1791367200000,
+      "signal_candle_iso": "2026-10-07T10:00:00+00:00",
+      "created_at": "2026-10-07T10:15:59.288802+00:00",
+      "entry": 0.0711,
+      "sl": 0.06892,
+      "tp": 0.07492,
+      "rr": 1.75,
+      "atr": 0.0009078088866174464,
+      "sl_atr": 2.4039670663687556,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 62.569074891617426,
+      "adx": 0.0,
+      "volume_ratio": 2.507997788910603,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -4538,20 +4611,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791365400000,
+  "last_smc_candle": 1791367200000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 98,
-    "signals": 0,
+    "scans": 3,
+    "pairs": 147,
+    "signals": 2,
     "stages": {
-      "Struktur": 22,
-      "Displacement": 27,
-      "Retest": 21,
-      "Sweep": 19,
-      "Konfirmasi": 9
+      "Struktur": 34,
+      "Displacement": 40,
+      "Retest": 32,
+      "Sweep": 25,
+      "Konfirmasi": 13,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "AKE-USDT-SWAP → Volume: SHORT CHOCH volume 0.58x (min 0.75x)"
+      },
       {
         "depth": 6,
         "text": "SAND-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
@@ -4571,10 +4649,6 @@
       {
         "depth": 6,
         "text": "STRK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
