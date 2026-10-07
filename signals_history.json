@@ -4539,18 +4539,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791347400000,
+  "last_smc_candle": 1791348300000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 47,
+    "scans": 2,
+    "pairs": 93,
     "signals": 1,
     "stages": {
-      "Sweep": 16,
+      "Sweep": 18,
       "Displacement": 8,
       "Retest": 7,
       "Struktur": 11,
-      "Konfirmasi": 4
+      "Konfirmasi": 4,
+      "Data": 44
     },
     "near": [
       {
