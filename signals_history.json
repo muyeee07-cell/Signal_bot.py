@@ -4899,20 +4899,37 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791408600000,
+  "last_smc_candle": 1791409500000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 47,
+    "scans": 2,
+    "pairs": 94,
     "signals": 0,
     "stages": {
-      "Displacement": 8,
-      "Konfirmasi": 12,
-      "Retest": 10,
-      "Struktur": 14,
-      "Sweep": 3
+      "Displacement": 20,
+      "Konfirmasi": 19,
+      "Retest": 19,
+      "Struktur": 25,
+      "Sweep": 7,
+      "Volume": 4
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "PEPE-USDT-SWAP → Volume: LONG CHOCH volume 0.42x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "PEOPLE-USDT-SWAP → Volume: LONG CHOCH volume 0.64x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "ARB-USDT-SWAP → Volume: LONG CHOCH volume 0.61x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "STRK-USDT-SWAP → Volume: LONG CHOCH volume 0.36x (min 0.75x)"
+      },
       {
         "depth": 6,
         "text": "PEPE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
@@ -4920,22 +4937,6 @@
       {
         "depth": 6,
         "text": "SHIB-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "DOGE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "HMSTR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ONE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
