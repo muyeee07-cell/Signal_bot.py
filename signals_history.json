@@ -4538,49 +4538,47 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791361800000,
+  "last_smc_candle": 1791363600000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 9,
-    "pairs": 433,
-    "signals": 1,
+    "scans": 1,
+    "pairs": 49,
+    "signals": 0,
     "stages": {
-      "Sweep": 147,
-      "Displacement": 92,
-      "Retest": 79,
-      "Struktur": 39,
-      "Konfirmasi": 28,
-      "Data": 44,
-      "Volume": 3
+      "Struktur": 11,
+      "Displacement": 13,
+      "Retest": 9,
+      "Sweep": 11,
+      "Konfirmasi": 5
     },
     "near": [
       {
-        "depth": 8,
-        "text": "MUBARAK-USDT-SWAP → Volume: SHORT CHOCH volume 0.55x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "RSR-USDT-SWAP → Volume: LONG CHOCH volume 0.39x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "W-USDT-SWAP → Volume: SHORT CHOCH volume 0.72x (min 0.75x)"
+        "depth": 6,
+        "text": "SAND-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "CAP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "MUBARAK-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
+        "text": "RSR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "RESOLV-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+        "text": "W-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "STRK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
+      },
+      {
+        "depth": 5,
+        "text": "FLOKI-USDT-SWAP → Retest: SHORT belum retest order block"
       }
     ]
   },
-  "last_report_ts": 1791348492.9765916,
+  "last_report_ts": 1791364537.4752116,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
