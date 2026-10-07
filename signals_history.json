@@ -4431,18 +4431,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791331200000,
+  "last_smc_candle": 1791333000000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 49,
+    "scans": 2,
+    "pairs": 98,
     "signals": 2,
     "stages": {
-      "Struktur": 12,
-      "Displacement": 13,
-      "Retest": 12,
-      "Sweep": 5,
-      "Konfirmasi": 5
+      "Struktur": 24,
+      "Displacement": 24,
+      "Retest": 31,
+      "Sweep": 9,
+      "Konfirmasi": 8
     },
     "near": [
       {
@@ -4466,8 +4466,8 @@
         "text": "LINEA-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "PUMP-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "HMSTR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
