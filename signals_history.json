@@ -1,42 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "GALA-USDT-SWAP|SHORT|1791390600000|SMC",
-      "symbol": "GALA-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC CHOCH BEAR | Sweep high @ 0.002323 | OB [0.002287-0.002339] | Disp bar 198 | RSI 54.5 | Vol 1.49x",
-      "signal_candle_time": 1791390600000,
-      "signal_candle_iso": "2026-10-07T16:30:00+00:00",
-      "created_at": "2026-10-07T16:47:36.685581+00:00",
-      "entry": 0.002287,
-      "sl": 0.002346,
-      "tp": 0.002183,
-      "rr": 1.75,
-      "atr": 2.4959369558595327e-05,
-      "sl_atr": 2.3833859556397488,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 54.510819849262525,
-      "adx": 0.0,
-      "volume_ratio": 1.493643005458832,
-      "rsi_deadzone": false,
-      "regime": "BEAR",
-      "structure": "CHOCH",
-      "bos": "CHOCH",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "LINEA-USDT-SWAP|SHORT|1791390600000|SMC",
       "symbol": "LINEA-USDT-SWAP",
       "direction": "SHORT",
@@ -4896,25 +4860,66 @@
       "result_r": 1.75,
       "result": "WIN",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "GALA-USDT-SWAP|SHORT|1791390600000|SMC",
+      "symbol": "GALA-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.002323 | OB [0.002287-0.002339] | Disp bar 198 | RSI 54.5 | Vol 1.49x",
+      "signal_candle_time": 1791390600000,
+      "signal_candle_iso": "2026-10-07T16:30:00+00:00",
+      "created_at": "2026-10-07T16:47:36.685581+00:00",
+      "entry": 0.002287,
+      "sl": 0.002346,
+      "tp": 0.002183,
+      "rr": 1.75,
+      "atr": 2.4959369558595327e-05,
+      "sl_atr": 2.3833859556397488,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 54.510819849262525,
+      "adx": 0.0,
+      "volume_ratio": 1.493643005458832,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.002346,
+      "exit_time": "2026-10-07T23:35:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791413100000,
+  "last_smc_candle": 1791414900000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 188,
+    "scans": 5,
+    "pairs": 235,
     "signals": 0,
     "stages": {
-      "Displacement": 39,
-      "Konfirmasi": 41,
-      "Retest": 30,
-      "Struktur": 52,
-      "Sweep": 15,
-      "Volume": 5,
-      "Data": 6
+      "Displacement": 46,
+      "Konfirmasi": 52,
+      "Retest": 39,
+      "Struktur": 67,
+      "Sweep": 18,
+      "Volume": 6,
+      "Data": 6,
+      "SL/RR": 1
     },
     "near": [
+      {
+        "depth": 9,
+        "text": "ENA-USDT-SWAP → SL/RR: LONG SL 2.94 ATR (perlu 0.35-2.5)"
+      },
       {
         "depth": 8,
         "text": "PEPE-USDT-SWAP → Volume: LONG CHOCH volume 0.42x (min 0.75x)"
@@ -4934,10 +4939,6 @@
       {
         "depth": 8,
         "text": "ADA-USDT-SWAP → Volume: LONG CHOCH volume 0.35x (min 0.75x)"
-      },
-      {
-        "depth": 6,
-        "text": "PEPE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
