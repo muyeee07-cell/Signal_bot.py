@@ -4899,19 +4899,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791399600000,
+  "last_smc_candle": 1791400500000,
   "last_online_day": "2026-10-07",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 222,
+    "scans": 6,
+    "pairs": 266,
     "signals": 1,
     "stages": {
-      "Konfirmasi": 44,
-      "Struktur": 77,
-      "Sweep": 24,
-      "Retest": 34,
-      "Displacement": 37,
-      "Volume": 5
+      "Konfirmasi": 52,
+      "Struktur": 90,
+      "Sweep": 29,
+      "Retest": 41,
+      "Displacement": 47,
+      "Volume": 6
     },
     "near": [
       {
@@ -4935,8 +4935,8 @@
         "text": "DOGE-USDT-SWAP → Volume: SHORT CHOCH volume 0.17x (min 0.75x)"
       },
       {
-        "depth": 6,
-        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
+        "depth": 8,
+        "text": "RESOLV-USDT-SWAP → Volume: SHORT CHOCH volume 0.35x (min 0.75x)"
       }
     ]
   },
