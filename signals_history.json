@@ -5295,20 +5295,20 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791444600000,
+  "last_smc_candle": 1791446400000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 85,
+    "scans": 3,
+    "pairs": 126,
     "signals": 4,
     "stages": {
-      "Konfirmasi": 29,
-      "Retest": 20,
-      "Displacement": 18,
+      "Konfirmasi": 42,
+      "Retest": 28,
+      "Displacement": 27,
       "SL/RR": 1,
-      "Struktur": 8,
-      "Volume": 2,
-      "Sweep": 3
+      "Struktur": 15,
+      "Volume": 4,
+      "Sweep": 5
     },
     "near": [
       {
@@ -5324,16 +5324,16 @@
         "text": "PEOPLE-USDT-SWAP → Volume: LONG CHOCH volume 0.69x (min 0.75x)"
       },
       {
+        "depth": 8,
+        "text": "FLOKI-USDT-SWAP → Volume: LONG CHOCH volume 0.48x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "TRIA-USDT-SWAP → Volume: LONG CHOCH volume 0.59x (min 1.00x, RSI 47.5 di deadzone +0.25)"
+      },
+      {
         "depth": 6,
         "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "W-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
