@@ -5582,20 +5582,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791486000000,
+  "last_smc_candle": 1791487800000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 96,
+    "scans": 3,
+    "pairs": 146,
     "signals": 0,
     "stages": {
-      "Sweep": 21,
-      "Struktur": 46,
-      "Retest": 19,
-      "Displacement": 8,
-      "Konfirmasi": 2
+      "Sweep": 31,
+      "Struktur": 70,
+      "Retest": 27,
+      "Displacement": 12,
+      "Konfirmasi": 5,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "ONE-USDT-SWAP → Volume: LONG CHOCH volume 0.51x (min 0.75x)"
+      },
       {
         "depth": 6,
         "text": "AKE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
@@ -5605,20 +5610,16 @@
         "text": "AKE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "BOME-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "HMSTR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "NEIRO-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "AKE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "NOT-USDT-SWAP → Retest: SHORT belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "IOST-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
