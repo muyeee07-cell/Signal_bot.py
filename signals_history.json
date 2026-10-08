@@ -4970,25 +4970,33 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791425700000,
+  "last_smc_candle": 1791427500000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 140,
+    "scans": 4,
+    "pairs": 186,
     "signals": 1,
     "stages": {
-      "Sweep": 40,
-      "Struktur": 32,
-      "Volume": 1,
-      "Retest": 31,
-      "Konfirmasi": 10,
-      "Displacement": 15,
-      "Data": 10
+      "Sweep": 50,
+      "Struktur": 39,
+      "Volume": 3,
+      "Retest": 34,
+      "Konfirmasi": 14,
+      "Displacement": 20,
+      "Data": 25
     },
     "near": [
       {
         "depth": 8,
         "text": "PUMP-USDT-SWAP → Volume: SHORT CHOCH volume 0.73x (min 1.00x, RSI 47.5 di deadzone +0.25)"
+      },
+      {
+        "depth": 8,
+        "text": "MEW-USDT-SWAP → Volume: SHORT CHOCH volume 0.48x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "NIGHT-USDT-SWAP → Volume: SHORT CHOCH volume 0.61x (min 0.75x)"
       },
       {
         "depth": 6,
@@ -5001,14 +5009,6 @@
       {
         "depth": 6,
         "text": "CORE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PUMP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "CAP-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
