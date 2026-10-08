@@ -4935,26 +4935,30 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791417600000,
+  "last_smc_candle": 1791419400000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 283,
+    "scans": 7,
+    "pairs": 330,
     "signals": 1,
     "stages": {
-      "Displacement": 52,
-      "Konfirmasi": 61,
-      "Retest": 50,
-      "Struktur": 84,
-      "Sweep": 22,
+      "Displacement": 58,
+      "Konfirmasi": 65,
+      "Retest": 61,
+      "Struktur": 101,
+      "Sweep": 30,
       "Volume": 6,
       "Data": 6,
-      "SL/RR": 1
+      "SL/RR": 2
     },
     "near": [
       {
         "depth": 9,
         "text": "ENA-USDT-SWAP → SL/RR: LONG SL 2.94 ATR (perlu 0.35-2.5)"
+      },
+      {
+        "depth": 9,
+        "text": "CP-USDT-SWAP → SL/RR: SHORT SL 2.85 ATR (perlu 0.35-2.5)"
       },
       {
         "depth": 8,
@@ -4971,10 +4975,6 @@
       {
         "depth": 8,
         "text": "STRK-USDT-SWAP → Volume: LONG CHOCH volume 0.36x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "ADA-USDT-SWAP → Volume: LONG CHOCH volume 0.35x (min 0.75x)"
       }
     ]
   },
