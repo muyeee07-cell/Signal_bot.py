@@ -5582,19 +5582,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791489600000,
+  "last_smc_candle": 1791491400000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 196,
+    "scans": 5,
+    "pairs": 246,
     "signals": 0,
     "stages": {
-      "Sweep": 41,
-      "Struktur": 92,
-      "Retest": 35,
-      "Displacement": 17,
-      "Konfirmasi": 9,
-      "Volume": 2
+      "Sweep": 50,
+      "Struktur": 113,
+      "Retest": 43,
+      "Displacement": 24,
+      "Konfirmasi": 13,
+      "Volume": 3
     },
     "near": [
       {
@@ -5604,6 +5604,10 @@
       {
         "depth": 8,
         "text": "MET-USDT-SWAP → Volume: LONG BOS volume 0.29x (min 0.50x)"
+      },
+      {
+        "depth": 8,
+        "text": "AEVO-USDT-SWAP → Volume: LONG CHOCH volume 0.31x (min 0.75x)"
       },
       {
         "depth": 6,
@@ -5616,10 +5620,6 @@
       {
         "depth": 6,
         "text": "HMSTR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "AKE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
