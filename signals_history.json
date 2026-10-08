@@ -4935,50 +4935,48 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791421200000,
+  "last_smc_candle": 1791423000000,
   "last_online_day": "2026-10-08",
   "smc_rej": {
-    "scans": 8,
-    "pairs": 377,
-    "signals": 1,
+    "scans": 1,
+    "pairs": 47,
+    "signals": 0,
     "stages": {
-      "Displacement": 63,
-      "Konfirmasi": 69,
-      "Retest": 73,
-      "Struktur": 113,
-      "Sweep": 44,
-      "Volume": 6,
-      "Data": 6,
-      "SL/RR": 2
+      "Sweep": 13,
+      "Struktur": 12,
+      "Volume": 1,
+      "Retest": 11,
+      "Konfirmasi": 3,
+      "Displacement": 7
     },
     "near": [
       {
-        "depth": 9,
-        "text": "ENA-USDT-SWAP → SL/RR: LONG SL 2.94 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 9,
-        "text": "CP-USDT-SWAP → SL/RR: SHORT SL 2.85 ATR (perlu 0.35-2.5)"
-      },
-      {
         "depth": 8,
-        "text": "PEPE-USDT-SWAP → Volume: LONG CHOCH volume 0.42x (min 0.75x)"
+        "text": "PUMP-USDT-SWAP → Volume: SHORT CHOCH volume 0.73x (min 1.00x, RSI 47.5 di deadzone +0.25)"
       },
       {
-        "depth": 8,
-        "text": "PEOPLE-USDT-SWAP → Volume: LONG CHOCH volume 0.64x (min 0.75x)"
+        "depth": 6,
+        "text": "CAP-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "ARB-USDT-SWAP → Volume: LONG CHOCH volume 0.61x (min 0.75x)"
+        "depth": 6,
+        "text": "CP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "STRK-USDT-SWAP → Volume: LONG CHOCH volume 0.36x (min 0.75x)"
+        "depth": 6,
+        "text": "CORE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
+      },
+      {
+        "depth": 5,
+        "text": "SAND-USDT-SWAP → Retest: LONG order block ditembus (close di bawah OB)"
+      },
+      {
+        "depth": 5,
+        "text": "ONE-USDT-SWAP → Retest: SHORT order block ditembus (close di atas OB)"
       }
     ]
   },
-  "last_report_ts": 1791409526.0048482,
+  "last_report_ts": 1791423975.2340012,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
