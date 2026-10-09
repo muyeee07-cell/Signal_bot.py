@@ -6015,49 +6015,10 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791558000000,
+  "last_smc_candle": 1791559800000,
   "last_online_day": "2026-10-09",
-  "smc_rej": {
-    "scans": 4,
-    "pairs": 135,
-    "signals": 4,
-    "stages": {
-      "Retest": 36,
-      "Struktur": 27,
-      "Displacement": 28,
-      "Sweep": 12,
-      "Konfirmasi": 23,
-      "SL/RR": 2,
-      "Volume": 3
-    },
-    "near": [
-      {
-        "depth": 9,
-        "text": "NIGHT-USDT-SWAP → SL/RR: SHORT SL 2.75 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 9,
-        "text": "PENGU-USDT-SWAP → SL/RR: SHORT SL 2.57 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 8,
-        "text": "SATS-USDT-SWAP → Volume: SHORT BOS volume 0.53x (min 0.75x, RSI 49.2 di deadzone +0.25)"
-      },
-      {
-        "depth": 8,
-        "text": "SHIB-USDT-SWAP → Volume: SHORT CHOCH volume 0.51x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "TURBO-USDT-SWAP → Volume: SHORT CHOCH volume 0.27x (min 0.75x)"
-      },
-      {
-        "depth": 6,
-        "text": "STRK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      }
-    ]
-  },
-  "last_report_ts": 1791546309.8827922,
+  "smc_rej": null,
+  "last_report_ts": 1791560856.9875753,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
