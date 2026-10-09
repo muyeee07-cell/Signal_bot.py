@@ -1,5 +1,42 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "SAND-USDT-SWAP|LONG|1791504000000|SMC",
+      "symbol": "SAND-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.06622 | OB [0.06567-0.06648] | Disp bar 191 | RSI 43.3 | Vol 1.27x",
+      "signal_candle_time": 1791504000000,
+      "signal_candle_iso": "2026-10-09T00:00:00+00:00",
+      "created_at": "2026-10-09T00:23:49.926444+00:00",
+      "entry": 0.06663,
+      "sl": 0.06548,
+      "tp": 0.06865,
+      "rr": 1.75,
+      "atr": 0.0006446132922195931,
+      "sl_atr": 1.7892649772926952,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 43.299818767834644,
+      "adx": 0.0,
+      "volume_ratio": 1.2732580204438173,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -5582,18 +5619,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791501300000,
-  "last_online_day": "2026-10-08",
+  "last_smc_candle": 1791504000000,
+  "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 100,
-    "signals": 0,
+    "scans": 3,
+    "pairs": 150,
+    "signals": 1,
     "stages": {
-      "Sweep": 54,
-      "Struktur": 12,
-      "Displacement": 22,
-      "Retest": 10,
-      "Konfirmasi": 2
+      "Sweep": 76,
+      "Struktur": 20,
+      "Displacement": 35,
+      "Retest": 15,
+      "Konfirmasi": 3
     },
     "near": [
       {
@@ -5603,6 +5640,10 @@
       {
         "depth": 6,
         "text": "MET-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "MINA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       },
       {
         "depth": 5,
@@ -5615,10 +5656,6 @@
       {
         "depth": 5,
         "text": "AKE-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "SAND-USDT-SWAP → Retest: LONG belum retest order block"
       }
     ]
   },
