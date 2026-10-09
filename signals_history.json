@@ -1,5 +1,42 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "ARB-USDT-SWAP|SHORT|1791510300000|SMC",
+      "symbol": "ARB-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.17336 | OB [0.17371-0.17429] | Disp bar 191 | RSI 55.8 | Vol 0.94x",
+      "signal_candle_time": 1791510300000,
+      "signal_candle_iso": "2026-10-09T01:45:00+00:00",
+      "created_at": "2026-10-09T02:15:01.806484+00:00",
+      "entry": 0.17366,
+      "sl": 0.17468,
+      "tp": 0.17188,
+      "rr": 1.75,
+      "atr": 0.0012891750655130622,
+      "sl_atr": 0.7886845990534797,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 55.78884366421927,
+      "adx": 0.0,
+      "volume_ratio": 0.9404959529206921,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -5618,19 +5655,20 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791509400000,
+  "last_smc_candle": 1791510300000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 297,
-    "signals": 1,
+    "scans": 7,
+    "pairs": 346,
+    "signals": 2,
     "stages": {
-      "Sweep": 123,
-      "Struktur": 53,
-      "Displacement": 66,
-      "Retest": 44,
-      "Konfirmasi": 9,
-      "Volume": 1
+      "Sweep": 130,
+      "Struktur": 65,
+      "Displacement": 77,
+      "Retest": 50,
+      "Konfirmasi": 13,
+      "Volume": 1,
+      "Data": 8
     },
     "near": [
       {
