@@ -5763,21 +5763,26 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791520200000,
+  "last_smc_candle": 1791521100000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 183,
+    "scans": 5,
+    "pairs": 229,
     "signals": 1,
     "stages": {
-      "Konfirmasi": 23,
-      "Struktur": 63,
-      "Retest": 30,
-      "Displacement": 35,
-      "Sweep": 14,
-      "Data": 17
+      "Konfirmasi": 28,
+      "Struktur": 79,
+      "Retest": 39,
+      "Displacement": 45,
+      "Sweep": 19,
+      "Data": 17,
+      "SL/RR": 1
     },
     "near": [
+      {
+        "depth": 9,
+        "text": "BOME-USDT-SWAP → SL/RR: SHORT SL 2.68 ATR (perlu 0.35-2.5)"
+      },
       {
         "depth": 6,
         "text": "SATS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
@@ -5797,10 +5802,6 @@
       {
         "depth": 6,
         "text": "MEW-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "BILL-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
