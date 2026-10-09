@@ -107,6 +107,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "BOME-USDT-SWAP|SHORT|1791531000000|SMC",
+      "symbol": "BOME-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.0010581 | OB [0.0010699-0.0010797] | Disp bar 192 | RSI 55.5 | Vol 0.96x",
+      "signal_candle_time": 1791531000000,
+      "signal_candle_iso": "2026-10-09T07:30:00+00:00",
+      "created_at": "2026-10-09T07:47:10.221946+00:00",
+      "entry": 0.0010643,
+      "sl": 0.0010834,
+      "tp": 0.0010309,
+      "rr": 1.75,
+      "atr": 1.2331086649363941e-05,
+      "sl_atr": 1.5488761483801836,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 55.49225133280191,
+      "adx": 0.0,
+      "volume_ratio": 0.9583603945984309,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -5799,20 +5835,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791529200000,
+  "last_smc_candle": 1791531000000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 46,
-    "signals": 0,
+    "scans": 2,
+    "pairs": 93,
+    "signals": 1,
     "stages": {
-      "Struktur": 15,
-      "Sweep": 12,
-      "Konfirmasi": 9,
-      "Displacement": 6,
-      "Retest": 4
+      "Struktur": 38,
+      "Sweep": 21,
+      "Konfirmasi": 15,
+      "Displacement": 10,
+      "Retest": 7,
+      "Diblokir": 1
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "AEVO-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
       {
         "depth": 6,
         "text": "PUMP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
@@ -5832,10 +5873,6 @@
       {
         "depth": 6,
         "text": "MET-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "XRP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
