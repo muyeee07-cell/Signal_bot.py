@@ -143,6 +143,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "MUBARAK-USDT-SWAP|LONG|1791536400000|SMC",
+      "symbol": "MUBARAK-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.074858 | OB [0.074792-0.07604] | Disp bar 198 | RSI 50.0 | Vol 1.04x",
+      "signal_candle_time": 1791536400000,
+      "signal_candle_iso": "2026-10-09T09:00:00+00:00",
+      "created_at": "2026-10-09T09:16:53.616025+00:00",
+      "entry": 0.076079,
+      "sl": 0.074331,
+      "tp": 0.079137,
+      "rr": 1.75,
+      "atr": 0.0007685288509690947,
+      "sl_atr": 2.273901172463591,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 50.013462536608564,
+      "adx": 0.0,
+      "volume_ratio": 1.0424400015919975,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -5835,24 +5871,33 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791534600000,
+  "last_smc_candle": 1791536400000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 185,
-    "signals": 1,
+    "scans": 5,
+    "pairs": 209,
+    "signals": 2,
     "stages": {
-      "Struktur": 76,
-      "Sweep": 42,
+      "Struktur": 81,
+      "Sweep": 49,
       "Konfirmasi": 21,
-      "Displacement": 25,
-      "Retest": 19,
-      "Diblokir": 1
+      "Displacement": 31,
+      "Retest": 22,
+      "Diblokir": 2,
+      "Volume": 1
     },
     "near": [
       {
         "depth": 10,
         "text": "AEVO-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 10,
+        "text": "CP-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 8,
+        "text": "PENGU-USDT-SWAP → Volume: SHORT CHOCH volume 0.74x (min 0.75x)"
       },
       {
         "depth": 6,
@@ -5865,14 +5910,6 @@
       {
         "depth": 6,
         "text": "MEW-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "CP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MET-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
