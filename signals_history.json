@@ -107,6 +107,78 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "ADA-USDT-SWAP|SHORT|1791556200000|SMC",
+      "symbol": "ADA-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep high @ 0.2393 | OB [0.239-0.2407] | Disp bar 190 | RSI 49.7 | Vol 1.06x",
+      "signal_candle_time": 1791556200000,
+      "signal_candle_iso": "2026-10-09T14:30:00+00:00",
+      "created_at": "2026-10-09T14:49:48.930732+00:00",
+      "entry": 0.2377,
+      "sl": 0.2412,
+      "tp": 0.2316,
+      "rr": 1.75,
+      "atr": 0.0016939326702113296,
+      "sl_atr": 2.0710267077060043,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 49.65935602154219,
+      "adx": 0.0,
+      "volume_ratio": 1.062493327231798,
+      "rsi_deadzone": true,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "ENA-USDT-SWAP|SHORT|1791556200000|SMC",
+      "symbol": "ENA-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.21839 | OB [0.21734-0.21941] | Disp bar 189 | RSI 55.3 | Vol 1.66x",
+      "signal_candle_time": 1791556200000,
+      "signal_candle_iso": "2026-10-09T14:30:00+00:00",
+      "created_at": "2026-10-09T14:49:52.228807+00:00",
+      "entry": 0.21748,
+      "sl": 0.22053,
+      "tp": 0.21214,
+      "rr": 1.75,
+      "atr": 0.0020725395486346633,
+      "sl_atr": 1.4724746104849045,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 55.27331641859702,
+      "adx": 0.0,
+      "volume_ratio": 1.6613502170408623,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -5943,19 +6015,20 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791554400000,
+  "last_smc_candle": 1791556200000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 105,
-    "signals": 2,
+    "scans": 4,
+    "pairs": 135,
+    "signals": 4,
     "stages": {
-      "Retest": 29,
-      "Struktur": 21,
-      "Displacement": 21,
-      "Sweep": 9,
-      "Konfirmasi": 22,
-      "SL/RR": 1
+      "Retest": 36,
+      "Struktur": 27,
+      "Displacement": 28,
+      "Sweep": 12,
+      "Konfirmasi": 23,
+      "SL/RR": 2,
+      "Volume": 3
     },
     "near": [
       {
@@ -5963,24 +6036,24 @@
         "text": "NIGHT-USDT-SWAP → SL/RR: SHORT SL 2.75 ATR (perlu 0.35-2.5)"
       },
       {
+        "depth": 9,
+        "text": "PENGU-USDT-SWAP → SL/RR: SHORT SL 2.57 ATR (perlu 0.35-2.5)"
+      },
+      {
+        "depth": 8,
+        "text": "SATS-USDT-SWAP → Volume: SHORT BOS volume 0.53x (min 0.75x, RSI 49.2 di deadzone +0.25)"
+      },
+      {
+        "depth": 8,
+        "text": "SHIB-USDT-SWAP → Volume: SHORT CHOCH volume 0.51x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "TURBO-USDT-SWAP → Volume: SHORT CHOCH volume 0.27x (min 0.75x)"
+      },
+      {
         "depth": 6,
         "text": "STRK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SHIB-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "CP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
