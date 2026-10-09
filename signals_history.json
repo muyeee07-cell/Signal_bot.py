@@ -6015,25 +6015,29 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791564300000,
+  "last_smc_candle": 1791567000000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 84,
+    "scans": 3,
+    "pairs": 127,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 32,
-      "Displacement": 10,
-      "Retest": 28,
-      "Sweep": 5,
-      "Struktur": 6,
-      "Diblokir": 1,
-      "Volume": 2
+      "Konfirmasi": 57,
+      "Displacement": 11,
+      "Retest": 38,
+      "Sweep": 9,
+      "Struktur": 7,
+      "Diblokir": 2,
+      "Volume": 3
     },
     "near": [
       {
         "depth": 10,
         "text": "CP-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 10,
+        "text": "ZK-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
       },
       {
         "depth": 8,
@@ -6044,16 +6048,12 @@
         "text": "S-USDT-SWAP → Volume: LONG CHOCH volume 0.22x (min 1.00x, RSI 49.0 di deadzone +0.25)"
       },
       {
+        "depth": 8,
+        "text": "ONDO-USDT-SWAP → Volume: LONG CHOCH volume 0.48x (min 1.00x, RSI 47.5 di deadzone +0.25)"
+      },
+      {
         "depth": 6,
         "text": "SATS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PEPE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SHIB-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
