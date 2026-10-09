@@ -1,42 +1,5 @@
 {
-  "open": [
-    {
-      "signal_id": "SAND-USDT-SWAP|LONG|1791504000000|SMC",
-      "symbol": "SAND-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BULL | Sweep low @ 0.06622 | OB [0.06567-0.06648] | Disp bar 191 | RSI 43.3 | Vol 1.27x",
-      "signal_candle_time": 1791504000000,
-      "signal_candle_iso": "2026-10-09T00:00:00+00:00",
-      "created_at": "2026-10-09T00:23:49.926444+00:00",
-      "entry": 0.06663,
-      "sl": 0.06548,
-      "tp": 0.06865,
-      "rr": 1.75,
-      "atr": 0.0006446132922195931,
-      "sl_atr": 1.7892649772926952,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 43.299818767834644,
-      "adx": 0.0,
-      "volume_ratio": 1.2732580204438173,
-      "rsi_deadzone": false,
-      "regime": "BULL",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    }
-  ],
+  "open": [],
   "closed": [
     {
       "signal_id": "BTC-USDT-SWAP|LONG|1790816400000|SMC",
@@ -5616,23 +5579,64 @@
       "result_r": 1.75,
       "result": "WIN",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "SAND-USDT-SWAP|LONG|1791504000000|SMC",
+      "symbol": "SAND-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.06622 | OB [0.06567-0.06648] | Disp bar 191 | RSI 43.3 | Vol 1.27x",
+      "signal_candle_time": 1791504000000,
+      "signal_candle_iso": "2026-10-09T00:00:00+00:00",
+      "created_at": "2026-10-09T00:23:49.926444+00:00",
+      "entry": 0.06663,
+      "sl": 0.06548,
+      "tp": 0.06865,
+      "rr": 1.75,
+      "atr": 0.0006446132922195931,
+      "sl_atr": 1.7892649772926952,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 43.299818767834644,
+      "adx": 0.0,
+      "volume_ratio": 1.2732580204438173,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.06865,
+      "exit_time": "2026-10-09T01:10:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791505800000,
+  "last_smc_candle": 1791507600000,
   "last_online_day": "2026-10-09",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 199,
+    "scans": 5,
+    "pairs": 248,
     "signals": 1,
     "stages": {
-      "Sweep": 97,
-      "Struktur": 29,
-      "Displacement": 46,
-      "Retest": 22,
-      "Konfirmasi": 4
+      "Sweep": 112,
+      "Struktur": 40,
+      "Displacement": 54,
+      "Retest": 34,
+      "Konfirmasi": 6,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "MEME-USDT-SWAP → Volume: LONG CHOCH volume 0.69x (min 1.00x, RSI 47.5 di deadzone +0.25)"
+      },
       {
         "depth": 6,
         "text": "MET-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
@@ -5650,12 +5654,8 @@
         "text": "MINA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "BOME-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "ONE-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
