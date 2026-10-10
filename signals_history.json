@@ -6339,23 +6339,28 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791614700000,
+  "last_smc_candle": 1791616500000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 273,
+    "scans": 7,
+    "pairs": 318,
     "signals": 3,
     "stages": {
-      "Sweep": 42,
-      "Struktur": 66,
-      "Displacement": 40,
-      "Konfirmasi": 35,
-      "Retest": 57,
-      "Volume": 5,
+      "Sweep": 47,
+      "Struktur": 75,
+      "Displacement": 46,
+      "Konfirmasi": 47,
+      "Retest": 68,
+      "Volume": 6,
       "Data": 24,
-      "SL/RR": 1
+      "SL/RR": 1,
+      "Diblokir": 1
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "GALA-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
       {
         "depth": 9,
         "text": "LAB-USDT-SWAP → SL/RR: SHORT SL 3.14 ATR (perlu 0.35-2.5)"
@@ -6375,10 +6380,6 @@
       {
         "depth": 8,
         "text": "RVN-USDT-SWAP → Volume: SHORT CHOCH volume 0.52x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "XDP-USDT-SWAP → Volume: SHORT CHOCH volume 0.63x (min 0.75x)"
       }
     ]
   },
