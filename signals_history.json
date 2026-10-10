@@ -6519,50 +6519,10 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791635400000,
+  "last_smc_candle": 1791636300000,
   "last_online_day": "2026-10-10",
-  "smc_rej": {
-    "scans": 7,
-    "pairs": 310,
-    "signals": 5,
-    "stages": {
-      "Retest": 68,
-      "Konfirmasi": 55,
-      "Displacement": 25,
-      "Struktur": 88,
-      "Volume": 6,
-      "Sweep": 30,
-      "Data": 32,
-      "SL/RR": 1
-    },
-    "near": [
-      {
-        "depth": 9,
-        "text": "KAT-USDT-SWAP → SL/RR: SHORT SL 2.69 ATR (perlu 0.35-2.5)"
-      },
-      {
-        "depth": 8,
-        "text": "NEIRO-USDT-SWAP → Volume: SHORT CHOCH volume 0.36x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "STRK-USDT-SWAP → Volume: LONG CHOCH volume 0.69x (min 1.00x, RSI 47.4 di deadzone +0.25)"
-      },
-      {
-        "depth": 8,
-        "text": "HOME-USDT-SWAP → Volume: SHORT CHOCH volume 0.54x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "SATS-USDT-SWAP → Volume: LONG CHOCH volume 0.03x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "ADA-USDT-SWAP → Volume: SHORT CHOCH volume 0.50x (min 0.75x)"
-      }
-    ]
-  },
-  "last_report_ts": 1791623612.045353,
+  "smc_rej": null,
+  "last_report_ts": 1791638036.4654405,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
