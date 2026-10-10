@@ -6339,51 +6339,48 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791621000000,
+  "last_smc_candle": 1791621900000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 9,
-    "pairs": 410,
-    "signals": 3,
+    "scans": 1,
+    "pairs": 47,
+    "signals": 0,
     "stages": {
-      "Sweep": 56,
-      "Struktur": 100,
-      "Displacement": 58,
-      "Konfirmasi": 68,
-      "Retest": 93,
-      "Volume": 6,
-      "Data": 24,
-      "SL/RR": 1,
-      "Diblokir": 1
+      "Retest": 11,
+      "Konfirmasi": 11,
+      "Displacement": 3,
+      "Struktur": 14,
+      "Volume": 3,
+      "Sweep": 5
     },
     "near": [
       {
-        "depth": 10,
-        "text": "GALA-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 9,
-        "text": "LAB-USDT-SWAP → SL/RR: SHORT SL 3.14 ATR (perlu 0.35-2.5)"
+        "depth": 8,
+        "text": "NEIRO-USDT-SWAP → Volume: SHORT CHOCH volume 0.36x (min 0.75x)"
       },
       {
         "depth": 8,
-        "text": "CAP-USDT-SWAP → Volume: LONG CHOCH volume 0.31x (min 0.75x)"
+        "text": "STRK-USDT-SWAP → Volume: LONG CHOCH volume 0.69x (min 1.00x, RSI 47.4 di deadzone +0.25)"
       },
       {
         "depth": 8,
-        "text": "S-USDT-SWAP → Volume: SHORT BOS volume 0.30x (min 0.50x)"
+        "text": "HOME-USDT-SWAP → Volume: SHORT CHOCH volume 0.54x (min 0.75x)"
       },
       {
-        "depth": 8,
-        "text": "BOME-USDT-SWAP → Volume: SHORT CHOCH volume 0.36x (min 0.75x)"
+        "depth": 6,
+        "text": "PEPE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "RVN-USDT-SWAP → Volume: SHORT CHOCH volume 0.52x (min 0.75x)"
+        "depth": 6,
+        "text": "GALA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "XDP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1791607645.9770918,
+  "last_report_ts": 1791623612.045353,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
