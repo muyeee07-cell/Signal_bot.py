@@ -6735,25 +6735,29 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791659700000,
+  "last_smc_candle": 1791661500000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 206,
+    "scans": 6,
+    "pairs": 251,
     "signals": 2,
     "stages": {
-      "Konfirmasi": 28,
-      "Sweep": 32,
-      "Retest": 23,
-      "Struktur": 43,
-      "Displacement": 34,
+      "Konfirmasi": 36,
+      "Sweep": 40,
+      "Retest": 31,
+      "Struktur": 55,
+      "Displacement": 42,
       "Data": 43,
-      "Volume": 1
+      "Volume": 2
     },
     "near": [
       {
         "depth": 8,
         "text": "XDP-USDT-SWAP → Volume: SHORT CHOCH volume 0.59x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "SHIB-USDT-SWAP → Volume: SHORT CHOCH volume 0.40x (min 0.75x)"
       },
       {
         "depth": 6,
@@ -6770,10 +6774,6 @@
       {
         "depth": 6,
         "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SHIB-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
