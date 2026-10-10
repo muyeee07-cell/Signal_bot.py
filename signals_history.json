@@ -107,6 +107,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "ENA-USDT-SWAP|SHORT|1791643500000|SMC",
+      "symbol": "ENA-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.22226 | OB [0.22129-0.22262] | Disp bar 189 | RSI 54.4 | Vol 1.50x",
+      "signal_candle_time": 1791643500000,
+      "signal_candle_iso": "2026-10-10T14:45:00+00:00",
+      "created_at": "2026-10-10T15:13:07.431587+00:00",
+      "entry": 0.22134,
+      "sl": 0.22307,
+      "tp": 0.21831,
+      "rr": 1.75,
+      "atr": 0.0014718351007992462,
+      "sl_atr": 1.1764568797819053,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 54.422071362749854,
+      "adx": 0.0,
+      "volume_ratio": 1.5001635304979553,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -6519,24 +6555,28 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791641700000,
+  "last_smc_candle": 1791643500000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 137,
-    "signals": 0,
+    "scans": 4,
+    "pairs": 183,
+    "signals": 1,
     "stages": {
-      "Struktur": 49,
-      "Retest": 38,
-      "Displacement": 35,
-      "Konfirmasi": 12,
-      "Volume": 1,
-      "Sweep": 2
+      "Struktur": 59,
+      "Retest": 55,
+      "Displacement": 47,
+      "Konfirmasi": 15,
+      "Volume": 2,
+      "Sweep": 4
     },
     "near": [
       {
         "depth": 8,
         "text": "DOGE-USDT-SWAP → Volume: SHORT CHOCH volume 0.61x (min 0.75x)"
+      },
+      {
+        "depth": 8,
+        "text": "CAP-USDT-SWAP → Volume: SHORT BOS volume 0.31x (min 0.50x)"
       },
       {
         "depth": 6,
@@ -6553,10 +6593,6 @@
       {
         "depth": 6,
         "text": "ENA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
