@@ -6519,19 +6519,24 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791638100000,
+  "last_smc_candle": 1791639900000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 46,
+    "scans": 2,
+    "pairs": 92,
     "signals": 0,
     "stages": {
-      "Struktur": 18,
-      "Retest": 13,
-      "Displacement": 11,
-      "Konfirmasi": 4
+      "Struktur": 34,
+      "Retest": 26,
+      "Displacement": 23,
+      "Konfirmasi": 8,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "DOGE-USDT-SWAP → Volume: SHORT CHOCH volume 0.61x (min 0.75x)"
+      },
       {
         "depth": 6,
         "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
@@ -6549,12 +6554,8 @@
         "text": "ENA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "PUMP-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "MAGIC-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
