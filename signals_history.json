@@ -6339,22 +6339,27 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791623700000,
+  "last_smc_candle": 1791625500000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 94,
+    "scans": 3,
+    "pairs": 141,
     "signals": 0,
     "stages": {
-      "Retest": 15,
-      "Konfirmasi": 14,
-      "Displacement": 4,
-      "Struktur": 20,
-      "Volume": 4,
-      "Sweep": 5,
-      "Data": 32
+      "Retest": 27,
+      "Konfirmasi": 26,
+      "Displacement": 8,
+      "Struktur": 31,
+      "Volume": 5,
+      "Sweep": 11,
+      "Data": 32,
+      "SL/RR": 1
     },
     "near": [
+      {
+        "depth": 9,
+        "text": "KAT-USDT-SWAP → SL/RR: SHORT SL 2.69 ATR (perlu 0.35-2.5)"
+      },
       {
         "depth": 8,
         "text": "NEIRO-USDT-SWAP → Volume: SHORT CHOCH volume 0.36x (min 0.75x)"
@@ -6372,12 +6377,8 @@
         "text": "SATS-USDT-SWAP → Volume: LONG CHOCH volume 0.03x (min 0.75x)"
       },
       {
-        "depth": 6,
-        "text": "PEPE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "GALA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
+        "depth": 8,
+        "text": "ADA-USDT-SWAP → Volume: SHORT CHOCH volume 0.50x (min 0.75x)"
       }
     ]
   },
