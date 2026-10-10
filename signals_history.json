@@ -71,42 +71,6 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
-    },
-    {
-      "signal_id": "HMSTR-USDT-SWAP|LONG|1791577800000|SMC",
-      "symbol": "HMSTR-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BULL | Sweep low @ 0.0001601 | OB [0.0001594-0.0001598] | Disp bar 197 | RSI 54.9 | Vol 1.53x",
-      "signal_candle_time": 1791577800000,
-      "signal_candle_iso": "2026-10-09T20:30:00+00:00",
-      "created_at": "2026-10-09T20:46:32.923141+00:00",
-      "entry": 0.0001605,
-      "sl": 0.0001592,
-      "tp": 0.0001628,
-      "rr": 1.75,
-      "atr": 6.950061480170617e-07,
-      "sl_atr": 1.8827198121029984,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 54.850156129639146,
-      "adx": 0.0,
-      "volume_ratio": 1.5290996508904247,
-      "rsi_deadzone": false,
-      "regime": "BULL",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -6120,51 +6084,86 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "HMSTR-USDT-SWAP|LONG|1791577800000|SMC",
+      "symbol": "HMSTR-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.0001601 | OB [0.0001594-0.0001598] | Disp bar 197 | RSI 54.9 | Vol 1.53x",
+      "signal_candle_time": 1791577800000,
+      "signal_candle_iso": "2026-10-09T20:30:00+00:00",
+      "created_at": "2026-10-09T20:46:32.923141+00:00",
+      "entry": 0.0001605,
+      "sl": 0.0001592,
+      "tp": 0.0001628,
+      "rr": 1.75,
+      "atr": 6.950061480170617e-07,
+      "sl_atr": 1.8827198121029984,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 54.850156129639146,
+      "adx": 0.0,
+      "volume_ratio": 1.5290996508904247,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.0001628,
+      "exit_time": "2026-10-09T23:40:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791587700000,
-  "last_online_day": "2026-10-09",
+  "last_smc_candle": 1791590400000,
+  "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 280,
-    "signals": 2,
+    "scans": 1,
+    "pairs": 45,
+    "signals": 0,
     "stages": {
-      "Konfirmasi": 77,
-      "Struktur": 68,
-      "Retest": 84,
-      "Displacement": 22,
-      "Sweep": 24,
-      "Volume": 3
+      "Retest": 19,
+      "Struktur": 12,
+      "Sweep": 8,
+      "Konfirmasi": 4,
+      "Displacement": 2
     },
     "near": [
       {
-        "depth": 8,
-        "text": "LAB-USDT-SWAP → Volume: LONG CHOCH volume 0.50x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "W-USDT-SWAP → Volume: LONG BOS volume 0.43x (min 0.50x)"
-      },
-      {
-        "depth": 8,
-        "text": "BONK-USDT-SWAP → Volume: SHORT CHOCH volume 0.38x (min 0.75x)"
+        "depth": 6,
+        "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (4 bar lalu)"
+        "text": "XDP-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "SHIB-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "text": "BAT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
         "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
+        "text": "S-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
+      },
+      {
+        "depth": 5,
+        "text": "SATS-USDT-SWAP → Retest: SHORT order block ditembus (close di atas OB)"
+      },
+      {
+        "depth": 5,
+        "text": "NEIRO-USDT-SWAP → Retest: SHORT order block ditembus (close di atas OB)"
       }
     ]
   },
-  "last_report_ts": 1791576821.6162066,
+  "last_report_ts": 1791591740.2776425,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
