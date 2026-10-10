@@ -143,42 +143,6 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
-    },
-    {
-      "signal_id": "SATS-USDT-SWAP|SHORT|1791648900000|SMC",
-      "symbol": "SATS-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 1.2008e-08 | OB [1.1946e-08-1.2011e-08] | Disp bar 194 | RSI 55.0 | Vol 3.59x",
-      "signal_candle_time": 1791648900000,
-      "signal_candle_iso": "2026-10-10T16:15:00+00:00",
-      "created_at": "2026-10-10T16:44:39.790040+00:00",
-      "entry": 1.1953e-08,
-      "sl": 1.204e-08,
-      "tp": 1.18e-08,
-      "rr": 1.75,
-      "atr": 5.0670972693967624e-11,
-      "sl_atr": 1.7209318703008145,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 54.97509561014063,
-      "adx": 0.0,
-      "volume_ratio": 3.594141457179378,
-      "rsi_deadzone": false,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -6660,22 +6624,58 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "SATS-USDT-SWAP|SHORT|1791648900000|SMC",
+      "symbol": "SATS-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 1.2008e-08 | OB [1.1946e-08-1.2011e-08] | Disp bar 194 | RSI 55.0 | Vol 3.59x",
+      "signal_candle_time": 1791648900000,
+      "signal_candle_iso": "2026-10-10T16:15:00+00:00",
+      "created_at": "2026-10-10T16:44:39.790040+00:00",
+      "entry": 1.1953e-08,
+      "sl": 1.204e-08,
+      "tp": 1.18e-08,
+      "rr": 1.75,
+      "atr": 5.0670972693967624e-11,
+      "sl_atr": 1.7209318703008145,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 54.97509561014063,
+      "adx": 0.0,
+      "volume_ratio": 3.594141457179378,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 1.204e-08,
+      "exit_time": "2026-10-10T16:35:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791648900000,
+  "last_smc_candle": 1791650700000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 268,
+    "scans": 8,
+    "pairs": 313,
     "signals": 4,
     "stages": {
-      "Struktur": 74,
-      "Retest": 85,
-      "Displacement": 64,
-      "Konfirmasi": 28,
-      "Volume": 2,
-      "Sweep": 11
+      "Struktur": 84,
+      "Retest": 96,
+      "Displacement": 73,
+      "Konfirmasi": 35,
+      "Volume": 4,
+      "Sweep": 17
     },
     "near": [
       {
@@ -6687,20 +6687,20 @@
         "text": "CAP-USDT-SWAP → Volume: SHORT BOS volume 0.31x (min 0.50x)"
       },
       {
+        "depth": 8,
+        "text": "BONK-USDT-SWAP → Volume: SHORT CHOCH volume 0.42x (min 1.00x, RSI 50.0 di deadzone +0.25)"
+      },
+      {
+        "depth": 8,
+        "text": "DOOD-USDT-SWAP → Volume: SHORT BOS volume 0.22x (min 0.50x)"
+      },
+      {
         "depth": 6,
         "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
         "depth": 6,
         "text": "BILL-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "RSR-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ENA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
