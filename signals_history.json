@@ -35,6 +35,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "SPACE-USDT-SWAP|SHORT|1791612000000|SMC",
+      "symbol": "SPACE-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.004511 | OB [0.004485-0.004515] | Disp bar 196 | RSI 51.4 | Vol 0.98x",
+      "signal_candle_time": 1791612000000,
+      "signal_candle_iso": "2026-10-10T06:00:00+00:00",
+      "created_at": "2026-10-10T06:18:17.969208+00:00",
+      "entry": 0.004487,
+      "sl": 0.00452,
+      "tp": 0.004428,
+      "rr": 1.75,
+      "atr": 1.8223217751759198e-05,
+      "sl_atr": 1.836501422603991,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 51.4177529415346,
+      "adx": 0.0,
+      "volume_ratio": 0.984214123589633,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -6267,19 +6303,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791609300000,
+  "last_smc_candle": 1791612000000,
   "last_online_day": "2026-10-10",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 135,
-    "signals": 1,
+    "scans": 4,
+    "pairs": 182,
+    "signals": 2,
     "stages": {
-      "Sweep": 21,
-      "Struktur": 39,
-      "Displacement": 18,
-      "Konfirmasi": 9,
-      "Retest": 20,
-      "Volume": 3,
+      "Sweep": 29,
+      "Struktur": 50,
+      "Displacement": 27,
+      "Konfirmasi": 16,
+      "Retest": 30,
+      "Volume": 4,
       "Data": 24
     },
     "near": [
@@ -6296,16 +6332,16 @@
         "text": "BOME-USDT-SWAP → Volume: SHORT CHOCH volume 0.36x (min 0.75x)"
       },
       {
+        "depth": 8,
+        "text": "RVN-USDT-SWAP → Volume: SHORT CHOCH volume 0.52x (min 0.75x)"
+      },
+      {
         "depth": 6,
         "text": "PUMP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       },
       {
         "depth": 6,
         "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "ZK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
