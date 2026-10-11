@@ -7239,26 +7239,35 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791724500000,
+  "last_smc_candle": 1791726300000,
   "last_online_day": "2026-10-11",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 308,
+    "scans": 8,
+    "pairs": 353,
     "signals": 2,
     "stages": {
-      "Struktur": 99,
-      "Konfirmasi": 34,
-      "Retest": 49,
-      "Sweep": 30,
-      "Displacement": 68,
-      "SL/RR": 1,
+      "Struktur": 109,
+      "Konfirmasi": 39,
+      "Retest": 62,
+      "Sweep": 35,
+      "Displacement": 78,
+      "SL/RR": 2,
       "Data": 22,
-      "Volume": 3
+      "Volume": 3,
+      "Diblokir": 1
     },
     "near": [
       {
+        "depth": 10,
+        "text": "NOT-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+      },
+      {
         "depth": 9,
         "text": "GALA-USDT-SWAP → SL/RR: SHORT SL 2.81 ATR (perlu 0.35-2.5)"
+      },
+      {
+        "depth": 9,
+        "text": "BILL-USDT-SWAP → SL/RR: LONG SL 2.81 ATR (perlu 0.35-2.5)"
       },
       {
         "depth": 8,
@@ -7271,14 +7280,6 @@
       {
         "depth": 8,
         "text": "FLOKI-USDT-SWAP → Volume: LONG CHOCH volume 0.33x (min 1.00x, RSI 49.8 di deadzone +0.25)"
-      },
-      {
-        "depth": 6,
-        "text": "SHIB-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
