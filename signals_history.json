@@ -107,6 +107,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "OP-USDT-SWAP|SHORT|1791724500000|SMC",
+      "symbol": "OP-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.14154 | OB [0.14023-0.14185] | Disp bar 198 | RSI 44.3 | Vol 0.54x",
+      "signal_candle_time": 1791724500000,
+      "signal_candle_iso": "2026-10-11T13:15:00+00:00",
+      "created_at": "2026-10-11T13:44:52.682928+00:00",
+      "entry": 0.14053,
+      "sl": 0.14222,
+      "tp": 0.13758,
+      "rr": 1.75,
+      "atr": 0.00108644897595895,
+      "sl_atr": 1.5517845109105144,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 44.31501328944271,
+      "adx": 0.0,
+      "volume_ratio": 0.5364512202352925,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -7203,21 +7239,21 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791722700000,
+  "last_smc_candle": 1791724500000,
   "last_online_day": "2026-10-11",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 264,
-    "signals": 1,
+    "scans": 7,
+    "pairs": 308,
+    "signals": 2,
     "stages": {
-      "Struktur": 85,
-      "Konfirmasi": 30,
-      "Retest": 42,
-      "Sweep": 26,
-      "Displacement": 55,
+      "Struktur": 99,
+      "Konfirmasi": 34,
+      "Retest": 49,
+      "Sweep": 30,
+      "Displacement": 68,
       "SL/RR": 1,
       "Data": 22,
-      "Volume": 2
+      "Volume": 3
     },
     "near": [
       {
@@ -7233,16 +7269,16 @@
         "text": "MAGIC-USDT-SWAP → Volume: LONG CHOCH volume 0.32x (min 0.75x)"
       },
       {
+        "depth": 8,
+        "text": "FLOKI-USDT-SWAP → Volume: LONG CHOCH volume 0.33x (min 1.00x, RSI 49.8 di deadzone +0.25)"
+      },
+      {
         "depth": 6,
         "text": "SHIB-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
         "depth": 6,
         "text": "NEIRO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       }
     ]
   },
