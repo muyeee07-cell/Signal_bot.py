@@ -7383,21 +7383,26 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791736200000,
+  "last_smc_candle": 1791737100000,
   "last_online_day": "2026-10-11",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 191,
+    "scans": 6,
+    "pairs": 234,
     "signals": 4,
     "stages": {
-      "Struktur": 31,
-      "Retest": 44,
-      "Konfirmasi": 35,
+      "Struktur": 38,
+      "Retest": 56,
+      "Konfirmasi": 41,
       "Data": 38,
-      "Sweep": 22,
-      "Displacement": 17
+      "Sweep": 33,
+      "Displacement": 23,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "TIA-USDT-SWAP → Volume: SHORT CHOCH volume 0.65x (min 1.00x, RSI 47.4 di deadzone +0.25)"
+      },
       {
         "depth": 6,
         "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
@@ -7417,10 +7422,6 @@
       {
         "depth": 6,
         "text": "MAGIC-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "CHIP-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
