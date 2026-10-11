@@ -7059,50 +7059,48 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791695700000,
+  "last_smc_candle": 1791698400000,
   "last_online_day": "2026-10-11",
   "smc_rej": {
-    "scans": 8,
-    "pairs": 306,
-    "signals": 7,
+    "scans": 1,
+    "pairs": 40,
+    "signals": 0,
     "stages": {
-      "Displacement": 34,
-      "Sweep": 33,
-      "Retest": 90,
-      "Struktur": 41,
-      "Konfirmasi": 50,
-      "Volume": 7,
-      "Diblokir": 1,
-      "Data": 43
+      "Retest": 12,
+      "Volume": 1,
+      "Displacement": 5,
+      "Struktur": 8,
+      "Sweep": 8,
+      "Konfirmasi": 6
     },
     "near": [
       {
-        "depth": 10,
-        "text": "IOST-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
+        "depth": 8,
+        "text": "PEPE-USDT-SWAP → Volume: LONG CHOCH volume 0.54x (min 1.00x, RSI 47.2 di deadzone +0.25)"
       },
       {
-        "depth": 8,
-        "text": "SATS-USDT-SWAP → Volume: SHORT CHOCH volume 0.47x (min 0.75x)"
+        "depth": 6,
+        "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "CFX-USDT-SWAP → Volume: LONG CHOCH volume 0.68x (min 0.75x)"
+        "depth": 6,
+        "text": "DOGE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "W-USDT-SWAP → Volume: SHORT CHOCH volume 0.96x (min 1.00x, RSI 47.7 di deadzone +0.25)"
+        "depth": 6,
+        "text": "LINEA-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "FLOKI-USDT-SWAP → Volume: SHORT BOS volume 0.39x (min 0.75x, RSI 48.3 di deadzone +0.25)"
+        "depth": 6,
+        "text": "GMT-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "CAP-USDT-SWAP → Volume: SHORT CHOCH volume 0.54x (min 0.75x)"
+        "depth": 6,
+        "text": "WLD-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1791683113.117526,
+  "last_report_ts": 1791699471.095927,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
