@@ -107,6 +107,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "BRETT-USDT-SWAP|LONG|1791707400000|SMC",
+      "symbol": "BRETT-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.005842 | OB [0.005806-0.005839] | Disp bar 197 | RSI 50.1 | Vol 1.10x",
+      "signal_candle_time": 1791707400000,
+      "signal_candle_iso": "2026-10-11T08:30:00+00:00",
+      "created_at": "2026-10-11T08:46:30.634398+00:00",
+      "entry": 0.005867,
+      "sl": 0.005784,
+      "tp": 0.006013,
+      "rr": 1.75,
+      "atr": 7.478814245859631e-05,
+      "sl_atr": 1.115637318894101,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 50.103068537943614,
+      "adx": 0.0,
+      "volume_ratio": 1.1031924582940862,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -7059,19 +7095,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791704700000,
+  "last_smc_candle": 1791707400000,
   "last_online_day": "2026-10-11",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 215,
-    "signals": 0,
+    "scans": 6,
+    "pairs": 262,
+    "signals": 1,
     "stages": {
-      "Retest": 63,
-      "Volume": 5,
-      "Displacement": 18,
-      "Struktur": 29,
-      "Sweep": 17,
-      "Konfirmasi": 23,
+      "Retest": 82,
+      "Volume": 6,
+      "Displacement": 23,
+      "Struktur": 37,
+      "Sweep": 22,
+      "Konfirmasi": 31,
       "Data": 60
     },
     "near": [
@@ -7096,8 +7132,8 @@
         "text": "MON-USDT-SWAP → Volume: SHORT CHOCH volume 0.51x (min 0.75x)"
       },
       {
-        "depth": 6,
-        "text": "PENGU-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
+        "depth": 8,
+        "text": "FLOKI-USDT-SWAP → Volume: LONG CHOCH volume 0.57x (min 0.75x)"
       }
     ]
   },
