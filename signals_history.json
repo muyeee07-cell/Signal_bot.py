@@ -7599,24 +7599,36 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791806400000,
+  "last_smc_candle": 1791809100000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 98,
+    "scans": 3,
+    "pairs": 147,
     "signals": 0,
     "stages": {
-      "Struktur": 33,
-      "Retest": 22,
-      "Konfirmasi": 14,
-      "Sweep": 12,
-      "Displacement": 16,
-      "Diblokir": 1
+      "Struktur": 52,
+      "Retest": 28,
+      "Konfirmasi": 21,
+      "Sweep": 20,
+      "Displacement": 22,
+      "Diblokir": 4
     },
     "near": [
       {
         "depth": 10,
         "text": "ONE-USDT-SWAP → Diblokir: LONG jam UTC 12 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "LINEA-USDT-SWAP → Diblokir: LONG jam UTC 12 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "MUBARAK-USDT-SWAP → Diblokir: LONG jam UTC 12 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "PEOPLE-USDT-SWAP → Diblokir: LONG jam UTC 12 diblokir (SMC_BLOCK_HOURS)"
       },
       {
         "depth": 6,
@@ -7625,18 +7637,6 @@
       {
         "depth": 6,
         "text": "STRK-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "DOGE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "PLUME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
