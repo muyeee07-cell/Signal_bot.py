@@ -7599,19 +7599,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791788400000,
+  "last_smc_candle": 1791790200000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 46,
+    "scans": 2,
+    "pairs": 92,
     "signals": 0,
     "stages": {
-      "Struktur": 15,
-      "Displacement": 11,
-      "Retest": 13,
-      "Sweep": 4,
+      "Struktur": 27,
+      "Displacement": 22,
+      "Retest": 27,
+      "Sweep": 9,
       "RSI": 1,
-      "Konfirmasi": 2
+      "Konfirmasi": 6
     },
     "near": [
       {
@@ -7627,16 +7627,16 @@
         "text": "SAND-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "FLOKI-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "MAGIC-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "S-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "ONE-USDT-SWAP → Retest: SHORT belum retest order block"
+        "depth": 6,
+        "text": "AKE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
