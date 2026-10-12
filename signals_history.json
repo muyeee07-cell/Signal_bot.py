@@ -143,6 +143,42 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "BILL-USDT-SWAP|LONG|1791774000000|SMC",
+      "symbol": "BILL-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.00978 | OB [0.00972-0.00982] | Disp bar 197 | RSI 49.9 | Vol 4.09x",
+      "signal_candle_time": 1791774000000,
+      "signal_candle_iso": "2026-10-12T03:00:00+00:00",
+      "created_at": "2026-10-12T03:17:03.211734+00:00",
+      "entry": 0.00987,
+      "sl": 0.0097,
+      "tp": 0.01017,
+      "rr": 1.75,
+      "atr": 7.74929120131596e-05,
+      "sl_atr": 2.2356609024387786,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 49.896097357951014,
+      "adx": 0.0,
+      "volume_ratio": 4.0893062788540915,
+      "rsi_deadzone": true,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -7563,49 +7599,47 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791772200000,
+  "last_smc_candle": 1791774000000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 8,
-    "pairs": 378,
-    "signals": 5,
+    "scans": 1,
+    "pairs": 33,
+    "signals": 1,
     "stages": {
-      "Retest": 90,
-      "Struktur": 121,
-      "Konfirmasi": 47,
-      "Sweep": 36,
-      "Displacement": 71,
-      "Volume": 6,
-      "SL/RR": 2
+      "Struktur": 12,
+      "Konfirmasi": 4,
+      "Sweep": 1,
+      "Displacement": 6,
+      "Retest": 9
     },
     "near": [
       {
-        "depth": 9,
-        "text": "ZK-USDT-SWAP → SL/RR: LONG SL 2.55 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "BONK-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 9,
-        "text": "CFX-USDT-SWAP → SL/RR: SHORT SL 2.57 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "MAGIC-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "BILL-USDT-SWAP → Volume: SHORT CHOCH volume 0.54x (min 0.75x)"
+        "depth": 6,
+        "text": "CFX-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "ENA-USDT-SWAP → Volume: SHORT CHOCH volume 0.70x (min 0.75x)"
+        "depth": 6,
+        "text": "IOST-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "ARB-USDT-SWAP → Volume: LONG CHOCH volume 0.50x (min 0.75x)"
+        "depth": 5,
+        "text": "NEIRO-USDT-SWAP → Retest: LONG belum retest order block"
       },
       {
-        "depth": 8,
-        "text": "ACT-USDT-SWAP → Volume: SHORT CHOCH volume 0.68x (min 0.75x)"
+        "depth": 5,
+        "text": "STRK-USDT-SWAP → Retest: SHORT belum retest order block"
       }
     ]
   },
-  "last_report_ts": 1791760365.497585,
+  "last_report_ts": 1791774994.969659,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
