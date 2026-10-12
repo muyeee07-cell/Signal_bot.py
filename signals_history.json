@@ -7599,20 +7599,20 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791795600000,
+  "last_smc_candle": 1791797400000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 233,
+    "scans": 6,
+    "pairs": 282,
     "signals": 0,
     "stages": {
-      "Struktur": 53,
-      "Displacement": 56,
-      "Retest": 68,
-      "Sweep": 26,
+      "Struktur": 59,
+      "Displacement": 70,
+      "Retest": 83,
+      "Sweep": 32,
       "RSI": 1,
-      "Konfirmasi": 25,
-      "Diblokir": 4
+      "Konfirmasi": 32,
+      "Diblokir": 5
     },
     "near": [
       {
@@ -7632,12 +7632,12 @@
         "text": "PENGU-USDT-SWAP → Diblokir: SHORT jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
       },
       {
-        "depth": 7,
-        "text": "NEIRO-USDT-SWAP → RSI: LONG mode DEFENSIF: RSI 48.0 di 40-60"
+        "depth": 10,
+        "text": "AZTEC-USDT-SWAP → Diblokir: SHORT jam UTC 9 diblokir (SMC_BLOCK_HOURS)"
       },
       {
-        "depth": 6,
-        "text": "S-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
+        "depth": 7,
+        "text": "NEIRO-USDT-SWAP → RSI: LONG mode DEFENSIF: RSI 48.0 di 40-60"
       }
     ]
   },
