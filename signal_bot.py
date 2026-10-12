@@ -12,6 +12,16 @@ Only one strategy remains: Smart Money Concept scalp on the 15m timeframe.
      (must be the latest candle; entry = its close)
   6. SL beyond OB / swept level / sweep wick, TP at TARGET_RR
 
+V5.3 changes (quality mode, based on 210 closed signals)
+- RSI deadzone widened to 45-55 and set to BLOCK (this zone lost -16R / 31.7% WR in history)
+- Session filter: no new signals during SMC_BLOCK_HOURS (default UTC 08-15, EU session)
+- Adaptive gate: win rate of the last ADAPT_WINDOW closed trades decides the mode.
+  NORMAL = base filters. DEFENSIVE (WR < ADAPT_MIN_WR) = trend-aligned setups only
+  and RSI must be outside 40-60. It never fully pauses, so the window keeps refreshing.
+- Ranking: all valid setups of a candle are collected first and the best "quality"
+  (RSI momentum + trend alignment) are sent, instead of the first pairs in volume order
+- MAX_NEW_SMC_PER_CANDLE default 1
+
 V5.2 changes (tighter filters)
 - Volume gate on the signal candle: BOS >= MIN_VOLUME_RATIO_BOS, CHOCH >= MIN_VOLUME_RATIO_CHOCH
 - RSI deadzone (47-50): mode PENALTY = extra volume required, BLOCK = rejected, OFF = ignored
@@ -75,16 +85,36 @@ MIN_VOLUME_RATIO_CHOCH = float(os.getenv("MIN_VOLUME_RATIO_CHOCH", "0.75"))
 
 # ---- POSITION CROWDING (0 = no limit) ----
 MAX_ACTIVE_SMC_PER_DIRECTION = int(os.getenv("MAX_ACTIVE_SMC_PER_DIRECTION", "3"))
-MAX_NEW_SMC_PER_CANDLE = int(os.getenv("MAX_NEW_SMC_PER_CANDLE", "2"))
+MAX_NEW_SMC_PER_CANDLE = int(os.getenv("MAX_NEW_SMC_PER_CANDLE", "1"))
 
 # ---- RSI deadzone: RSI of the signal candle between LOW and HIGH = undecided momentum ----
-RSI_DEADZONE_LOW = float(os.getenv("RSI_DEADZONE_LOW", "47"))
-RSI_DEADZONE_HIGH = float(os.getenv("RSI_DEADZONE_HIGH", "50"))
+RSI_DEADZONE_LOW = float(os.getenv("RSI_DEADZONE_LOW", "45"))
+RSI_DEADZONE_HIGH = float(os.getenv("RSI_DEADZONE_HIGH", "55"))
 # OFF     : ignore the deadzone
 # BLOCK   : reject signals whose RSI is inside the deadzone
 # PENALTY : allow them, but they need extra volume (RSI_DEADZONE_EXTRA_VOLUME added to the minimum)
-RSI_DEADZONE_MODE = os.getenv("RSI_DEADZONE_MODE", "PENALTY").strip().upper()
+RSI_DEADZONE_MODE = os.getenv("RSI_DEADZONE_MODE", "BLOCK").strip().upper()
 RSI_DEADZONE_EXTRA_VOLUME = float(os.getenv("RSI_DEADZONE_EXTRA_VOLUME", "0.25"))
+def parse_hours(spec):
+    """'8-15,22' -> {8..15, 22}. Empty string = no blocked hours."""
+    out = set()
+    for part in (spec or "").split(","):
+        part = part.strip()
+        if not part:
+            continue
+        a, _, b = part.partition("-")
+        lo = int(a)
+        hi = int(b) if b else lo
+        out.update(range(lo, hi + 1))
+    return out
+
+SMC_BLOCK_HOURS = parse_hours(os.getenv("SMC_BLOCK_HOURS", "8-15"))   # UTC hours, signal candle
+ADAPT_WINDOW = int(os.getenv("ADAPT_WINDOW", "30"))                   # last N closed trades
+ADAPT_MIN_TRADES = int(os.getenv("ADAPT_MIN_TRADES", "20"))           # fewer -> stay NORMAL
+ADAPT_MIN_WR = float(os.getenv("ADAPT_MIN_WR", "0.40"))               # below -> DEFENSIVE
+DEFENSIVE_RSI_LOW = float(os.getenv("DEFENSIVE_RSI_LOW", "40"))
+DEFENSIVE_RSI_HIGH = float(os.getenv("DEFENSIVE_RSI_HIGH", "60"))
+DEFENSIVE = [False]                                                   # set by scan_smc each candle
 SMC_MIN_SL_ATR = 0.35
 SMC_MAX_SL_ATR = 2.50
 SMC_DISP_BODY_MIN = 0.55
@@ -571,6 +601,19 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
 
     close = cs[-1][4]
 
+    # --- session gate: skip hours with a history of losses (UTC, signal candle) ---
+    sig_hour = datetime.fromisoformat(iso(cs[-1][0])).hour
+    if sig_hour in SMC_BLOCK_HOURS:
+        return "Diblokir", f"{side} jam UTC {sig_hour} diblokir (SMC_BLOCK_HOURS)"
+
+    # --- defensive mode: trend-aligned only, RSI clearly away from the middle ---
+    aligned = bias == ("BULL" if side == "LONG" else "BEAR")
+    if DEFENSIVE[0]:
+        if not aligned:
+            return "Struktur", f"{side} mode DEFENSIF: hanya setup searah tren (bias {bias})"
+        if DEFENSIVE_RSI_LOW <= rs[-1] <= DEFENSIVE_RSI_HIGH:
+            return "RSI", f"{side} mode DEFENSIF: RSI {rs[-1]:.1f} di {DEFENSIVE_RSI_LOW:g}-{DEFENSIVE_RSI_HIGH:g}"
+
     # --- quality gates on the confirmation candle: RSI deadzone, then volume ---
     vr = volume_ratio(cs, VOL_PERIOD) or 0.0
     kind = event or "BOS"
@@ -660,6 +703,8 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         "adx": 0.0,
         "volume_ratio": vr,
         "rsi_deadzone": bool(in_dead),
+        "quality": round(abs(rs[-1] - 50) / 10 + (1.0 if aligned else 0.0), 2),
+        "mode": "DEFENSIVE" if DEFENSIVE[0] else "NORMAL",
         "regime": bias or "-",
         "structure": event or "-",
         "bos": event or "NONE",
@@ -1033,6 +1078,16 @@ def smc_report_text(h):
         text += "\n\n<b>Paling dekat lolos</b>\n" + "\n".join(x["text"] for x in d["near"][:4])
     return text
 
+def market_mode(h):
+    """Rolling win rate of the last ADAPT_WINDOW closed trades -> NORMAL / DEFENSIVE."""
+    closed = [x for x in h["closed"] if x.get("exit_time")]
+    closed.sort(key=lambda x: x["exit_time"])
+    win = closed[-ADAPT_WINDOW:]
+    if len(win) < ADAPT_MIN_TRADES:
+        return "NORMAL", None, len(win)
+    wr = sum(1 for x in win if x.get("result") == "WIN") / len(win)
+    return ("DEFENSIVE" if wr < ADAPT_MIN_WR else "NORMAL"), wr, len(win)
+
 def scan_smc(h):
     """
     Scan the top pairs for an SMC scalp on every NEW 15m candle.
@@ -1061,6 +1116,12 @@ def scan_smc(h):
     REJECTS.clear()
     CUR_SETUP = "SMC_SCALP"
     created, scanned = 0, 0
+    found = []
+
+    mode, mwr, mn = market_mode(h)
+    DEFENSIVE[0] = (mode == "DEFENSIVE")
+    log.info("Market mode: %s (rolling WR %s over %s trades)", mode,
+             "n/a" if mwr is None else f"{mwr * 100:.0f}%", mn)
 
     def n_dir(d):
         return sum(1 for x in h["open"] if x.get("direction") == d)
@@ -1110,16 +1171,31 @@ def scan_smc(h):
                      f"(maks {MAX_ACTIVE_SMC_PER_DIRECTION})")
                 continue
 
-            h["open"].append(s)
-            save_history(h)
-            created += 1
-            log.info("NEW SIGNAL %s %s rr=%s", s["symbol"], s["direction"], s["rr"])
-            tg(signal_message(s))
-            time.sleep(0.3)
+            found.append(s)
 
         except Exception as e:
             log.exception("Scan error %s: %s", inst, e)
             _rej(inst, "Error", str(e)[:60])
+
+    # Best-quality setups first (RSI momentum + trend alignment), then the caps.
+    found.sort(key=lambda x: x.get("quality", 0), reverse=True)
+    for s in found:
+        if n_open(h) >= SMC_MAX_OPEN:
+            break
+        if MAX_NEW_SMC_PER_CANDLE > 0 and created >= MAX_NEW_SMC_PER_CANDLE:
+            _rej(s["symbol"], "Diblokir", f"{s['direction']} kalah kualitas (maks {MAX_NEW_SMC_PER_CANDLE}/candle)")
+            continue
+        if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
+                and n_dir(s["direction"]) >= MAX_ACTIVE_SMC_PER_DIRECTION):
+            _rej(s["symbol"], "Diblokir", f"{s['direction']} sudah penuh")
+            continue
+        h["open"].append(s)
+        save_history(h)
+        created += 1
+        log.info("NEW SIGNAL %s %s rr=%s q=%s mode=%s", s["symbol"], s["direction"],
+                 s["rr"], s.get("quality"), s.get("mode"))
+        tg(signal_message(s))
+        time.sleep(0.3)
 
     log.info("SMC scan complete. Pairs: %s | New signals: %s", scanned, created)
     _tally(h, scanned, created, dict(REJECTS))
