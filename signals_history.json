@@ -35,44 +35,6 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
-    },
-    {
-      "signal_id": "NIGHT-USDT-SWAP|SHORT|1791822600000|SMC",
-      "symbol": "NIGHT-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.046889 | OB [0.046645-0.047105] | Disp bar 198 | RSI 35.2 | Vol 0.63x",
-      "signal_candle_time": 1791822600000,
-      "signal_candle_iso": "2026-10-12T16:30:00+00:00",
-      "created_at": "2026-10-12T16:48:09.949360+00:00",
-      "entry": 0.04667,
-      "sl": 0.047246,
-      "tp": 0.045662,
-      "rr": 1.75,
-      "atr": 0.0004094099878754395,
-      "sl_atr": 1.4064703192776493,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 35.23652177100276,
-      "adx": 0.0,
-      "volume_ratio": 0.6309368688269684,
-      "rsi_deadzone": false,
-      "quality": 2.48,
-      "mode": "DEFENSIVE",
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -7634,23 +7596,71 @@
       "result_r": -1.0,
       "result": "LOSS",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "NIGHT-USDT-SWAP|SHORT|1791822600000|SMC",
+      "symbol": "NIGHT-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.046889 | OB [0.046645-0.047105] | Disp bar 198 | RSI 35.2 | Vol 0.63x",
+      "signal_candle_time": 1791822600000,
+      "signal_candle_iso": "2026-10-12T16:30:00+00:00",
+      "created_at": "2026-10-12T16:48:09.949360+00:00",
+      "entry": 0.04667,
+      "sl": 0.047246,
+      "tp": 0.045662,
+      "rr": 1.75,
+      "atr": 0.0004094099878754395,
+      "sl_atr": 1.4064703192776493,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 35.23652177100276,
+      "adx": 0.0,
+      "volume_ratio": 0.6309368688269684,
+      "rsi_deadzone": false,
+      "quality": 2.48,
+      "mode": "DEFENSIVE",
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.045662,
+      "exit_time": "2026-10-12T16:55:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791822600000,
+  "last_smc_candle": 1791824400000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 100,
+    "scans": 3,
+    "pairs": 149,
     "signals": 1,
     "stages": {
-      "Sweep": 38,
-      "Struktur": 36,
-      "Displacement": 14,
-      "Retest": 9,
-      "Konfirmasi": 2
+      "Sweep": 47,
+      "Struktur": 62,
+      "Displacement": 19,
+      "Retest": 15,
+      "Konfirmasi": 3,
+      "Volume": 1,
+      "RSI": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "MAGIC-USDT-SWAP → Volume: LONG CHOCH volume 0.67x (min 0.75x)"
+      },
+      {
+        "depth": 7,
+        "text": "BILL-USDT-SWAP → RSI: LONG RSI 48.8 di deadzone 45-55 (mode BLOCK)"
+      },
       {
         "depth": 6,
         "text": "BILL-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
@@ -7660,20 +7670,12 @@
         "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       },
       {
+        "depth": 6,
+        "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
+      },
+      {
         "depth": 5,
         "text": "RVN-USDT-SWAP → Retest: LONG order block ditembus (close di bawah OB)"
-      },
-      {
-        "depth": 5,
-        "text": "MAGIC-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "S-USDT-SWAP → Retest: SHORT belum retest order block"
-      },
-      {
-        "depth": 5,
-        "text": "OL-USDT-SWAP → Retest: LONG belum retest order block"
       }
     ]
   },
