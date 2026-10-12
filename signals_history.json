@@ -35,6 +35,44 @@
       "result_r": null,
       "result": null,
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "NIGHT-USDT-SWAP|SHORT|1791822600000|SMC",
+      "symbol": "NIGHT-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.046889 | OB [0.046645-0.047105] | Disp bar 198 | RSI 35.2 | Vol 0.63x",
+      "signal_candle_time": 1791822600000,
+      "signal_candle_iso": "2026-10-12T16:30:00+00:00",
+      "created_at": "2026-10-12T16:48:09.949360+00:00",
+      "entry": 0.04667,
+      "sl": 0.047246,
+      "tp": 0.045662,
+      "rr": 1.75,
+      "atr": 0.0004094099878754395,
+      "sl_atr": 1.4064703192776493,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 35.23652177100276,
+      "adx": 0.0,
+      "volume_ratio": 0.6309368688269684,
+      "rsi_deadzone": false,
+      "quality": 2.48,
+      "mode": "DEFENSIVE",
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -7599,23 +7637,27 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791820800000,
+  "last_smc_candle": 1791822600000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 50,
-    "signals": 0,
+    "scans": 2,
+    "pairs": 100,
+    "signals": 1,
     "stages": {
-      "Sweep": 20,
-      "Struktur": 17,
-      "Displacement": 8,
-      "Retest": 4,
-      "Konfirmasi": 1
+      "Sweep": 38,
+      "Struktur": 36,
+      "Displacement": 14,
+      "Retest": 9,
+      "Konfirmasi": 2
     },
     "near": [
       {
         "depth": 6,
         "text": "BILL-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       },
       {
         "depth": 5,
@@ -7632,10 +7674,6 @@
       {
         "depth": 5,
         "text": "OL-USDT-SWAP → Retest: LONG belum retest order block"
-      },
-      {
-        "depth": 3,
-        "text": "RSR-USDT-SWAP → Displacement: SHORT tidak ada displacement setelah sweep"
       }
     ]
   },
