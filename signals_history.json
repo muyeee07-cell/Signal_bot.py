@@ -7599,20 +7599,25 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791804600000,
+  "last_smc_candle": 1791806400000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 49,
+    "scans": 2,
+    "pairs": 98,
     "signals": 0,
     "stages": {
-      "Struktur": 17,
-      "Retest": 11,
-      "Konfirmasi": 8,
-      "Sweep": 5,
-      "Displacement": 8
+      "Struktur": 33,
+      "Retest": 22,
+      "Konfirmasi": 14,
+      "Sweep": 12,
+      "Displacement": 16,
+      "Diblokir": 1
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "ONE-USDT-SWAP → Diblokir: LONG jam UTC 12 diblokir (SMC_BLOCK_HOURS)"
+      },
       {
         "depth": 6,
         "text": "FLOKI-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
@@ -7632,10 +7637,6 @@
       {
         "depth": 6,
         "text": "PLUME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SAND-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
