@@ -7637,18 +7637,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791824400000,
+  "last_smc_candle": 1791826200000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 149,
+    "scans": 4,
+    "pairs": 198,
     "signals": 1,
     "stages": {
-      "Sweep": 47,
-      "Struktur": 62,
-      "Displacement": 19,
-      "Retest": 15,
-      "Konfirmasi": 3,
+      "Sweep": 59,
+      "Struktur": 87,
+      "Displacement": 24,
+      "Retest": 19,
+      "Konfirmasi": 6,
       "Volume": 1,
       "RSI": 1
     },
@@ -7674,8 +7674,8 @@
         "text": "RVN-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "RVN-USDT-SWAP → Retest: LONG order block ditembus (close di bawah OB)"
+        "depth": 6,
+        "text": "RSR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       }
     ]
   },
