@@ -37,42 +37,6 @@
       "monitor_tf_ms": 900000
     },
     {
-      "signal_id": "BAT-USDT-SWAP|LONG|1791768600000|SMC",
-      "symbol": "BAT-USDT-SWAP",
-      "direction": "LONG",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BULL | Sweep low @ 0.15513 | OB [0.15352-0.16037] | Disp bar 198 | RSI 52.9 | Vol 2.05x",
-      "signal_candle_time": 1791768600000,
-      "signal_candle_iso": "2026-10-12T01:30:00+00:00",
-      "created_at": "2026-10-12T01:49:31.389134+00:00",
-      "entry": 0.15922,
-      "sl": 0.15269,
-      "tp": 0.17065,
-      "rr": 1.75,
-      "atr": 0.0027786613857836728,
-      "sl_atr": 2.3513474686633784,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 52.86003660721166,
-      "adx": 0.0,
-      "volume_ratio": 2.0450655318381346,
-      "rsi_deadzone": false,
-      "regime": "BULL",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    },
-    {
       "signal_id": "SATS-USDT-SWAP|LONG|1791772200000|SMC",
       "symbol": "SATS-USDT-SWAP",
       "direction": "LONG",
@@ -7596,23 +7560,59 @@
       "result_r": 1.75,
       "result": "WIN",
       "monitor_tf_ms": 900000
+    },
+    {
+      "signal_id": "BAT-USDT-SWAP|LONG|1791768600000|SMC",
+      "symbol": "BAT-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.15513 | OB [0.15352-0.16037] | Disp bar 198 | RSI 52.9 | Vol 2.05x",
+      "signal_candle_time": 1791768600000,
+      "signal_candle_iso": "2026-10-12T01:30:00+00:00",
+      "created_at": "2026-10-12T01:49:31.389134+00:00",
+      "entry": 0.15922,
+      "sl": 0.15269,
+      "tp": 0.17065,
+      "rr": 1.75,
+      "atr": 0.0027786613857836728,
+      "sl_atr": 2.3513474686633784,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 52.86003660721166,
+      "adx": 0.0,
+      "volume_ratio": 2.0450655318381346,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.15269,
+      "exit_time": "2026-10-12T08:35:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791792000000,
+  "last_smc_candle": 1791793800000,
   "last_online_day": "2026-10-12",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 139,
+    "scans": 4,
+    "pairs": 186,
     "signals": 0,
     "stages": {
-      "Struktur": 37,
-      "Displacement": 30,
-      "Retest": 43,
-      "Sweep": 16,
+      "Struktur": 46,
+      "Displacement": 43,
+      "Retest": 55,
+      "Sweep": 21,
       "RSI": 1,
-      "Konfirmasi": 10,
-      "Diblokir": 2
+      "Konfirmasi": 16,
+      "Diblokir": 4
     },
     "near": [
       {
@@ -7624,20 +7624,20 @@
         "text": "ONE-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
       },
       {
+        "depth": 10,
+        "text": "FLOKI-USDT-SWAP → Diblokir: SHORT jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "PENGU-USDT-SWAP → Diblokir: SHORT jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
         "depth": 7,
         "text": "NEIRO-USDT-SWAP → RSI: LONG mode DEFENSIF: RSI 48.0 di 40-60"
       },
       {
         "depth": 6,
         "text": "S-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "SAND-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
