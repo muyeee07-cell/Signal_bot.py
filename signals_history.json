@@ -7636,18 +7636,18 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791869400000,
+  "last_smc_candle": 1791871200000,
   "last_online_day": "2026-10-13",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 100,
+    "scans": 3,
+    "pairs": 150,
     "signals": 0,
     "stages": {
-      "Retest": 40,
-      "Sweep": 19,
-      "Displacement": 19,
-      "Struktur": 19,
-      "Konfirmasi": 2,
+      "Retest": 59,
+      "Sweep": 28,
+      "Displacement": 30,
+      "Struktur": 27,
+      "Konfirmasi": 5,
       "Volume": 1
     },
     "near": [
@@ -7664,16 +7664,16 @@
         "text": "MUBARAK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "SATS-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "OL-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "RSR-USDT-SWAP → Retest: LONG belum retest order block"
+        "depth": 6,
+        "text": "ZK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 5,
-        "text": "BOME-USDT-SWAP → Retest: SHORT order block ditembus (close di atas OB)"
+        "depth": 6,
+        "text": "MUBARAK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
