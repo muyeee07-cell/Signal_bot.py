@@ -7675,44 +7675,45 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791876600000,
+  "last_smc_candle": 1791878400000,
   "last_online_day": "2026-10-13",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 300,
+    "scans": 7,
+    "pairs": 349,
     "signals": 1,
     "stages": {
-      "Retest": 103,
-      "Sweep": 64,
-      "Displacement": 64,
-      "Struktur": 45,
-      "Konfirmasi": 20,
-      "Volume": 3
+      "Retest": 111,
+      "Sweep": 75,
+      "Displacement": 71,
+      "Struktur": 54,
+      "Konfirmasi": 29,
+      "Volume": 3,
+      "Diblokir": 5
     },
     "near": [
       {
+        "depth": 10,
+        "text": "SHIB-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "NEIRO-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "STRK-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "GALA-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "ADA-USDT-SWAP → Diblokir: LONG jam UTC 8 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
         "depth": 8,
         "text": "ZK-USDT-SWAP → Volume: SHORT CHOCH volume 0.75x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "CAP-USDT-SWAP → Volume: LONG CHOCH volume 0.47x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "SAND-USDT-SWAP → Volume: SHORT CHOCH volume 0.52x (min 0.75x)"
-      },
-      {
-        "depth": 6,
-        "text": "NOT-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MUBARAK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (1 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "OL-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
       }
     ]
   },
