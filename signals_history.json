@@ -7674,19 +7674,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791924300000,
+  "last_smc_candle": 1791925200000,
   "last_online_day": "2026-10-13",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 350,
+    "scans": 8,
+    "pairs": 400,
     "signals": 0,
     "stages": {
-      "Displacement": 81,
-      "Sweep": 29,
-      "Konfirmasi": 90,
-      "Retest": 82,
-      "Struktur": 66,
-      "RSI": 2
+      "Displacement": 91,
+      "Sweep": 36,
+      "Konfirmasi": 96,
+      "Retest": 94,
+      "Struktur": 80,
+      "RSI": 3
     },
     "near": [
       {
@@ -7696,6 +7696,10 @@
       {
         "depth": 7,
         "text": "GALA-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 46.4 di 40-60"
+      },
+      {
+        "depth": 7,
+        "text": "TURBO-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 51.4 di 40-60"
       },
       {
         "depth": 6,
@@ -7708,10 +7712,6 @@
       {
         "depth": 6,
         "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "DOGE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
