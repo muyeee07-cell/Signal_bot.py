@@ -7674,24 +7674,28 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791885600000,
+  "last_smc_candle": 1791887400000,
   "last_online_day": "2026-10-13",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 147,
+    "scans": 4,
+    "pairs": 196,
     "signals": 0,
     "stages": {
-      "Sweep": 21,
-      "Displacement": 26,
-      "Konfirmasi": 33,
-      "Struktur": 33,
-      "Retest": 33,
-      "Diblokir": 1
+      "Sweep": 27,
+      "Displacement": 35,
+      "Konfirmasi": 38,
+      "Struktur": 46,
+      "Retest": 48,
+      "Diblokir": 2
     },
     "near": [
       {
         "depth": 10,
         "text": "MAGIC-USDT-SWAP → Diblokir: LONG jam UTC 9 diblokir (SMC_BLOCK_HOURS)"
+      },
+      {
+        "depth": 10,
+        "text": "LINEA-USDT-SWAP → Diblokir: LONG jam UTC 10 diblokir (SMC_BLOCK_HOURS)"
       },
       {
         "depth": 6,
@@ -7708,10 +7712,6 @@
       {
         "depth": 6,
         "text": "PUMP-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
       }
     ]
   },
