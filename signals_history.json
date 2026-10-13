@@ -7674,20 +7674,33 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791930600000,
+  "last_smc_candle": 1791932400000,
   "last_online_day": "2026-10-13",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 150,
+    "scans": 4,
+    "pairs": 200,
     "signals": 0,
     "stages": {
-      "Displacement": 24,
-      "Sweep": 15,
-      "Konfirmasi": 31,
-      "Struktur": 49,
-      "Retest": 31
+      "Displacement": 30,
+      "Sweep": 19,
+      "Konfirmasi": 40,
+      "Struktur": 72,
+      "Retest": 36,
+      "RSI": 3
     },
     "near": [
+      {
+        "depth": 7,
+        "text": "STRK-USDT-SWAP → RSI: LONG mode DEFENSIF: RSI 46.7 di 40-60"
+      },
+      {
+        "depth": 7,
+        "text": "DOGE-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 48.0 di 40-60"
+      },
+      {
+        "depth": 7,
+        "text": "NOT-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 47.7 di 40-60"
+      },
       {
         "depth": 6,
         "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
@@ -7699,18 +7712,6 @@
       {
         "depth": 6,
         "text": "S-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (7 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "MEME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "TURBO-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "GPS-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
