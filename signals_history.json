@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791980100000,
+  "last_scan_candle": 1791981900000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,43 +8213,44 @@
     }
   ],
   "scan_rej": {
-    "scans": 6,
-    "pairs": 500,
+    "scans": 7,
+    "pairs": 600,
     "signals": 0,
     "stages": {
-      "HTF": 108,
-      "Tren": 117,
-      "MA4": 134,
-      "RSI": 42,
-      "Stochastic": 15,
+      "HTF": 124,
+      "Tren": 151,
+      "MA4": 141,
+      "RSI": 48,
+      "Stochastic": 27,
       "Volume": 1,
       "Data": 82,
-      "Pullback": 1
+      "Pullback": 19,
+      "SL/RR": 7
     },
     "near": [
       {
-        "depth": 8,
-        "text": "SPACE-USDT-SWAP → Volume: LONG volume 0.96x (min 1.00x)"
+        "depth": 10,
+        "text": "GALA-USDT-SWAP → SL/RR: SHORT SL 3.61 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 6,
-        "text": "SPACE-USDT-SWAP → Stochastic: LONG K 54/D 56 belum cross dari zona ekstrem"
+        "depth": 10,
+        "text": "NOT-USDT-SWAP → SL/RR: SHORT SL 3.82 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 6,
-        "text": "RSR-USDT-SWAP → Stochastic: SHORT K 20/D 19 belum cross dari zona ekstrem"
+        "depth": 10,
+        "text": "SAND-USDT-SWAP → SL/RR: SHORT SL 2.71 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 6,
-        "text": "W-USDT-SWAP → Stochastic: SHORT K 37/D 35 belum cross dari zona ekstrem"
+        "depth": 10,
+        "text": "ENA-USDT-SWAP → SL/RR: SHORT SL 3.72 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 6,
-        "text": "PYTH-USDT-SWAP → Stochastic: LONG K 52/D 51 belum cross dari zona ekstrem"
+        "depth": 10,
+        "text": "ROBO-USDT-SWAP → SL/RR: SHORT SL 3.80 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 6,
-        "text": "W-USDT-SWAP → Stochastic: SHORT K 41/D 41 belum cross dari zona ekstrem"
+        "depth": 10,
+        "text": "PIPPIN-USDT-SWAP → SL/RR: SHORT SL 3.41 ATR (perlu 0.35-2.5)"
       }
     ]
   }
