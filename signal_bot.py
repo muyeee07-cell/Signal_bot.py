@@ -1454,6 +1454,13 @@ def main():
         MONITOR_TF, HISTORY_FILE, "ON" if TELEGRAM else "OFF", RUN_FOREVER
     )
 
+    log.info(
+        "Build MURPHY-6.0b | STOCH_LOOKBACK=%s | HTF=%s | BB_MIN_R=%s | VOL>=%.2fx | "
+        "BLOCK_HOURS=%s | PULL_N=%s",
+        STOCH_LOOKBACK, "ON" if HTF_FILTER else "OFF", BB_MIN_R, MIN_VOLUME_RATIO,
+        sorted(BLOCK_HOURS) or "-", PULL_N
+    )
+
     today = datetime.now(timezone.utc).date().isoformat()
     if TELEGRAM and h.get("last_online_day") != today:
         h["last_online_day"] = today
@@ -1533,4 +1540,5 @@ if __name__ == "__main__":
         run_backtest(args or [REF_SYMBOL], bars)
     else:
         main()
+
 
