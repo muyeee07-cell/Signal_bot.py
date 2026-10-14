@@ -7674,19 +7674,19 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791936900000,
+  "last_smc_candle": 1791938700000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 300,
+    "scans": 7,
+    "pairs": 350,
     "signals": 0,
     "stages": {
-      "Displacement": 42,
-      "Sweep": 25,
-      "Konfirmasi": 63,
-      "Struktur": 115,
-      "Retest": 51,
-      "RSI": 4
+      "Displacement": 46,
+      "Sweep": 28,
+      "Konfirmasi": 73,
+      "Struktur": 131,
+      "Retest": 67,
+      "RSI": 5
     },
     "near": [
       {
@@ -7706,12 +7706,12 @@
         "text": "ZK-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 47.6 di 40-60"
       },
       {
-        "depth": 6,
-        "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "depth": 7,
+        "text": "HMSTR-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 54.6 di 40-60"
       },
       {
         "depth": 6,
-        "text": "PENGU-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
+        "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
