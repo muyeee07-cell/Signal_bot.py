@@ -11,7 +11,7 @@ Rules (LONG; SHORT mirrors):
   2. Pullback   low touches MA9 within PULL_N bars, closes never break MA18
   3. Trigger    bullish candle closes back above a rising MA4 (Murphy "buying alert")
   4. RSI(14)    lowest RSI of the pullback is between 35 and 55
-  5. Stoch      (14,3,3) %K crosses above %D after being <= 40
+  5. Stoch      (14,3,3) %K crosses above %D (within the last 3 candles) after being <= 40
   6. MACD       (12,26,9) histogram rising
   7. Volume     signal candle >= average volume
   8. Bollinger  (20,2) no squeeze, opposite band at least 0.5R away
@@ -21,6 +21,7 @@ Modes
   python signal_bot_murphy.py                      live scan (GitHub Actions: run every 15 min)
   python signal_bot_murphy.py selftest             offline check on synthetic candles
   python signal_bot_murphy.py backtest BTC-USDT-SWAP ETH-USDT-SWAP --bars 5000
+  python signal_bot_murphy.py ablation [PAIR ...] --bars 3000   matikan tiap filter bergantian, bandingkan
 
 Backtest uses the exact same engine as live. Treat every signal as unproven until a
 backtest on the pairs you actually scan shows an edge after fees.
@@ -51,7 +52,7 @@ CHAT_ID = env_first("CHAT_ID", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT")
 # Based on John J. Murphy, "Technical Analysis of the Financial Markets":
 # MA 4-9-18 trend (ch. 9), Bollinger bands (ch. 9), RSI / Stochastic / MACD (ch. 10),
 # volume confirmation (ch. 7), trade with the major trend (ch. 10).
-SETUP_ID = "MURPHY_STRATEGY"
+SETUP_ID = "MURPHY_PULLBACK"
 
 
 def env_num(default, *names):
@@ -103,6 +104,7 @@ RSI_FLOOR = env_num(35.0, "RSI_FLOOR")               # ...and >= this (not a col
 # ---- 3. Stochastic (14,3,3) cross from the extreme zone (p.248-249) ----
 ST_N, ST_SMOOTH, ST_D = 14, 3, 3
 ST_OS = env_num(40.0, "ST_OS")                       # book uses 20/80; looser for pullbacks in a trend
+STOCH_LOOKBACK = max(1, env_num(3, "STOCH_LOOKBACK"))  # %K/%D cross may be up to this many candles old (1 = this candle only)
 
 # ---- 4. MACD 12-26-9 histogram turning with the trade (p.252-255) ----
 MACD_FAST, MACD_SLOW, MACD_SIG = 12, 26, 9
@@ -123,7 +125,7 @@ MAX_RISK_PCT = env_num(0.015, "MAX_RISK_PCT")
 MIN_RISK_PCT = env_num(0.004, "MIN_RISK_PCT", "SMC_MIN_RISK_PCT")      # 0 disables the cost gate
 # Separate cost gate for BTC only. Negative = use MIN_RISK_PCT.
 MIN_RISK_PCT_BTC = env_num(-1.0, "MIN_RISK_PCT_BTC", "SMC_MIN_RISK_PCT_BTC")
-MAX_OPEN = env_num(10, "MAX_OPEN", "SMC_MAX_OPEN")
+MAX_OPEN = env_num(5, "MAX_OPEN", "SMC_MAX_OPEN")
 COOLDOWN_HOURS = 4
 
 # ---- POSITION CROWDING (0 = no limit) ----
@@ -142,9 +144,10 @@ DEFENSIVE = [False]                                  # set by scan_murphy each c
 
 # --- backtest mode ---
 BT_MAX_HOLD = 200                                    # bars (50 h); older open trades are closed at the close
+OFF = set()   # filters switched off (ablation only; live = empty): HTF PULLBACK MA4 RSI STOCH MACD VOLUME SQUEEZE BANDROOM MINRISK
 
 # --- universe ---
-TOP_PAIRS = int(os.getenv("TOP_PAIRS", "100"))
+TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
 MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
@@ -178,7 +181,7 @@ S = requests.Session()
 S.headers.update({"User-Agent": "ALPHAQUANT-MURPHY"})
 TELEGRAM = bool(TOKEN and CHAT_ID)
 
-SETUP_NAME = {"MURPHY_STRATEGY": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
+SETUP_NAME = {"MURPHY_PULLBACK": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
 
 # ================= HELPERS =================
 
@@ -444,7 +447,7 @@ def tick_round(x, tick):
 # ================= REJECT TRACKING =================
 
 STAGES = [
-    "Data", "Tren", "HTF", "Pullback", "MA4", "RSI", "Stochastic",
+    "Data", "Candle sedikit", "Candle telat", "Tren", "HTF", "Pullback", "MA4", "RSI", "Stochastic",
     "MACD", "Volume", "Bollinger", "SL/RR", "Diblokir"
 ]
 
@@ -608,7 +611,7 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
         return "Tren", f"{side} MA{MA_MID}/MA{MA_SLOW} tidak searah"
 
     want = "UP" if up else "DOWN"
-    if (HTF_FILTER or DEFENSIVE[0]) and htf != want:
+    if "HTF" not in OFF and (HTF_FILTER or DEFENSIVE[0]) and htf != want:
         return "HTF", f"{side} tren 1H {htf or 'netral'} (perlu {want})"
 
     # --- 2. Pullback into MA9 that never breaks MA18 ---
@@ -621,9 +624,9 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
     else:
         touched = max(highs) >= ma_m
         hold = min(s - c for c, s in zip(closes_w, ma_s_w)) > -HOLD_ATR * a
-    if not touched:
+    if "PULLBACK" not in OFF and not touched:
         return "Pullback", f"{side} belum pullback ke MA{MA_MID}"
-    if not hold:
+    if "PULLBACK" not in OFF and not hold:
         return "Pullback", f"{side} close menembus MA{MA_SLOW} saat pullback"
 
     # --- 3. Trigger candle: MA4 turning back with the trend (Murphy "buying alert", p.205) ---
@@ -631,7 +634,7 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
         trig = close > ma_f and ma_f > ma_f1 and close > opn
     else:
         trig = close < ma_f and ma_f < ma_f1 and close < opn
-    if not trig:
+    if "MA4" not in OFF and not trig:
         return "MA4", f"{side} candle pemicu / MA{MA_FAST} belum berbalik searah"
 
     # --- 4. RSI pulled back into the 35-55 zone (mirror for SHORT) and did not collapse ---
@@ -641,30 +644,38 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
     else:
         r_ext = max(rsi_w)
         rsi_ok = 100 - RSI_PULL_HI <= r_ext <= 100 - RSI_FLOOR
-    if not rsi_ok:
+    if "RSI" not in OFF and not rsi_ok:
         return "RSI", f"{side} RSI ekstrem pullback {r_ext:.1f} di luar zona"
 
-    # --- 5. Stochastic %K crosses %D out of the oversold/overbought zone (p.248-249) ---
-    if up:
-        st_ok = k > d and k1 <= d1 and min(k_w) <= ST_OS
-    else:
-        st_ok = k < d and k1 >= d1 and max(k_w) >= 100 - ST_OS
-    if not st_ok:
-        return "Stochastic", f"{side} K {k:.0f}/D {d:.0f} belum cross dari zona ekstrem"
+    # --- 5. Stochastic %K crosses %D out of the oversold/overbought zone, within the last
+    #        STOCH_LOOKBACK candles (p.248-249) ---
+    def _crossed(j):
+        kj, dj, kp, dp = ind["k"][j], ind["d"][j], ind["k"][j - 1], ind["d"][j - 1]
+        if None in (kj, dj, kp, dp):
+            return False
+        return (kj > dj and kp <= dp) if up else (kj < dj and kp >= dp)
+
+    crossed = any(_crossed(j) for j in range(max(1, i - STOCH_LOOKBACK + 1), i + 1))
+    still = k > d if up else k < d                      # %K must still be on the trade side of %D
+    zone = min(k_w) <= ST_OS if up else max(k_w) >= 100 - ST_OS
+    st_ok = crossed and still and zone
+    if "STOCH" not in OFF and not st_ok:
+        return "Stochastic", (f"{side} K {k:.0f}/D {d:.0f} belum cross dari zona ekstrem "
+                              f"(dalam {STOCH_LOOKBACK} candle)")
 
     # --- 6. MACD histogram turning with the trade (p.255) ---
-    if (up and not hist > hist1) or (not up and not hist < hist1):
+    if "MACD" not in OFF and ((up and not hist > hist1) or (not up and not hist < hist1)):
         return "MACD", f"{side} histogram MACD belum berbalik searah"
 
     # --- 7. Volume confirms (p.174) ---
     vr = volume_ratio(cs, VOL_PERIOD) or 0.0
     need_vol = MIN_VOLUME_RATIO + (DEFENSIVE_EXTRA_VOLUME if DEFENSIVE[0] else 0.0)
-    if vr < need_vol:
+    if "VOLUME" not in OFF and vr < need_vol:
         return "Volume", f"{side} volume {vr:.2f}x (min {need_vol:.2f}x)"
 
     # --- 8. Bollinger: not in a squeeze (p.211) ---
     bw_hist = [x for x in ind["bw"][-BW_LOOKBACK:] if x is not None]
-    if len(bw_hist) >= 20 and bw < _quantile(bw_hist, BW_MIN_PCT):
+    if "SQUEEZE" not in OFF and len(bw_hist) >= 20 and bw < _quantile(bw_hist, BW_MIN_PCT):
         return "Bollinger", f"{side} band menyempit (squeeze), tunggu breakout"
 
     sig_hour = datetime.fromisoformat(iso(cs[i][0])).hour
@@ -687,14 +698,14 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
 
     risk_pct = risk / close
     min_risk = MIN_RISK_PCT_BTC if (inst == REF_SYMBOL and MIN_RISK_PCT_BTC >= 0) else MIN_RISK_PCT
-    if risk_pct < min_risk:
+    if "MINRISK" not in OFF and risk_pct < min_risk:
         return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% (min {min_risk * 100:.2f}%, fee memakan R)"
     if MAX_RISK_PCT > 0 and risk_pct > MAX_RISK_PCT:
         return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% terlalu jauh (maks {MAX_RISK_PCT * 100:.2f}%)"
 
     # --- Bollinger target: room toward the opposite band (p.210) ---
     room_r = ((bb_up - close) if up else (close - bb_lo)) / risk
-    if BB_MIN_R > 0 and room_r < BB_MIN_R:
+    if "BANDROOM" not in OFF and BB_MIN_R > 0 and room_r < BB_MIN_R:
         return "Bollinger", f"{side} band hanya {room_r:.2f}R dari entry (min {BB_MIN_R:g}R)"
 
     tp_raw = close + TARGET_RR * risk if up else close - TARGET_RR * risk
@@ -761,7 +772,7 @@ def build_murphy_pullback(inst, cs, meta):
       2. Pullback   low touches MA9 within PULL_N bars, closes hold above MA18
       3. Trigger    close back above a rising MA4 on a bullish candle
       4. RSI        pullback low between 35 and 55
-      5. Stochastic %K crosses above %D after being <= 40
+      5. Stochastic %K crosses above %D (within STOCH_LOOKBACK candles) after being <= 40
       6. MACD       histogram rising
       7. Volume     >= average
       8. Bollinger  no squeeze; opposite band at least BB_MIN_R away
@@ -771,7 +782,7 @@ def build_murphy_pullback(inst, cs, meta):
     CUR_SETUP = SETUP_ID
 
     if len(cs) < MIN_BARS:
-        return _rej(inst, "Data", f"hanya {len(cs)} candle (min {MIN_BARS})")
+        return _rej(inst, "Candle sedikit", f"hanya {len(cs)} candle (min {MIN_BARS})")
 
     ind = murphy_indicators(cs)
     if ind["atr"][-1] is None or ind["rsi"][-1] is None:
@@ -893,6 +904,80 @@ def run_backtest(insts, bars):
         bt_report(f"{inst} [{iso(cs[0][0])[:10]} -> {iso(cs[-1][0])[:10]}]", t)
     if len(insts) > 1:
         bt_report("GABUNGAN", allt)
+
+ABLATION_FILTERS = ["HTF", "PULLBACK", "MA4", "RSI", "STOCH", "MACD", "VOLUME", "SQUEEZE", "BANDROOM", "MINRISK"]
+
+def _ablation_job(args):
+    name, off, data = args
+    QUIET[0] = True
+    OFF.clear()
+    OFF.update(off)
+    rows = []
+    for inst, cs in data.items():
+        for t in backtest_series(inst, cs):
+            rows.append((float(t["result_r"]), fee_r_of(t)))
+    return name, rows
+
+def _abl_stats(rows):
+    n = len(rows)
+    if not n:
+        return 0, 0.0, 0.0, 0.0, 0.0
+    net = [r - f for r, f in rows]
+    wr = sum(1 for r, _ in rows if r > 0) / n * 100
+    gp = sum(x for x in net if x > 0)
+    gl = -sum(x for x in net if x <= 0)
+    return n, wr, sum(net), sum(net) / n, (gp / gl if gl else float("inf"))
+
+def run_ablation(insts, bars, synthetic=False):
+    """Backtest with every filter switched off one at a time (all others stay on)."""
+    if synthetic:
+        data = {f"SYN{sd}": synthetic_candles(bars, sd) for sd in (7, 11, 23)}
+    else:
+        insts = insts or top_pairs()[:10]
+        data = {}
+        for inst in insts:
+            cs = candles(inst, TF, bars, history=True)
+            if len(cs) >= MIN_BARS + 10:
+                data[inst] = cs
+            else:
+                print(f"{inst}: data kurang ({len(cs)} candle), dilewati")
+    if not data:
+        print("Tidak ada data.")
+        return
+    jobs = [("BASELINE (semua aktif)", ())] + [(f"tanpa {f}", (f,)) for f in ABLATION_FILTERS]
+    payload = [(n, o, data) for n, o in jobs]
+    results = {}
+    try:
+        from concurrent.futures import ProcessPoolExecutor
+        with ProcessPoolExecutor() as ex:
+            for name, rows in ex.map(_ablation_job, payload):
+                results[name] = rows
+    except Exception as e:
+        print(f"Paralel gagal ({e}); jalan berurutan, ini lebih lama...")
+        results = dict(_ablation_job(x) for x in payload)
+
+    base = _abl_stats(results[jobs[0][0]])
+    print(f"\nAblation: {len(data)} pair x {bars} candle 15m | fee {FEE_PER_SIDE * 100:.2f}%/sisi | RR 1:{TARGET_RR}")
+    print(f"{'Konfigurasi':<24}{'Trade':>6}{'WR%':>7}{'Net R':>8}{'Avg R':>8}{'PF':>6}")
+    reliable = base[0] >= 60
+    for name, _ in jobs:
+        n, wr, tot, avg, pf = _abl_stats(results[name])
+        pf_t = "inf" if pf == float("inf") else f"{pf:.2f}"
+        mark = ""
+        if name != jobs[0][0] and reliable:
+            if avg >= base[3] + 0.05 and n >= base[0]:
+                mark = "  <- kandidat DIBUANG"
+            elif avg <= base[3] - 0.05:
+                mark = "  <- berguna, pertahankan"
+            else:
+                mark = "  <- beda tidak jelas"
+        print(f"{name:<24}{n:>6}{wr:>7.1f}{tot:>+8.2f}{avg:>+8.3f}{pf_t:>6}{mark}")
+    if not reliable:
+        print(f"\nPERINGATAN: baseline hanya {base[0]} trade (<60). Selisih antar baris masih noise, "
+              "jangan ambil keputusan. Tambah pair atau --bars.")
+    else:
+        print("\nCatatan: tanda di kanan indikatif (ambang selisih 0,05R). Dengan <200 trade, "
+              "selisih sekecil itu masih bisa noise.")
 
 def run_selftest():
     QUIET[0] = True
@@ -1176,7 +1261,7 @@ def _tally(h, scanned, created, rows):
 
     for (_, stage), items in rows.items():
         d["stages"][stage] = d["stages"].get(stage, 0) + len(items)
-        if stage in STAGES and stage not in ("Data", "Tren", "HTF"):
+        if stage in STAGES and stage not in ("Data", "Candle sedikit", "Candle telat", "Tren", "HTF"):
             depth = STAGES.index(stage)
             for inst, detail in items:
                 d["near"].append({"depth": depth, "text": f"{inst} → {stage}: {detail}"})
@@ -1272,12 +1357,12 @@ def scan_murphy(h):
         try:
             cs = candles(inst, TF, HISTORY_BARS)
             if len(cs) < MIN_BARS:
-                _rej(inst, "Data", f"hanya {len(cs)} candle")
+                _rej(inst, "Candle sedikit", f"hanya {len(cs)} candle (min {MIN_BARS})")
                 continue
 
             # Stale data (no trades in the latest bar): never signal on an old candle.
             if ref is not None and cs[-1][0] != ref:
-                _rej(inst, "Data", "candle terakhir tidak sinkron")
+                _rej(inst, "Candle telat", "candle terakhir tidak sinkron dengan acuan BTC")
                 continue
 
             s = build_murphy_pullback(inst, cs, meta)
@@ -1427,6 +1512,16 @@ def main():
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "selftest":
         run_selftest()
+    elif len(sys.argv) > 1 and sys.argv[1] == "ablation":
+        # python signal_bot_murphy.py ablation [PAIR ...] [--bars 3000] [--synthetic]
+        args = sys.argv[2:]
+        bars, synth = 3000, "--synthetic" in args
+        args = [x for x in args if x != "--synthetic"]
+        if "--bars" in args:
+            p = args.index("--bars")
+            bars = int(args[p + 1])
+            args = args[:p] + args[p + 2:]
+        run_ablation(args, bars, synth)
     elif len(sys.argv) > 1 and sys.argv[1] == "backtest":
         # python signal_bot_murphy.py backtest BTC-USDT-SWAP ETH-USDT-SWAP [--bars 5000]
         args = sys.argv[2:]
@@ -1438,3 +1533,4 @@ if __name__ == "__main__":
         run_backtest(args or [REF_SYMBOL], bars)
     else:
         main()
+
