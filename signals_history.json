@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792017900000,
+  "last_scan_candle": 1792019700000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,22 +8213,26 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 200,
+    "scans": 3,
+    "pairs": 300,
     "signals": 0,
     "stages": {
-      "HTF": 100,
-      "Tren": 70,
-      "RSI": 6,
-      "MA4": 14,
+      "HTF": 162,
+      "Tren": 97,
+      "RSI": 7,
+      "MA4": 23,
       "Stochastic": 6,
       "Volume": 3,
-      "Bollinger": 1
+      "Bollinger": 2
     },
     "near": [
       {
         "depth": 11,
         "text": "RESOLV-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
+      },
+      {
+        "depth": 11,
+        "text": "XLM-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
       },
       {
         "depth": 10,
@@ -8245,10 +8249,6 @@
       {
         "depth": 8,
         "text": "MAGIC-USDT-SWAP → Stochastic: SHORT K 18/D 30 belum cross dari zona ekstrem (dalam 3 candle)"
-      },
-      {
-        "depth": 8,
-        "text": "XDP-USDT-SWAP → Stochastic: SHORT K 17/D 15 belum cross dari zona ekstrem (dalam 3 candle)"
       }
     ]
   }
