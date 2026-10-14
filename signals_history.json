@@ -7674,24 +7674,28 @@
     }
   ],
   "last_scan_candle": 1790870400000,
-  "last_smc_candle": 1791941400000,
+  "last_smc_candle": 1791943200000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
-    "scans": 1,
-    "pairs": 50,
+    "scans": 2,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "Retest": 12,
-      "Konfirmasi": 13,
-      "Displacement": 6,
-      "Sweep": 3,
-      "RSI": 1,
-      "Struktur": 15
+      "Retest": 23,
+      "Konfirmasi": 27,
+      "Displacement": 13,
+      "Sweep": 5,
+      "RSI": 2,
+      "Struktur": 30
     },
     "near": [
       {
         "depth": 7,
         "text": "ONE-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 47.8 di 40-60"
+      },
+      {
+        "depth": 7,
+        "text": "STRK-USDT-SWAP → RSI: SHORT mode DEFENSIF: RSI 46.8 di 40-60"
       },
       {
         "depth": 6,
@@ -7708,10 +7712,6 @@
       {
         "depth": 6,
         "text": "STRK-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (5 bar lalu)"
-      },
-      {
-        "depth": 6,
-        "text": "HMSTR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
