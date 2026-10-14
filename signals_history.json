@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791990900000,
+  "last_scan_candle": 1791993600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,16 +8213,17 @@
     }
   ],
   "scan_rej": {
-    "scans": 3,
-    "pairs": 300,
+    "scans": 4,
+    "pairs": 400,
     "signals": 0,
     "stages": {
-      "MA4": 213,
-      "RSI": 24,
+      "MA4": 220,
+      "RSI": 26,
       "Stochastic": 9,
       "HTF": 29,
-      "Tren": 24,
-      "Pullback": 1
+      "Tren": 25,
+      "Pullback": 1,
+      "Data": 90
     },
     "near": [
       {
