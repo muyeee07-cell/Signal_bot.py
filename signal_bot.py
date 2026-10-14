@@ -1,54 +1,35 @@
 """
-ALPHAQUANT V5.2
-SMC Scalp 15m - Telegram signal engine (signal-only) for the top 50 OKX USDT perpetuals
+ALPHAQUANT MURPHY V6.0
+Murphy Pullback Scalp 15m - Telegram signal engine (signal-only) for the top 50 OKX USDT perpetuals
 
-Only one strategy remains: Smart Money Concept scalp on the 15m timeframe.
+Strategy source: John J. Murphy, "Technical Analysis of the Financial Markets".
+The SMC engine of V5.x was replaced; the infrastructure (OKX data, Telegram, history file,
+TP/SL monitor, reports, crowding limits, adaptive mode) is unchanged.
 
-  1. Liquidity sweep of a recent swing (wick through, close back inside)
-  2. Structure BEFORE the sweep agrees with the trade (BOS / CHOCH)
-  3. Displacement candle after the sweep
-  4. Order block = last opposing candle before the displacement
-  5. Retest of the order block AFTER the displacement + confirmation candle
-     (must be the latest candle; entry = its close)
-  6. SL beyond OB / swept level / sweep wick, TP at TARGET_RR
+Rules (LONG; SHORT mirrors):
+  1. Trend      MA9 > MA18, MA18 rising, price above MA18, and the 1H trend agrees
+  2. Pullback   low touches MA9 within PULL_N bars, closes never break MA18
+  3. Trigger    bullish candle closes back above a rising MA4 (Murphy "buying alert")
+  4. RSI(14)    lowest RSI of the pullback is between 35 and 55
+  5. Stoch      (14,3,3) %K crosses above %D after being <= 40
+  6. MACD       (12,26,9) histogram rising
+  7. Volume     signal candle >= average volume
+  8. Bollinger  (20,2) no squeeze, opposite band at least 0.5R away
+  Entry = close of the signal candle, SL beyond the pullback extreme, TP at TARGET_RR (1.75).
 
-V5.3 changes (quality mode, based on 210 closed signals)
-- RSI deadzone widened to 45-55 and set to BLOCK (this zone lost -16R / 31.7% WR in history)
-- Session filter: no new signals during SMC_BLOCK_HOURS (default UTC 08-15, EU session)
-- Adaptive gate: win rate of the last ADAPT_WINDOW closed trades decides the mode.
-  NORMAL = base filters. DEFENSIVE (WR < ADAPT_MIN_WR) = trend-aligned setups only
-  and RSI must be outside 40-60. It never fully pauses, so the window keeps refreshing.
-- Ranking: all valid setups of a candle are collected first and the best "quality"
-  (RSI momentum + trend alignment) are sent, instead of the first pairs in volume order
-- MAX_NEW_SMC_PER_CANDLE default 1
+Modes
+  python signal_bot_murphy.py                      live scan (GitHub Actions: run every 15 min)
+  python signal_bot_murphy.py selftest             offline check on synthetic candles
+  python signal_bot_murphy.py backtest BTC-USDT-SWAP ETH-USDT-SWAP --bars 5000
 
-V5.2 changes (tighter filters)
-- Volume gate on the signal candle: BOS >= MIN_VOLUME_RATIO_BOS, CHOCH >= MIN_VOLUME_RATIO_CHOCH
-- RSI deadzone (47-50): mode PENALTY = extra volume required, BLOCK = rejected, OFF = ignored
-- Crowding: max MAX_ACTIVE_SMC_PER_DIRECTION open positions per direction and
-  max MAX_NEW_SMC_PER_CANDLE new signals per candle (best-ranked pairs first)
-- TARGET_RR replaces SMC_RR
-
-V5.1 changes
-- Trades of the removed strategies (Breakout, Mean Rev, ...) are moved to
-  h["archive"] on start-up: no more monitoring, notifications or statistics for them
-- Notifications and statistics now only cover SMC scalp
-
-V5.0 changes
-- 4H setups, ICT and Adaptive removed (they failed backtests)
-- SMC scans the top TOP_PAIRS pairs by 24h volume (default 50) on every new 15m candle,
-  24 hours a day (there is no session filter; run the workflow every 15 minutes)
-- Cost gate: SL must be >= SMC_MIN_RISK_PCT of price (default 0.4%)
-- Portfolio cap: at most SMC_MAX_OPEN open scalps (default 5)
-- Periodic report (every REPORT_EVERY_HOURS) with the scan funnel + near misses
-
-Backtests of the previous BTC-only version were negative after fees. Treat every
-signal as unproven until backtest.py shows an edge on the pairs you actually scan.
+Backtest uses the exact same engine as live. Treat every signal as unproven until a
+backtest on the pairs you actually scan shows an edge after fees.
+Old SMC trades that are still open keep being monitored; once closed they go to h["archive"].
 """
 
 from __future__ import annotations
 
-import os, json, time, math, logging
+import os, sys, json, time, math, logging
 from datetime import datetime, timezone
 import requests
 
@@ -66,35 +47,24 @@ def env_first(*names: str) -> str:
 TOKEN = env_first("TELEGRAM_TOKEN", "TELEGRAM_BOT_TOKEN", "BOT_TOKEN")
 CHAT_ID = env_first("CHAT_ID", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT")
 
-# --- SMC scalp ---
-SMC_TF = "15m"
-SMC_TF_MS = 15 * 60_000
-SMC_MONITOR_TF = "5m"                 # finer candles to resolve TP/SL of open scalps
-SMC_MONITOR_MS = 5 * 60_000
-SMC_SYMBOL = "BTC-USDT-SWAP"          # reference symbol for the "new 15m candle" gate
-SMC_HISTORY_BARS = 200
-SMC_MIN_BARS = 80
-SMC_SWING = 3
+# --- Murphy pullback scalp ---
+# Based on John J. Murphy, "Technical Analysis of the Financial Markets":
+# MA 4-9-18 trend (ch. 9), Bollinger bands (ch. 9), RSI / Stochastic / MACD (ch. 10),
+# volume confirmation (ch. 7), trade with the major trend (ch. 10).
+SETUP_ID = "MURPHY_PULLBACK"
 
-# ---- CORE ----
-TARGET_RR = float(os.getenv("TARGET_RR", "1.75"))
 
-# ---- VOLUME: volume of the signal candle / average volume of the previous candles ----
-MIN_VOLUME_RATIO_BOS = float(os.getenv("MIN_VOLUME_RATIO_BOS", "0.50"))
-MIN_VOLUME_RATIO_CHOCH = float(os.getenv("MIN_VOLUME_RATIO_CHOCH", "0.75"))
+def env_num(default, *names):
+    """First env var that is set, converted to the type of `default`."""
+    v = env_first(*names)
+    if not v:
+        return default
+    try:
+        return type(default)(v)
+    except ValueError:
+        return default
 
-# ---- POSITION CROWDING (0 = no limit) ----
-MAX_ACTIVE_SMC_PER_DIRECTION = int(os.getenv("MAX_ACTIVE_SMC_PER_DIRECTION", "3"))
-MAX_NEW_SMC_PER_CANDLE = int(os.getenv("MAX_NEW_SMC_PER_CANDLE", "1"))
 
-# ---- RSI deadzone: RSI of the signal candle between LOW and HIGH = undecided momentum ----
-RSI_DEADZONE_LOW = float(os.getenv("RSI_DEADZONE_LOW", "45"))
-RSI_DEADZONE_HIGH = float(os.getenv("RSI_DEADZONE_HIGH", "55"))
-# OFF     : ignore the deadzone
-# BLOCK   : reject signals whose RSI is inside the deadzone
-# PENALTY : allow them, but they need extra volume (RSI_DEADZONE_EXTRA_VOLUME added to the minimum)
-RSI_DEADZONE_MODE = os.getenv("RSI_DEADZONE_MODE", "BLOCK").strip().upper()
-RSI_DEADZONE_EXTRA_VOLUME = float(os.getenv("RSI_DEADZONE_EXTRA_VOLUME", "0.25"))
 def parse_hours(spec):
     """'8-15,22' -> {8..15, 22}. Empty string = no blocked hours."""
     out = set()
@@ -108,26 +78,70 @@ def parse_hours(spec):
         out.update(range(lo, hi + 1))
     return out
 
-SMC_BLOCK_HOURS = parse_hours(os.getenv("SMC_BLOCK_HOURS", "20-2"))   # UTC hours, signal candle
-ADAPT_WINDOW = int(os.getenv("ADAPT_WINDOW", "30"))                   # last N closed trades
-ADAPT_MIN_TRADES = int(os.getenv("ADAPT_MIN_TRADES", "20"))           # fewer -> stay NORMAL
-ADAPT_MIN_WR = float(os.getenv("ADAPT_MIN_WR", "0.40"))               # below -> DEFENSIVE
-DEFENSIVE_RSI_LOW = float(os.getenv("DEFENSIVE_RSI_LOW", "40"))
-DEFENSIVE_RSI_HIGH = float(os.getenv("DEFENSIVE_RSI_HIGH", "60"))
-DEFENSIVE = [False]                                                   # set by scan_smc each candle
-SMC_MIN_SL_ATR = 0.35
-SMC_MAX_SL_ATR = 2.50
-SMC_DISP_BODY_MIN = 0.55
-SMC_DISP_ATR_MIN = 0.80
-SMC_OB_LOOKBACK = 12
-SMC_SWEEP_TOL_ATR = 0.15
-SMC_CONFIRM_BARS = 1
-SMC_COOLDOWN_HOURS = 4
-SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))   # 0 disables the cost gate
-# Separate cost gate for BTC only (BTC moves little relative to its price, so the
-# global 0.4% gate rejects almost every BTC signal). Negative = use SMC_MIN_RISK_PCT.
-SMC_MIN_RISK_PCT_BTC = float(os.getenv("SMC_MIN_RISK_PCT_BTC", "-1"))
-SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "5"))
+
+TF = "15m"
+TF_MS = 15 * 60_000
+MONITOR_TF = "5m"                      # finer candles to resolve TP/SL of open scalps
+MONITOR_MS = 5 * 60_000
+REF_SYMBOL = "BTC-USDT-SWAP"           # reference symbol for the "new 15m candle" gate
+HISTORY_BARS = env_num(300, "HISTORY_BARS")
+MIN_BARS = 150
+
+# ---- CORE ----
+TARGET_RR = env_num(1.75, "TARGET_RR")
+
+# ---- 1. trend: MA 4-9-18 (Murphy p.204-206) + 1H filter ----
+MA_FAST, MA_MID, MA_SLOW = 4, 9, 18
+HTF_FILTER = env_first("HTF_FILTER") != "0"          # 1H trend must agree (needs ~25 h of 15m data)
+HOLD_ATR = 0.5                                       # pullback may not close further than 0.5 ATR through MA18
+
+# ---- 2. pullback window / RSI zone (50 acts as support in pullbacks, p.245) ----
+PULL_N = env_num(6, "PULL_N")                        # bars in the pullback window
+RSI_PULL_HI = env_num(55.0, "RSI_PULL_HI")           # LONG: lowest RSI of the window must be <= this
+RSI_FLOOR = env_num(35.0, "RSI_FLOOR")               # ...and >= this (not a collapse). SHORT mirrors (100-x)
+
+# ---- 3. Stochastic (14,3,3) cross from the extreme zone (p.248-249) ----
+ST_N, ST_SMOOTH, ST_D = 14, 3, 3
+ST_OS = env_num(40.0, "ST_OS")                       # book uses 20/80; looser for pullbacks in a trend
+
+# ---- 4. MACD 12-26-9 histogram turning with the trade (p.252-255) ----
+MACD_FAST, MACD_SLOW, MACD_SIG = 12, 26, 9
+
+# ---- 5. volume must confirm (p.174) ----
+MIN_VOLUME_RATIO = env_num(1.0, "MIN_VOLUME_RATIO")  # signal-candle volume / average of the last VOL_PERIOD
+
+# ---- 6. Bollinger 20/2: no squeeze, room to the opposite band (p.209-211) ----
+BB_N, BB_K = 20, 2.0
+BW_LOOKBACK = 100
+BW_MIN_PCT = env_num(0.20, "BW_MIN_PCT")             # skip when band width is in the lowest 20%
+BB_MIN_R = env_num(0.5, "BB_MIN_R")                  # band must be >= this many R away from entry (0 = off)
+
+# ---- stop / cost gates ----
+MIN_SL_ATR = 0.35
+MAX_SL_ATR = 2.50
+MAX_RISK_PCT = env_num(0.015, "MAX_RISK_PCT")
+MIN_RISK_PCT = env_num(0.004, "MIN_RISK_PCT", "SMC_MIN_RISK_PCT")      # 0 disables the cost gate
+# Separate cost gate for BTC only. Negative = use MIN_RISK_PCT.
+MIN_RISK_PCT_BTC = env_num(-1.0, "MIN_RISK_PCT_BTC", "SMC_MIN_RISK_PCT_BTC")
+MAX_OPEN = env_num(5, "MAX_OPEN", "SMC_MAX_OPEN")
+COOLDOWN_HOURS = 4
+
+# ---- POSITION CROWDING (0 = no limit) ----
+MAX_ACTIVE_PER_DIRECTION = env_num(3, "MAX_ACTIVE_PER_DIRECTION", "MAX_ACTIVE_SMC_PER_DIRECTION")
+MAX_NEW_PER_CANDLE = env_num(1, "MAX_NEW_PER_CANDLE", "MAX_NEW_SMC_PER_CANDLE")
+
+# ---- session gate: UTC hours of the signal candle to skip (default none; was 8-15 for SMC) ----
+BLOCK_HOURS = parse_hours(env_first("BLOCK_HOURS", "SMC_BLOCK_HOURS"))
+
+# ---- adaptive gate: rolling win rate of the last ADAPT_WINDOW closed trades ----
+ADAPT_WINDOW = env_num(30, "ADAPT_WINDOW")
+ADAPT_MIN_TRADES = env_num(20, "ADAPT_MIN_TRADES")   # fewer -> stay NORMAL
+ADAPT_MIN_WR = env_num(0.40, "ADAPT_MIN_WR")         # below -> DEFENSIVE
+DEFENSIVE_EXTRA_VOLUME = env_num(0.25, "DEFENSIVE_EXTRA_VOLUME")  # DEFENSIVE: more volume + 1H filter forced on
+DEFENSIVE = [False]                                  # set by scan_murphy each candle
+
+# --- backtest mode ---
+BT_MAX_HOLD = 200                                    # bars (50 h); older open trades are closed at the close
 
 # --- universe ---
 TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
@@ -137,7 +151,7 @@ MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 RSI_PERIOD = 14
 ATR_PERIOD = 14
 VOL_PERIOD = 20
-SL_ATR_BUFFER = 0.30
+SL_ATR_BUFFER = env_num(0.10, "SL_ATR_BUFFER")
 
 # --- risk / reporting ---
 RISK_PER_TRADE = float(os.getenv("RISK_PER_TRADE", "0.004"))
@@ -159,12 +173,12 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
-log = logging.getLogger("V5.2")
+log = logging.getLogger("MURPHY")
 S = requests.Session()
-S.headers.update({"User-Agent": "ALPHAQUANT-V5.2"})
+S.headers.update({"User-Agent": "ALPHAQUANT-MURPHY"})
 TELEGRAM = bool(TOKEN and CHAT_ID)
 
-SETUP_NAME = {"SMC_SCALP": "SMC Scalp"}
+SETUP_NAME = {"MURPHY_PULLBACK": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
 
 # ================= HELPERS =================
 
@@ -234,7 +248,7 @@ def load_history():
             d = json.load(f)
         d.setdefault("open", [])
         d.setdefault("closed", [])
-        # last_scan_candle / last_smc_candle are optional keys preserved as-is
+        # last_scan_candle / last_scan_candle are optional keys preserved as-is
         return d
     except Exception as e:
         log.error("History load failed: %s", e)
@@ -242,20 +256,17 @@ def load_history():
 
 def archive_legacy(h):
     """
-    Move trades of removed strategies (Breakout, Mean Rev, ...) out of open/closed.
-    They are kept under h["archive"] (not deleted) but are never monitored,
-    reported or counted again. Returns how many trades were moved.
+    Move CLOSED trades of other strategies (SMC scalp, Breakout, ...) to h["archive"] so
+    statistics and the adaptive win rate only cover the Murphy system. Open legacy
+    trades are left alone and keep being monitored until they close.
     """
-    moved = 0
-    for key in ("open", "closed"):
-        keep, drop = [], []
-        for x in h.get(key, []):
-            (keep if x.get("setup") == "SMC_SCALP" else drop).append(x)
-        if drop:
-            h[key] = keep
-            h.setdefault("archive", []).extend(dict(x, archived_from=key) for x in drop)
-            moved += len(drop)
-    return moved
+    keep, drop = [], []
+    for x in h.get("closed", []):
+        (keep if x.get("setup") == SETUP_ID else drop).append(x)
+    if drop:
+        h["closed"] = keep
+        h.setdefault("archive", []).extend(dict(x, archived_from="closed") for x in drop)
+    return len(drop)
 
 def save_history(h):
     tmp = HISTORY_FILE + ".tmp"
@@ -307,7 +318,7 @@ def price(inst):
     except:
         return None
 
-def candles(inst, bar, needed):
+def candles(inst, bar, needed, history=False):
     """
     OKX pagination using `after`.
     Returns confirmed candles oldest -> newest.
@@ -325,7 +336,7 @@ def candles(inst, bar, needed):
         if cursor is not None:
             p["after"] = str(cursor)
 
-        d = api("/api/v5/market/candles", p)
+        d = api("/api/v5/market/history-candles" if history else "/api/v5/market/candles", p)
         if not d:
             break
 
@@ -367,7 +378,7 @@ def candles(inst, bar, needed):
     out = sorted(found.values(), key=lambda x: x[0])
     return out[-needed:]
 
-def latest_candle_ts(bar=SMC_TF, inst=SMC_SYMBOL):
+def latest_candle_ts(bar=TF, inst=REF_SYMBOL):
     """Open time of the newest confirmed candle (BTC as the reference clock)."""
     cs = candles(inst, bar, 3)
     return cs[-1][0] if cs else None
@@ -432,12 +443,13 @@ def tick_round(x, tick):
 
 # ================= REJECT TRACKING =================
 
-SMC_STAGES = [
-    "Data", "Struktur", "Sweep", "Displacement", "OrderBlock",
-    "Retest", "Konfirmasi", "RSI", "Volume", "SL/RR", "Diblokir"
+STAGES = [
+    "Data", "Tren", "HTF", "Pullback", "MA4", "RSI", "Stochastic",
+    "MACD", "Volume", "Bollinger", "SL/RR", "Diblokir"
 ]
 
-CUR_SETUP = "SMC_SCALP"
+CUR_SETUP = SETUP_ID
+QUIET = [False]            # True while backtesting: no reject bookkeeping
 
 # (setup, stage) -> [(pair, detail)], reset at the start of every scan.
 REJECTS = {}
@@ -450,246 +462,263 @@ def _safe(text):
     return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 def _rej(inst, stage, detail="", setup=None):
+    if QUIET[0]:
+        return None
     key = (setup or CUR_SETUP, stage)
     REJECTS.setdefault(key, []).append((inst, _safe(detail)))
     return None
 
-# ================= SMC SCALP (15m) =================
+# ================= MURPHY PULLBACK SCALP (15m) =================
 
-def _smc_swings(cs, swing=SMC_SWING):
-    """Fractal swing highs/lows. Returns lists of (index, price)."""
-    highs, lows = [], []
-    for i in range(swing, len(cs) - swing):
-        h, l = cs[i][2], cs[i][3]
-        if all(h >= cs[i - j][2] for j in range(1, swing + 1)) and \
-           all(h > cs[i + j][2] for j in range(1, swing + 1)):
-            highs.append((i, h))
-        if all(l <= cs[i - j][3] for j in range(1, swing + 1)) and \
-           all(l < cs[i + j][3] for j in range(1, swing + 1)):
-            lows.append((i, l))
-    return highs, lows
+def _roll_mean(v, n):
+    out = [None] * len(v)
+    for i in range(n - 1, len(v)):
+        w = v[i - n + 1:i + 1]
+        if None in w:
+            continue
+        out[i] = sum(w) / n
+    return out
 
-def _smc_structure(highs, lows):
+def sma_list(v, n):
+    out = [None] * len(v)
+    if len(v) < n:
+        return out
+    s = sum(v[:n])
+    out[n - 1] = s / n
+    for i in range(n, len(v)):
+        s += v[i] - v[i - n]
+        out[i] = s / n
+    return out
+
+def ema_list(v, n):
+    out = [None] * len(v)
+    if not v:
+        return out
+    k = 2 / (n + 1)
+    x = v[0]
+    out[0] = x
+    for i in range(1, len(v)):
+        x = v[i] * k + x * (1 - k)
+        out[i] = x
+    return out
+
+def std_list(v, n):
+    out = [None] * len(v)
+    for i in range(n - 1, len(v)):
+        w = v[i - n + 1:i + 1]
+        m = sum(w) / n
+        out[i] = math.sqrt(sum((x - m) ** 2 for x in w) / n)
+    return out
+
+def _quantile(vals, q):
+    v = sorted(vals)
+    pos = q * (len(v) - 1)
+    lo = int(math.floor(pos))
+    hi = min(lo + 1, len(v) - 1)
+    return v[lo] + (v[hi] - v[lo]) * (pos - lo)
+
+def murphy_indicators(cs):
+    """All indicators of the strategy as lists aligned with `cs` (None = warm-up)."""
+    n = len(cs)
+    cl = [x[4] for x in cs]
+    ma_f, ma_m, ma_s = (sma_list(cl, p) for p in (MA_FAST, MA_MID, MA_SLOW))
+
+    mid = sma_list(cl, BB_N)
+    sd = std_list(cl, BB_N)
+    bb_up = [None if m is None else m + BB_K * s for m, s in zip(mid, sd)]
+    bb_lo = [None if m is None else m - BB_K * s for m, s in zip(mid, sd)]
+    bw = [None if (m is None or not m) else (u - l_) / m
+          for m, u, l_ in zip(mid, bb_up, bb_lo)]
+
+    raw = [None] * n
+    for i in range(ST_N - 1, n):
+        win = cs[i - ST_N + 1:i + 1]
+        hh, ll = max(x[2] for x in win), min(x[3] for x in win)
+        raw[i] = 100 * (cl[i] - ll) / (hh - ll) if hh > ll else None
+    k = _roll_mean(raw, ST_SMOOTH)
+    d = _roll_mean(k, ST_D)
+
+    e_f, e_s = ema_list(cl, MACD_FAST), ema_list(cl, MACD_SLOW)
+    macd = [a - b for a, b in zip(e_f, e_s)]
+    sig = ema_list(macd, MACD_SIG)
+    hist = [a - b for a, b in zip(macd, sig)]
+
+    return {
+        "ma_f": ma_f, "ma_m": ma_m, "ma_s": ma_s,
+        "bb_mid": mid, "bb_up": bb_up, "bb_lo": bb_lo, "bw": bw,
+        "rsi": rsi(cs, RSI_PERIOD), "atr": atr(cs, ATR_PERIOD),
+        "k": k, "d": d, "hist": hist,
+    }
+
+def htf_state(cs):
     """
-    Determine last structural bias from swing sequence.
-    Returns: bias ('BULL'|'BEAR'|None), event ('BOS'|'CHOCH'|None),
-             last_sh, last_sl
+    1H trend from COMPLETED hourly bars only (the hour of the signal candle is excluded).
+    UP   : MA9 > MA18 and last hourly close > MA18
+    DOWN : mirror. None : neutral or not enough data.
     """
-    if len(highs) < 2 or len(lows) < 2:
-        return None, None, None, None
-
-    sh1, sh0 = highs[-2], highs[-1]
-    sl1, sl0 = lows[-2], lows[-1]
-    last_sh, last_sl = sh0, sl0
-
-    # Most recent swing event determines bias.
-    # Higher high + higher low = bull structure; opposite = bear.
-    hh = sh0[1] > sh1[1]
-    hl = sl0[1] > sl1[1]
-    lh = sh0[1] < sh1[1]
-    ll = sl0[1] < sl1[1]
-
-    if hh and hl:
-        return "BULL", "BOS", last_sh, last_sl
-    if lh and ll:
-        return "BEAR", "BOS", last_sh, last_sl
-    # CHOCH: only one side of structure flips
-    if hh and ll:
-        # conflict – use the more recent swing
-        if sh0[0] > sl0[0]:
-            return "BULL", "CHOCH", last_sh, last_sl
-        return "BEAR", "CHOCH", last_sh, last_sl
-    if lh and hl:
-        if sl0[0] > sh0[0]:
-            return "BEAR", "CHOCH", last_sh, last_sl
-        return "BULL", "CHOCH", last_sh, last_sl
-    return None, None, last_sh, last_sl
-
-def _find_order_block(cs, side, start_i, end_i):
-    """
-    Order block = last opposing candle before the impulse that caused the
-    structure break / sweep recovery.
-    LONG  → last bearish candle (close < open) in [start_i, end_i)
-    SHORT → last bullish candle
-    Returns (index, high, low) or None.
-    """
-    if start_i < 0:
-        start_i = 0
-    end_i = min(end_i, len(cs))
-    for i in range(end_i - 1, start_i - 1, -1):
-        o, cl = cs[i][1], cs[i][4]
-        if side == "LONG" and cl < o:
-            return i, cs[i][2], cs[i][3]
-        if side == "SHORT" and cl > o:
-            return i, cs[i][2], cs[i][3]
+    last_key = cs[-1][0] // 3_600_000
+    groups = {}
+    for x in cs:
+        groups.setdefault(x[0] // 3_600_000, []).append(x)
+    keys = sorted(k for k, g in groups.items() if k < last_key and len(g) == 4)
+    closes = [groups[k][-1][4] for k in keys]
+    if len(closes) < MA_SLOW + 1:
+        return None
+    m = sum(closes[-MA_MID:]) / MA_MID
+    s = sum(closes[-MA_SLOW:]) / MA_SLOW
+    if m > s and closes[-1] > s:
+        return "UP"
+    if m < s and closes[-1] < s:
+        return "DOWN"
     return None
 
-def _is_displacement(c, atr_v, side):
-    """Strong impulse candle in the trade direction."""
-    o, hi, lo, cl = c[1], c[2], c[3], c[4]
-    rng = hi - lo
-    if rng <= 0 or not atr_v:
-        return False
-    body = abs(cl - o) / rng
-    atr_mult = rng / atr_v
-    if body < SMC_DISP_BODY_MIN or atr_mult < SMC_DISP_ATR_MIN:
-        return False
-    if side == "LONG":
-        return cl > o
-    return cl < o
-
-def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_level):
+def _murphy_attempt(inst, cs, meta, ind, htf, side):
     """
-    Run steps 2-6 for ONE sweep candidate.
-    Returns a signal dict, or (stage, detail) describing why it failed.
+    Evaluate ONE direction on the latest candle.
+    Returns a signal dict, or (stage, detail) describing the first filter that failed.
     """
-    # Structure is judged on swings that existed BEFORE the sweep. The sweep
-    # candle's own wick later becomes a swing low/high and must not flip the bias.
-    pre_h = [x for x in highs if x[0] < sweep_idx]
-    pre_l = [x for x in lows if x[0] < sweep_idx]
-    bias, event, _, _ = _smc_structure(pre_h, pre_l)
-    if bias is None:
-        return "Struktur", "bias struktur tidak jelas"
+    n = len(cs)
+    i = n - 1
+    w = PULL_N
+    up = side == "LONG"
+    close, opn = cs[i][4], cs[i][1]
 
-    if bias != ("BULL" if side == "LONG" else "BEAR") and event != "CHOCH":
-        return "Struktur", f"sweep {side} tapi bias {bias} (bukan CHOCH)"
+    def at(key, j=i):
+        return ind[key][j]
 
-    # --- Displacement after the sweep ---
-    disp_idx = None
-    for i in range(sweep_idx, min(sweep_idx + 6, len(cs))):
-        if _is_displacement(cs[i], a, side):
-            disp_idx = i
-            break
-    if disp_idx is None:
-        return "Displacement", f"{side} tidak ada displacement setelah sweep"
+    ma_f, ma_m, ma_s, a = at("ma_f"), at("ma_m"), at("ma_s"), at("atr")
+    rs, k, d, hist, bb_up, bb_lo, bw = (at(x) for x in ("rsi", "k", "d", "hist", "bb_up", "bb_lo", "bw"))
+    ma_s3, ma_f1 = at("ma_s", i - 3), at("ma_f", i - 1)
+    k1, d1, hist1 = at("k", i - 1), at("d", i - 1), at("hist", i - 1)
+    win = range(i - w + 1, i + 1)
+    ma_s_w = [ind["ma_s"][j] for j in win]
+    rsi_w = [ind["rsi"][j] for j in win]
+    k_w = [ind["k"][j] for j in win]
 
-    # --- Order block: last opposing candle before displacement ---
-    ob = _find_order_block(cs, side, max(0, disp_idx - SMC_OB_LOOKBACK), disp_idx)
-    if ob is None:
-        return "OrderBlock", f"{side} order block tidak ditemukan"
-    ob_i, ob_hi, ob_lo = ob
+    need = [ma_f, ma_m, ma_s, a, rs, k, d, hist, bb_up, bb_lo, bw, ma_s3, ma_f1, k1, d1, hist1]
+    if any(x is None for x in need) or any(x is None for x in ma_s_w + rsi_w + k_w) or not a or a <= 0:
+        return "Data", "indikator belum siap"
 
-    # --- Retest of the order block AFTER the displacement candle ---
-    confirm_idx = None
-    mid_ob = (ob_hi + ob_lo) / 2
-    for i in range(max(ob_i + 1, disp_idx + 1, len(cs) - 8), len(cs)):
-        c = cs[i]
-        if side == "LONG" and c[4] < ob_lo:
-            return "Retest", "LONG order block ditembus (close di bawah OB)"
-        if side == "SHORT" and c[4] > ob_hi:
-            return "Retest", "SHORT order block ditembus (close di atas OB)"
+    # --- 1. Trend: MA9 > MA18, MA18 rising, price above MA18 (Murphy p.204-206) ---
+    if up:
+        trend_ok = ma_m > ma_s and ma_s > ma_s3 and close > ma_s
+    else:
+        trend_ok = ma_m < ma_s and ma_s < ma_s3 and close < ma_s
+    if not trend_ok:
+        return "Tren", f"{side} MA{MA_MID}/MA{MA_SLOW} tidak searah"
 
-        tapped = c[3] <= ob_hi and c[2] >= ob_lo
-        if not tapped:
-            continue
-        if side == "LONG" and c[4] > mid_ob and c[4] > c[1]:
-            confirm_idx = i
-            break
-        if side == "SHORT" and c[4] < mid_ob and c[4] < c[1]:
-            confirm_idx = i
-            break
+    want = "UP" if up else "DOWN"
+    if (HTF_FILTER or DEFENSIVE[0]) and htf != want:
+        return "HTF", f"{side} tren 1H {htf or 'netral'} (perlu {want})"
 
-    if confirm_idx is None:
-        return "Retest", f"{side} belum retest order block"
+    # --- 2. Pullback into MA9 that never breaks MA18 ---
+    lows = [cs[j][3] for j in win]
+    highs = [cs[j][2] for j in win]
+    closes_w = [cs[j][4] for j in win]
+    if up:
+        touched = min(lows) <= ma_m
+        hold = min(c - s for c, s in zip(closes_w, ma_s_w)) > -HOLD_ATR * a
+    else:
+        touched = max(highs) >= ma_m
+        hold = min(s - c for c, s in zip(closes_w, ma_s_w)) > -HOLD_ATR * a
+    if not touched:
+        return "Pullback", f"{side} belum pullback ke MA{MA_MID}"
+    if not hold:
+        return "Pullback", f"{side} close menembus MA{MA_SLOW} saat pullback"
 
-    # Confirmation must be the latest candle (entry = its close)
-    if confirm_idx < len(cs) - SMC_CONFIRM_BARS:
-        return (
-            "Konfirmasi",
-            f"{side} konfirmasi terlalu lama ({len(cs) - 1 - confirm_idx} bar lalu)"
-        )
+    # --- 3. Trigger candle: MA4 turning back with the trend (Murphy "buying alert", p.205) ---
+    if up:
+        trig = close > ma_f and ma_f > ma_f1 and close > opn
+    else:
+        trig = close < ma_f and ma_f < ma_f1 and close < opn
+    if not trig:
+        return "MA4", f"{side} candle pemicu / MA{MA_FAST} belum berbalik searah"
 
-    close = cs[-1][4]
+    # --- 4. RSI pulled back into the 35-55 zone (mirror for SHORT) and did not collapse ---
+    if up:
+        r_ext = min(rsi_w)
+        rsi_ok = RSI_FLOOR <= r_ext <= RSI_PULL_HI
+    else:
+        r_ext = max(rsi_w)
+        rsi_ok = 100 - RSI_PULL_HI <= r_ext <= 100 - RSI_FLOOR
+    if not rsi_ok:
+        return "RSI", f"{side} RSI ekstrem pullback {r_ext:.1f} di luar zona"
 
-    # --- session gate: skip hours with a history of losses (UTC, signal candle) ---
-    sig_hour = datetime.fromisoformat(iso(cs[-1][0])).hour
-    if sig_hour in SMC_BLOCK_HOURS:
-        return "Diblokir", f"{side} jam UTC {sig_hour} diblokir (SMC_BLOCK_HOURS)"
+    # --- 5. Stochastic %K crosses %D out of the oversold/overbought zone (p.248-249) ---
+    if up:
+        st_ok = k > d and k1 <= d1 and min(k_w) <= ST_OS
+    else:
+        st_ok = k < d and k1 >= d1 and max(k_w) >= 100 - ST_OS
+    if not st_ok:
+        return "Stochastic", f"{side} K {k:.0f}/D {d:.0f} belum cross dari zona ekstrem"
 
-    # --- defensive mode: trend-aligned only, RSI clearly away from the middle ---
-    aligned = bias == ("BULL" if side == "LONG" else "BEAR")
-    if DEFENSIVE[0]:
-        if not aligned:
-            return "Struktur", f"{side} mode DEFENSIF: hanya setup searah tren (bias {bias})"
-        if DEFENSIVE_RSI_LOW <= rs[-1] <= DEFENSIVE_RSI_HIGH:
-            return "RSI", f"{side} mode DEFENSIF: RSI {rs[-1]:.1f} di {DEFENSIVE_RSI_LOW:g}-{DEFENSIVE_RSI_HIGH:g}"
+    # --- 6. MACD histogram turning with the trade (p.255) ---
+    if (up and not hist > hist1) or (not up and not hist < hist1):
+        return "MACD", f"{side} histogram MACD belum berbalik searah"
 
-    # --- quality gates on the confirmation candle: RSI deadzone, then volume ---
+    # --- 7. Volume confirms (p.174) ---
     vr = volume_ratio(cs, VOL_PERIOD) or 0.0
-    kind = event or "BOS"
-    need_vol = MIN_VOLUME_RATIO_CHOCH if kind == "CHOCH" else MIN_VOLUME_RATIO_BOS
-    in_dead = RSI_DEADZONE_LOW <= rs[-1] <= RSI_DEADZONE_HIGH
-    penalised = False
-
-    if in_dead and RSI_DEADZONE_MODE == "BLOCK":
-        return (
-            "RSI",
-            f"{side} RSI {rs[-1]:.1f} di deadzone {RSI_DEADZONE_LOW:g}-{RSI_DEADZONE_HIGH:g} (mode BLOCK)"
-        )
-    if in_dead and RSI_DEADZONE_MODE == "PENALTY":
-        need_vol += RSI_DEADZONE_EXTRA_VOLUME
-        penalised = True
-
+    need_vol = MIN_VOLUME_RATIO + (DEFENSIVE_EXTRA_VOLUME if DEFENSIVE[0] else 0.0)
     if vr < need_vol:
-        extra = f", RSI {rs[-1]:.1f} di deadzone +{RSI_DEADZONE_EXTRA_VOLUME:g}" if penalised else ""
-        return (
-            "Volume",
-            f"{side} {kind} volume {vr:.2f}x (min {need_vol:.2f}x{extra})"
-        )
+        return "Volume", f"{side} volume {vr:.2f}x (min {need_vol:.2f}x)"
 
-    # SL: beyond the OB extreme, the swept level and the sweep wick
-    if side == "LONG":
-        sweep_ext = cs[sweep_idx][3]
-        sl_raw = min(ob_lo, swept_level, sweep_ext) - SL_ATR_BUFFER * a
+    # --- 8. Bollinger: not in a squeeze (p.211) ---
+    bw_hist = [x for x in ind["bw"][-BW_LOOKBACK:] if x is not None]
+    if len(bw_hist) >= 20 and bw < _quantile(bw_hist, BW_MIN_PCT):
+        return "Bollinger", f"{side} band menyempit (squeeze), tunggu breakout"
+
+    sig_hour = datetime.fromisoformat(iso(cs[i][0])).hour
+    if sig_hour in BLOCK_HOURS:
+        return "Diblokir", f"{side} jam UTC {sig_hour} diblokir (BLOCK_HOURS)"
+
+    # --- stop beyond the pullback extreme, cost gates ---
+    if up:
+        sl_raw = min(lows) - SL_ATR_BUFFER * a
         risk = close - sl_raw
     else:
-        sweep_ext = cs[sweep_idx][2]
-        sl_raw = max(ob_hi, swept_level, sweep_ext) + SL_ATR_BUFFER * a
+        sl_raw = max(highs) + SL_ATR_BUFFER * a
         risk = sl_raw - close
-
     if risk <= 0:
         return "SL/RR", f"{side} SL tidak valid"
 
     sl_atr = risk / a
-    if not SMC_MIN_SL_ATR <= sl_atr <= SMC_MAX_SL_ATR:
-        return (
-            "SL/RR",
-            f"{side} SL {sl_atr:.2f} ATR (perlu {SMC_MIN_SL_ATR}-{SMC_MAX_SL_ATR})"
-        )
+    if not MIN_SL_ATR <= sl_atr <= MAX_SL_ATR:
+        return "SL/RR", f"{side} SL {sl_atr:.2f} ATR (perlu {MIN_SL_ATR}-{MAX_SL_ATR})"
 
-    # Cost gate: with ~0.10% round-trip taker fees, a tiny SL makes fees eat the R.
     risk_pct = risk / close
-    min_risk = SMC_MIN_RISK_PCT_BTC if (inst == SMC_SYMBOL and SMC_MIN_RISK_PCT_BTC >= 0) \
-        else SMC_MIN_RISK_PCT
+    min_risk = MIN_RISK_PCT_BTC if (inst == REF_SYMBOL and MIN_RISK_PCT_BTC >= 0) else MIN_RISK_PCT
     if risk_pct < min_risk:
-        return (
-            "SL/RR",
-            f"{side} SL {risk_pct * 100:.2f}% (min {min_risk * 100:.2f}%, fee memakan R)"
-        )
+        return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% (min {min_risk * 100:.2f}%, fee memakan R)"
+    if MAX_RISK_PCT > 0 and risk_pct > MAX_RISK_PCT:
+        return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% terlalu jauh (maks {MAX_RISK_PCT * 100:.2f}%)"
 
-    tp_raw = close + TARGET_RR * risk if side == "LONG" else close - TARGET_RR * risk
+    # --- Bollinger target: room toward the opposite band (p.210) ---
+    room_r = ((bb_up - close) if up else (close - bb_lo)) / risk
+    if BB_MIN_R > 0 and room_r < BB_MIN_R:
+        return "Bollinger", f"{side} band hanya {room_r:.2f}R dari entry (min {BB_MIN_R:g}R)"
 
+    tp_raw = close + TARGET_RR * risk if up else close - TARGET_RR * risk
     tick = meta.get(inst, {}).get("tick", 0.00000001)
     entry = tick_round(close, tick)
     sl = tick_round(sl_raw, tick)
     tp = tick_round(tp_raw, tick)
 
     note = (
-        f"SMC {event or 'BOS'} {bias} | "
-        f"Sweep {'low' if side == 'LONG' else 'high'} @ {swept_level:.8g} | "
-        f"OB [{ob_lo:.8g}-{ob_hi:.8g}] | "
-        f"Disp bar {disp_idx} | RSI {rs[-1]:.1f} | Vol {vr:.2f}x"
+        f"Murphy pullback {'UPTREND' if up else 'DOWNTREND'} | "
+        f"MA{MA_MID}/{MA_SLOW} + 1H {htf or '-'} | RSI {rs:.1f} (pullback {r_ext:.1f}) | "
+        f"Stoch K{k:.0f}/D{d:.0f} | MACD hist {hist:+.3g} | "
+        f"Vol {vr:.2f}x | Band {room_r:.2f}R"
     )
 
     return {
-        "signal_id": f"{inst}|{side}|{cs[-1][0]}|SMC",
+        "signal_id": f"{inst}|{side}|{cs[i][0]}|MURPHY",
         "symbol": inst,
         "direction": side,
-        "timeframe": SMC_TF,
-        "setup": "SMC_SCALP",
+        "timeframe": TF,
+        "setup": SETUP_ID,
         "note": note,
-        "signal_candle_time": cs[-1][0],
-        "signal_candle_iso": iso(cs[-1][0]),
+        "signal_candle_time": cs[i][0],
+        "signal_candle_iso": iso(cs[i][0]),
         "created_at": now(),
         "entry": entry,
         "sl": sl,
@@ -699,16 +728,21 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         "sl_atr": sl_atr,
         "ema50": 0.0,
         "ema200": 0.0,
-        "rsi": rs[-1],
+        "rsi": rs,
         "adx": 0.0,
         "volume_ratio": vr,
-        "rsi_deadzone": bool(in_dead),
-        "quality": round(abs(rs[-1] - 50) / 10 + (1.0 if aligned else 0.0), 2),
+        "stoch_k": k,
+        "stoch_d": d,
+        "macd_hist": hist,
+        "band_room_r": round(room_r, 2),
+        "htf": htf,
+        "rsi_deadzone": False,
+        "quality": round(min(vr, 3.0) + 0.5 * min(room_r, 3.0) + (1.0 if htf == want else 0.0), 2),
         "mode": "DEFENSIVE" if DEFENSIVE[0] else "NORMAL",
-        "regime": bias or "-",
-        "structure": event or "-",
-        "bos": event or "NONE",
-        "pullback": None,
+        "regime": "UPTREND" if up else "DOWNTREND",
+        "structure": "PULLBACK",
+        "bos": "NONE",
+        "pullback": round(r_ext, 1),
         "score": None,
         "score_reasons": [],
         "risk_usdt": ACCOUNT_EQUITY * RISK_PER_TRADE,
@@ -717,71 +751,158 @@ def _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept_leve
         "exit_time": None,
         "result_r": None,
         "result": None,
-        "monitor_tf_ms": SMC_TF_MS,
+        "monitor_tf_ms": TF_MS,
     }
 
-def build_smc_scalp(inst, cs, meta):
+def build_murphy_pullback(inst, cs, meta):
     """
-    15m Smart Money Concept scalp, any USDT perpetual (long; short is mirrored):
-      1. Liquidity sweep of a recent swing (wick through, close back inside)
-      2. Structure BEFORE the sweep agrees with the trade (BOS/CHOCH)
-      3. Displacement candle after the sweep
-      4. Order block = last opposing candle before the displacement
-      5. Price retests the OB AFTER the displacement and prints a
-         confirmation candle (must be the latest candle)
-      6. Entry at close, SL beyond OB / swept level / sweep wick, TP at TARGET_RR
-    Both directions are evaluated; the first valid one wins.
+    15m Murphy pullback scalp on the LAST candle of `cs`, both directions:
+      1. Trend      MA9 > MA18, MA18 rising, price above MA18 (+ 1H trend agrees)
+      2. Pullback   low touches MA9 within PULL_N bars, closes hold above MA18
+      3. Trigger    close back above a rising MA4 on a bullish candle
+      4. RSI        pullback low between 35 and 55
+      5. Stochastic %K crosses above %D after being <= 40
+      6. MACD       histogram rising
+      7. Volume     >= average
+      8. Bollinger  no squeeze; opposite band at least BB_MIN_R away
+      Entry = close, SL beyond the pullback extreme, TP at TARGET_RR. SHORT mirrors.
     """
     global CUR_SETUP
-    CUR_SETUP = "SMC_SCALP"
+    CUR_SETUP = SETUP_ID
 
-    if len(cs) < SMC_MIN_BARS:
-        return _rej(inst, "Data", f"hanya {len(cs)} candle (min {SMC_MIN_BARS})")
+    if len(cs) < MIN_BARS:
+        return _rej(inst, "Data", f"hanya {len(cs)} candle (min {MIN_BARS})")
 
-    at = atr(cs, ATR_PERIOD)
-    rs = rsi(cs, RSI_PERIOD)
-    if at[-1] is None or rs[-1] is None:
+    ind = murphy_indicators(cs)
+    if ind["atr"][-1] is None or ind["rsi"][-1] is None:
         return _rej(inst, "Data", "indikator belum siap")
 
-    a = at[-1]
-    if a <= 0:
-        return _rej(inst, "Data", "ATR nol")
-
-    highs, lows = _smc_swings(cs, SMC_SWING)
-    if len(highs) < 2 or len(lows) < 2:
-        return _rej(inst, "Struktur", "swing high/low kurang dari 2")
-
-    # --- Sweep candidates (last 15 bars), newest first, both directions ---
-    cands = []
-    for side in ("LONG", "SHORT"):
-        pool = lows if side == "LONG" else highs
-        for abs_i in range(len(cs) - 1, max(0, len(cs) - 15) - 1, -1):
-            c = cs[abs_i]
-            for si, p in pool:
-                if si >= abs_i or abs_i - si > 30:
-                    continue
-                if side == "LONG":
-                    ok = (p - c[3]) / a >= SMC_SWEEP_TOL_ATR and c[4] > p
-                else:
-                    ok = (c[2] - p) / a >= SMC_SWEEP_TOL_ATR and c[4] < p
-                if ok:
-                    cands.append((side, abs_i, p))
-                    break
-
-    if not cands:
-        return _rej(inst, "Sweep", "tidak ada liquidity sweep terkini")
-
+    htf = htf_state(cs)
     best = None
-    for side, sweep_idx, swept in cands:
-        res = _smc_attempt(inst, cs, meta, a, rs, highs, lows, side, sweep_idx, swept)
+    for side in ("LONG", "SHORT"):
+        res = _murphy_attempt(inst, cs, meta, ind, htf, side)
         if isinstance(res, dict):
             return res
         stage, detail = res
-        depth = SMC_STAGES.index(stage)
+        depth = STAGES.index(stage)
         if best is None or depth > best[0]:
             best = (depth, stage, detail)
 
     return _rej(inst, best[1], best[2])
+
+# ================= BACKTEST (same engine as live) =================
+
+def _simulate(cs, k, s):
+    """Walk forward from candle k+1 exactly like monitor(): SL first when one bar touches both."""
+    entry, sl, tp = s["entry"], s["sl"], s["tp"]
+    long_ = s["direction"] == "LONG"
+    end = min(len(cs), k + 1 + BT_MAX_HOLD)
+    for j in range(k + 1, end):
+        hi, lo = cs[j][2], cs[j][3]
+        hit_sl = lo <= sl if long_ else hi >= sl
+        hit_tp = hi >= tp if long_ else lo <= tp
+        if hit_sl:
+            return j, "LOSS", -1.0
+        if hit_tp:
+            return j, "WIN", float(s["rr"])
+    if end >= len(cs):
+        return None                      # still open at the end of the data
+    p = cs[end - 1][4]
+    return end - 1, ("WIN" if float_r(s, p) > 0 else "LOSS"), float_r(s, p)
+
+def backtest_series(inst, cs, meta=None):
+    meta = meta or {}
+    trades, k, busy_until = [], MIN_BARS, -1
+    cooldown_bars = int(COOLDOWN_HOURS * 3600_000 / TF_MS)
+    while k < len(cs) - 1:
+        if k <= busy_until:
+            k += 1
+            continue
+        window = cs[max(0, k - HISTORY_BARS + 1):k + 1]
+        s = build_murphy_pullback(inst, window, meta)
+        if not s:
+            k += 1
+            continue
+        res = _simulate(cs, k, s)
+        if res is None:
+            break
+        j, result, r = res
+        t = dict(s)
+        t.update({"status": "CLOSED", "exit_time": iso(cs[j][0]), "result": result, "result_r": r})
+        trades.append(t)
+        busy_until = j + cooldown_bars
+        k += 1
+    return trades
+
+def bt_report(name, trades):
+    if not trades:
+        print(f"{name}: 0 trade")
+        return
+    r = [float(t["result_r"]) for t in trades]
+    fees = [fee_r_of(t) for t in trades]
+    wins = sum(1 for x in r if x > 0)
+    gp = sum(x for x in r if x > 0)
+    gl = -sum(x for x in r if x <= 0)
+    net = sum(r) - sum(fees)
+    eq = peak = dd = 0.0
+    for x, f in zip(r, fees):
+        eq += x - f
+        peak = max(peak, eq)
+        dd = max(dd, peak - eq)
+    avg_rr = sum(float(t["rr"]) for t in trades) / len(trades)
+    bep_net = 100 * (1 + sum(fees) / len(trades)) / (1 + avg_rr)
+    longs = sum(1 for t in trades if t["direction"] == "LONG")
+    print(
+        f"{name}: {len(trades)} trade ({longs} long / {len(trades) - longs} short) | "
+        f"WR {wins / len(trades) * 100:.1f}% (BEP net {bep_net:.1f}%) | "
+        f"R gross {sum(r):+.2f} | net {net:+.2f} | avg net {net / len(trades):+.3f}R | "
+        f"PF {gp / gl if gl else float('inf'):.2f} | MaxDD net -{dd:.2f}R"
+    )
+
+def synthetic_candles(n=12000, seed=7):
+    """OKX-style candles [ts,o,h,l,c,v] with trend / range regimes, for offline selftest."""
+    import random
+    rng = random.Random(seed)
+    ts0 = int(datetime(2026, 1, 1, tzinfo=timezone.utc).timestamp() * 1000)
+    drift, left, price, out = 0.0, 0, 100.0, []
+    for i in range(n):
+        if left <= 0:
+            left = rng.randint(150, 600)
+            drift = rng.choice([-1, 0, 1]) * 0.00025
+        left -= 1
+        ret = drift + rng.gauss(0, 0.0025)
+        o, c = price, price * math.exp(ret)
+        hi = max(o, c) + abs(rng.gauss(0, 0.0015)) * c
+        lo = min(o, c) - abs(rng.gauss(0, 0.0015)) * c
+        vol = rng.lognormvariate(5, 0.5) * (1 + 3 * abs(ret) / 0.0025)
+        out.append([ts0 + i * TF_MS, o, hi, lo, c, vol])
+        price = c
+    return out
+
+def run_backtest(insts, bars):
+    QUIET[0] = True
+    meta = instruments()
+    allt = []
+    for inst in insts:
+        cs = candles(inst, TF, bars, history=True)
+        if len(cs) < MIN_BARS + 10:
+            print(f"{inst}: data kurang ({len(cs)} candle)")
+            continue
+        t = backtest_series(inst, cs, meta)
+        allt += t
+        bt_report(f"{inst} [{iso(cs[0][0])[:10]} -> {iso(cs[-1][0])[:10]}]", t)
+    if len(insts) > 1:
+        bt_report("GABUNGAN", allt)
+
+def run_selftest():
+    QUIET[0] = True
+    allt = []
+    for seed in (7, 11, 23):
+        t = backtest_series("SYNTH-USDT-SWAP", synthetic_candles(12000, seed))
+        allt += t
+        bt_report(f"synthetic seed {seed}", t)
+    bt_report("TOTAL", allt)
+    print("Selftest selesai: kode jalan. Angka di atas dari data acak, BUKAN bukti edge.")
 
 # ================= DEDUPE =================
 
@@ -789,7 +910,7 @@ def symbol_blocked(h, inst):
     """True if `inst` already has an open trade, or is cooling down after a close."""
     if any(x.get("symbol") == inst for x in h["open"]):
         return True
-    cutoff = time.time() - SMC_COOLDOWN_HOURS * 3600
+    cutoff = time.time() - COOLDOWN_HOURS * 3600
     for x in h["closed"]:
         if x.get("symbol") != inst:
             continue
@@ -813,8 +934,8 @@ def n_open(h):
 
 def monitor(trade):
     # Entry = close of the signal candle: monitoring starts when that candle ENDS.
-    start = trade.get("signal_candle_time", 0) + SMC_TF_MS
-    mon_tf, mon_ms = SMC_MONITOR_TF, SMC_MONITOR_MS
+    start = trade.get("signal_candle_time", 0) + TF_MS
+    mon_tf, mon_ms = MONITOR_TF, MONITOR_MS
 
     age_ms = max(0, int(time.time() * 1000) - start)
     needed = max(60, age_ms // mon_ms + 24)
@@ -879,7 +1000,10 @@ def check_open(h):
 
     h["open"] = remain
     if closed:
-        h["closed"].extend(closed)
+        h["closed"].extend(x for x in closed if x.get("setup") == SETUP_ID)
+        legacy = [x for x in closed if x.get("setup") != SETUP_ID]
+        if legacy:
+            h.setdefault("archive", []).extend(dict(x, archived_from="open") for x in legacy)
         save_history(h)
 
     for t in closed:
@@ -991,7 +1115,7 @@ def stats(h):
         note = "\n\n<i>Kurang dari 30 trade: belum bisa disimpulkan.</i>"
 
     tg(
-        "<b>📊 V5.2 PERFORMANCE</b>\n"
+        "<b>📊 MURPHY PERFORMANCE</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"Trades        : {len(ts)}\n"
         f"Wins          : {len(wins)}\n"
@@ -1009,7 +1133,7 @@ def stats(h):
 # ================= SIGNAL MESSAGE =================
 
 def signal_message(s):
-    setup = s.get("setup", "SMC_SCALP")
+    setup = s.get("setup", SETUP_ID)
     risk = abs(s["entry"] - s["sl"])
     fee_r = (2 * FEE_PER_SIDE * s["entry"] / risk) if risk > 0 else 0.0
     risk_pct = (risk / s["entry"] * 100) if s["entry"] else 0.0
@@ -1021,7 +1145,7 @@ def signal_message(s):
     )
 
     return (
-        "<b>🚨 ALPHAQUANT V5.2 SIGNAL</b>\n"
+        "<b>🚨 ALPHAQUANT MURPHY V6.0 SIGNAL</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"<b>{s['symbol']}</b> · <b>{s['direction']}</b>\n" +
         head +
@@ -1043,7 +1167,7 @@ def signal_message(s):
 
 def _tally(h, scanned, created, rows):
     """Accumulate the scan funnel in the history file until the next report."""
-    d = h.get("smc_rej")
+    d = h.get("scan_rej")
     if not d or "pairs" not in d:           # empty, or left over from V4.x (different format)
         d = {"scans": 0, "pairs": 0, "signals": 0, "stages": {}, "near": []}
     d["scans"] += 1
@@ -1052,21 +1176,21 @@ def _tally(h, scanned, created, rows):
 
     for (_, stage), items in rows.items():
         d["stages"][stage] = d["stages"].get(stage, 0) + len(items)
-        if stage in SMC_STAGES and stage not in ("Data", "Struktur", "Sweep"):
-            depth = SMC_STAGES.index(stage)
+        if stage in STAGES and stage not in ("Data", "Tren", "HTF"):
+            depth = STAGES.index(stage)
             for inst, detail in items:
                 d["near"].append({"depth": depth, "text": f"{inst} → {stage}: {detail}"})
 
     d["near"] = sorted(d["near"], key=lambda x: -x["depth"])[:6]
-    h["smc_rej"] = d
+    h["scan_rej"] = d
 
-def smc_report_text(h):
-    d = h.get("smc_rej")
+def scan_report_text(h):
+    d = h.get("scan_rej")
     if not d or "pairs" not in d or not d.get("scans"):
         return ""
-    parts_ = [f"{st} {d['stages'][st]}" for st in SMC_STAGES + ["Error"] if d["stages"].get(st)]
+    parts_ = [f"{st} {d['stages'][st]}" for st in STAGES + ["Error"] if d["stages"].get(st)]
     text = (
-        "<b>⚡ SMC SCALP · SCAN REPORT</b>\n"
+        "<b>⚡ MURPHY PULLBACK · SCAN REPORT</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"Scan         : {d['scans']} candle 15m\n"
         f"Pair dicek   : {d['pairs']}\n"
@@ -1088,22 +1212,22 @@ def market_mode(h):
     wr = sum(1 for x in win if x.get("result") == "WIN") / len(win)
     return ("DEFENSIVE" if wr < ADAPT_MIN_WR else "NORMAL"), wr, len(win)
 
-def scan_smc(h):
+def scan_murphy(h):
     """
-    Scan the top pairs for an SMC scalp on every NEW 15m candle.
+    Scan the top pairs for a Murphy pullback scalp on every NEW 15m candle.
     Returns the number of new signals.
     """
     global CUR_SETUP
 
     ref = latest_candle_ts()
-    if ref is not None and h.get("last_smc_candle") == ref:
-        log.info("No new %s candle since %s - scan skipped.", SMC_TF, iso(ref))
+    if ref is not None and h.get("last_scan_candle") == ref:
+        log.info("No new %s candle since %s - scan skipped.", TF, iso(ref))
         return 0
 
-    if n_open(h) >= SMC_MAX_OPEN:
-        log.info("SMC scan skipped: %s open scalps (cap %s).", n_open(h), SMC_MAX_OPEN)
+    if n_open(h) >= MAX_OPEN:
+        log.info("Murphy scan skipped: %s open scalps (cap %s).", n_open(h), MAX_OPEN)
         if ref is not None:
-            h["last_smc_candle"] = ref
+            h["last_scan_candle"] = ref
         return 0
 
     pairs = top_pairs()
@@ -1112,9 +1236,9 @@ def scan_smc(h):
         return 0
     meta = instruments()
 
-    log.info("SMC scan: %s pairs on %s...", len(pairs), SMC_TF)
+    log.info("Murphy scan: %s pairs on %s...", len(pairs), TF)
     REJECTS.clear()
-    CUR_SETUP = "SMC_SCALP"
+    CUR_SETUP = SETUP_ID
     created, scanned = 0, 0
     found = []
 
@@ -1127,16 +1251,16 @@ def scan_smc(h):
         return sum(1 for x in h["open"] if x.get("direction") == d)
 
     for inst in pairs:
-        if n_open(h) >= SMC_MAX_OPEN:
-            log.info("Open scalp cap (%s) reached - stopping the scan.", SMC_MAX_OPEN)
+        if n_open(h) >= MAX_OPEN:
+            log.info("Open scalp cap (%s) reached - stopping the scan.", MAX_OPEN)
             break
-        if MAX_NEW_SMC_PER_CANDLE > 0 and created >= MAX_NEW_SMC_PER_CANDLE:
-            log.info("New-signal limit per candle (%s) reached - stopping the scan.", MAX_NEW_SMC_PER_CANDLE)
+        if MAX_NEW_PER_CANDLE > 0 and created >= MAX_NEW_PER_CANDLE:
+            log.info("New-signal limit per candle (%s) reached - stopping the scan.", MAX_NEW_PER_CANDLE)
             break
-        if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
-                and n_dir("LONG") >= MAX_ACTIVE_SMC_PER_DIRECTION
-                and n_dir("SHORT") >= MAX_ACTIVE_SMC_PER_DIRECTION):
-            log.info("Both directions are at the limit (%s) - stopping the scan.", MAX_ACTIVE_SMC_PER_DIRECTION)
+        if (MAX_ACTIVE_PER_DIRECTION > 0
+                and n_dir("LONG") >= MAX_ACTIVE_PER_DIRECTION
+                and n_dir("SHORT") >= MAX_ACTIVE_PER_DIRECTION):
+            log.info("Both directions are at the limit (%s) - stopping the scan.", MAX_ACTIVE_PER_DIRECTION)
             break
 
         # Skip pairs that already have a position / are cooling down BEFORE
@@ -1146,8 +1270,8 @@ def scan_smc(h):
 
         scanned += 1
         try:
-            cs = candles(inst, SMC_TF, SMC_HISTORY_BARS)
-            if len(cs) < SMC_MIN_BARS:
+            cs = candles(inst, TF, HISTORY_BARS)
+            if len(cs) < MIN_BARS:
                 _rej(inst, "Data", f"hanya {len(cs)} candle")
                 continue
 
@@ -1156,7 +1280,7 @@ def scan_smc(h):
                 _rej(inst, "Data", "candle terakhir tidak sinkron")
                 continue
 
-            s = build_smc_scalp(inst, cs, meta)
+            s = build_murphy_pullback(inst, cs, meta)
             if not s:
                 continue
 
@@ -1164,11 +1288,11 @@ def scan_smc(h):
                 _rej(inst, "Diblokir", f"{s['direction']} duplikat/cooldown/posisi open")
                 continue
 
-            if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
-                    and n_dir(s["direction"]) >= MAX_ACTIVE_SMC_PER_DIRECTION):
+            if (MAX_ACTIVE_PER_DIRECTION > 0
+                    and n_dir(s["direction"]) >= MAX_ACTIVE_PER_DIRECTION):
                 _rej(inst, "Diblokir",
                      f"{s['direction']} sudah {n_dir(s['direction'])} posisi aktif "
-                     f"(maks {MAX_ACTIVE_SMC_PER_DIRECTION})")
+                     f"(maks {MAX_ACTIVE_PER_DIRECTION})")
                 continue
 
             found.append(s)
@@ -1180,13 +1304,13 @@ def scan_smc(h):
     # Best-quality setups first (RSI momentum + trend alignment), then the caps.
     found.sort(key=lambda x: x.get("quality", 0), reverse=True)
     for s in found:
-        if n_open(h) >= SMC_MAX_OPEN:
+        if n_open(h) >= MAX_OPEN:
             break
-        if MAX_NEW_SMC_PER_CANDLE > 0 and created >= MAX_NEW_SMC_PER_CANDLE:
-            _rej(s["symbol"], "Diblokir", f"{s['direction']} kalah kualitas (maks {MAX_NEW_SMC_PER_CANDLE}/candle)")
+        if MAX_NEW_PER_CANDLE > 0 and created >= MAX_NEW_PER_CANDLE:
+            _rej(s["symbol"], "Diblokir", f"{s['direction']} kalah kualitas (maks {MAX_NEW_PER_CANDLE}/candle)")
             continue
-        if (MAX_ACTIVE_SMC_PER_DIRECTION > 0
-                and n_dir(s["direction"]) >= MAX_ACTIVE_SMC_PER_DIRECTION):
+        if (MAX_ACTIVE_PER_DIRECTION > 0
+                and n_dir(s["direction"]) >= MAX_ACTIVE_PER_DIRECTION):
             _rej(s["symbol"], "Diblokir", f"{s['direction']} sudah penuh")
             continue
         h["open"].append(s)
@@ -1197,12 +1321,12 @@ def scan_smc(h):
         tg(signal_message(s))
         time.sleep(0.3)
 
-    log.info("SMC scan complete. Pairs: %s | New signals: %s", scanned, created)
+    log.info("Murphy scan complete. Pairs: %s | New signals: %s", scanned, created)
     _tally(h, scanned, created, dict(REJECTS))
     REJECTS.clear()
 
     if ref is not None:
-        h["last_smc_candle"] = ref
+        h["last_scan_candle"] = ref
     return created
 
 # ================= MAIN =================
@@ -1211,7 +1335,7 @@ def main():
     global TELEGRAM
 
     log.info("==========================================")
-    log.info("ALPHAQUANT V5.2 STARTING")
+    log.info("ALPHAQUANT MURPHY V6.0 STARTING")
     log.info("==========================================")
 
     if not TOKEN or not CHAT_ID:
@@ -1238,23 +1362,23 @@ def main():
 
     log.info("Open trades: %s | Closed trades: %s", len(h["open"]), len(h["closed"]))
     log.info(
-        "Config | SMC@%s RR=1:%.2f | Pairs=%s | MaxOpen=%s | MinRisk=%.2f%% (BTC %s) | "
+        "Config | Murphy@%s RR=1:%.2f | Pairs=%s | MaxOpen=%s | MinRisk=%.2f%% (BTC %s) | "
         "Monitor=%s | History=%s | Telegram=%s | RunForever=%s",
-        SMC_TF, TARGET_RR, TOP_PAIRS, SMC_MAX_OPEN, SMC_MIN_RISK_PCT * 100,
-        f"{SMC_MIN_RISK_PCT_BTC * 100:.2f}%" if SMC_MIN_RISK_PCT_BTC >= 0 else "= sama",
-        SMC_MONITOR_TF, HISTORY_FILE, "ON" if TELEGRAM else "OFF", RUN_FOREVER
+        TF, TARGET_RR, TOP_PAIRS, MAX_OPEN, MIN_RISK_PCT * 100,
+        f"{MIN_RISK_PCT_BTC * 100:.2f}%" if MIN_RISK_PCT_BTC >= 0 else "= sama",
+        MONITOR_TF, HISTORY_FILE, "ON" if TELEGRAM else "OFF", RUN_FOREVER
     )
 
     today = datetime.now(timezone.utc).date().isoformat()
     if TELEGRAM and h.get("last_online_day") != today:
         h["last_online_day"] = today
         tg(
-            "<b>🟢 ALPHAQUANT V5.2 ONLINE</b>\n"
+            "<b>🟢 ALPHAQUANT MURPHY V6.0 ONLINE</b>\n"
             "━━━━━━━━━━━━━━━━━━\n"
-            f"SMC Scalp 15m · top {TOP_PAIRS} pair\n"
-            "Sweep · Order Block · Displacement · Retest\n"
-            f"Maks {SMC_MAX_OPEN} posisi ({MAX_ACTIVE_SMC_PER_DIRECTION} per arah, "
-            f"{MAX_NEW_SMC_PER_CANDLE} baru per candle) · SL min {SMC_MIN_RISK_PCT * 100:.2f}% harga\n"
+            f"Murphy Pullback 15m · top {TOP_PAIRS} pair\n"
+            "MA 4-9-18 · RSI · Stochastic · MACD · Bollinger · Volume\n"
+            f"Maks {MAX_OPEN} posisi ({MAX_ACTIVE_PER_DIRECTION} per arah, "
+            f"{MAX_NEW_PER_CANDLE} baru per candle) · SL min {MIN_RISK_PCT * 100:.2f}% harga\n"
             "Signal-only"
         )
 
@@ -1270,15 +1394,15 @@ def main():
             if due:
                 running_report(h)
                 stats(h)
-                text = smc_report_text(h)
+                text = scan_report_text(h)
                 if text:
                     tg(text)
-                    h["smc_rej"] = None
+                    h["scan_rej"] = None
                 h["last_report_ts"] = time.time()
             elif closed_n:
                 stats(h)
 
-            scan_smc(h)
+            scan_murphy(h)
             save_history(h)
         except KeyboardInterrupt:
             log.info("Engine stopped.")
@@ -1301,6 +1425,16 @@ def main():
         time.sleep(sleep_for)
 
 if __name__ == "__main__":
-    main()
-
-
+    if len(sys.argv) > 1 and sys.argv[1] == "selftest":
+        run_selftest()
+    elif len(sys.argv) > 1 and sys.argv[1] == "backtest":
+        # python signal_bot_murphy.py backtest BTC-USDT-SWAP ETH-USDT-SWAP [--bars 5000]
+        args = sys.argv[2:]
+        bars = 5000
+        if "--bars" in args:
+            p = args.index("--bars")
+            bars = int(args[p + 1])
+            args = args[:p] + args[p + 2:]
+        run_backtest(args or [REF_SYMBOL], bars)
+    else:
+        main()
