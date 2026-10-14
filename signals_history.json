@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792009800000,
+  "last_scan_candle": 1792011600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,20 +8213,25 @@
     }
   ],
   "scan_rej": {
-    "scans": 5,
-    "pairs": 500,
+    "scans": 6,
+    "pairs": 600,
     "signals": 0,
     "stages": {
-      "Tren": 203,
-      "RSI": 40,
-      "MA4": 105,
-      "HTF": 85,
+      "Tren": 233,
+      "RSI": 48,
+      "MA4": 137,
+      "HTF": 104,
       "MACD": 1,
-      "Pullback": 2,
-      "Stochastic": 6,
-      "Data": 58
+      "Pullback": 3,
+      "Stochastic": 15,
+      "Data": 58,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "MAGIC-USDT-SWAP → Volume: SHORT volume 0.60x (min 1.00x)"
+      },
       {
         "depth": 7,
         "text": "SAHARA-USDT-SWAP → MACD: SHORT histogram MACD belum berbalik searah"
@@ -8246,10 +8251,6 @@
       {
         "depth": 6,
         "text": "BILL-USDT-SWAP → Stochastic: SHORT K 30/D 31 belum cross dari zona ekstrem"
-      },
-      {
-        "depth": 6,
-        "text": "TRIA-USDT-SWAP → Stochastic: SHORT K 19/D 28 belum cross dari zona ekstrem"
       }
     ]
   }
