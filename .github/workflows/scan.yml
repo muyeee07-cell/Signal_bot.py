@@ -2,16 +2,18 @@ name: scan
 
 on:
   schedule:
-    # Setiap 30 menit (lebih stabil daripada 20 menit)
-    - cron: "5,35 * * * *"
+    # Tiap 15 menit, digeser +3 menit setelah candle 15m close (UTC),
+    # supaya scan ~2 menit tidak melewati pergantian candle.
+    - cron: "3,18,33,48 * * * *"
   workflow_dispatch:
 
+# Hanya satu scan berjalan pada satu waktu (history JSON tidak boleh ditulis dua proses).
 concurrency:
-  group: scan
+  group: alphaquant-scan
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: write   # perlu untuk commit signals_history.json
 
 jobs:
   scan:
@@ -34,26 +36,32 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
+          RUN_FOREVER: "0"
+          # --- sesuaikan dengan setting Anda yang lama (nilai di bawah = yang terlihat di log) ---
           TOP_PAIRS: "100"
-          SMC_MAX_OPEN: "10"
-          SMC_MIN_RISK_PCT: "0.004"
+          MAX_OPEN: "10"
           SMC_MIN_RISK_PCT_BTC: "0.0015"
+          # --- opsional (default ada di kode) ---
+          # TARGET_RR: "1.75"
+          # HTF_FILTER: "1"
+          # BLOCK_HOURS: ""
         run: python signal_bot.py
 
-      - name: Commit signal history
+      - name: Commit history
         if: always()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-          if [ -f signals_history.json ]; then
-            git add signals_history.json
-          fi
-          
+          git config user.name "alphaquant-bot"
+          git config user.email "alphaquant-bot@users.noreply.github.com"
+          git add signals_history.json || true
           if git diff --cached --quiet; then
-            echo "Tidak ada perubahan riwayat."
-          else
-            git commit -m "Update signal history [skip ci]" || true
-            git pull --rebase --autostash origin ${{ github.ref_name }} || true
-            git push origin HEAD:${{ github.ref_name }} || echo "Push gagal (mungkin concurrent)"
+            echo "Tidak ada perubahan history."
+            exit 0
           fi
+          git commit -m "update signals history [skip ci]"
+          for i in 1 2 3; do
+            git pull --rebase --autostash && git push && exit 0
+            sleep 5
+          done
+          echo "Push gagal setelah 3 percobaan"
+          exit 1
+
