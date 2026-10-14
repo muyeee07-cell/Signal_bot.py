@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791985500000,
+  "last_scan_candle": 1791987300000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1791972330.45413,
+  "last_report_ts": 1791988399.7125707,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8213,44 +8213,40 @@
     }
   ],
   "scan_rej": {
-    "scans": 8,
-    "pairs": 700,
+    "scans": 1,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "HTF": 135,
-      "Tren": 165,
-      "MA4": 158,
-      "RSI": 98,
-      "Stochastic": 35,
-      "Volume": 1,
-      "Data": 82,
-      "Pullback": 19,
-      "SL/RR": 7
+      "MA4": 66,
+      "RSI": 14,
+      "Stochastic": 4,
+      "HTF": 11,
+      "Tren": 5
     },
     "near": [
       {
-        "depth": 10,
-        "text": "GALA-USDT-SWAP → SL/RR: SHORT SL 3.61 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "PUMP-USDT-SWAP → Stochastic: SHORT K 9/D 20 belum cross dari zona ekstrem"
       },
       {
-        "depth": 10,
-        "text": "NOT-USDT-SWAP → SL/RR: SHORT SL 3.82 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "OL-USDT-SWAP → Stochastic: SHORT K 22/D 30 belum cross dari zona ekstrem"
       },
       {
-        "depth": 10,
-        "text": "SAND-USDT-SWAP → SL/RR: SHORT SL 2.71 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "XRP-USDT-SWAP → Stochastic: SHORT K 5/D 16 belum cross dari zona ekstrem"
       },
       {
-        "depth": 10,
-        "text": "ENA-USDT-SWAP → SL/RR: SHORT SL 3.72 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "NIGHT-USDT-SWAP → Stochastic: SHORT K 17/D 27 belum cross dari zona ekstrem"
       },
       {
-        "depth": 10,
-        "text": "ROBO-USDT-SWAP → SL/RR: SHORT SL 3.80 ATR (perlu 0.35-2.5)"
+        "depth": 5,
+        "text": "PEPE-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 44.0 di luar zona"
       },
       {
-        "depth": 10,
-        "text": "PIPPIN-USDT-SWAP → SL/RR: SHORT SL 3.41 ATR (perlu 0.35-2.5)"
+        "depth": 5,
+        "text": "BOME-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 38.5 di luar zona"
       }
     ]
   }
