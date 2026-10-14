@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791969300000,
+  "last_scan_candle": 1791971100000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1791957532.4347725,
+  "last_report_ts": 1791972330.45413,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8213,42 +8213,40 @@
     }
   ],
   "scan_rej": {
-    "scans": 5,
-    "pairs": 250,
+    "scans": 1,
+    "pairs": 50,
     "signals": 0,
     "stages": {
-      "HTF": 113,
-      "Tren": 58,
-      "MA4": 42,
-      "RSI": 16,
-      "Stochastic": 11,
-      "Pullback": 9,
-      "Volume": 1
+      "HTF": 20,
+      "Tren": 12,
+      "MA4": 14,
+      "RSI": 3,
+      "Stochastic": 1
     },
     "near": [
       {
-        "depth": 8,
-        "text": "SPACE-USDT-SWAP → Volume: LONG volume 0.23x (min 1.00x)"
+        "depth": 6,
+        "text": "SPACE-USDT-SWAP → Stochastic: LONG K 54/D 56 belum cross dari zona ekstrem"
       },
       {
-        "depth": 6,
-        "text": "BOME-USDT-SWAP → Stochastic: SHORT K 15/D 24 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "TRUTH-USDT-SWAP → RSI: LONG RSI ekstrem pullback 59.5 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "AKE-USDT-SWAP → Stochastic: LONG K 85/D 77 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "XDP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 15.5 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "STRK-USDT-SWAP → Stochastic: SHORT K 35/D 38 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "SAND-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 33.3 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "NOT-USDT-SWAP → Stochastic: SHORT K 13/D 28 belum cross dari zona ekstrem"
+        "depth": 4,
+        "text": "SHIB-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       },
       {
-        "depth": 6,
-        "text": "SAND-USDT-SWAP → Stochastic: SHORT K 24/D 39 belum cross dari zona ekstrem"
+        "depth": 4,
+        "text": "BONK-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       }
     ]
   }
