@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791989100000,
+  "last_scan_candle": 1791990900000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,15 +8213,15 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 200,
+    "scans": 3,
+    "pairs": 300,
     "signals": 0,
     "stages": {
-      "MA4": 141,
-      "RSI": 18,
-      "Stochastic": 5,
-      "HTF": 20,
-      "Tren": 15,
+      "MA4": 213,
+      "RSI": 24,
+      "Stochastic": 9,
+      "HTF": 29,
+      "Tren": 24,
       "Pullback": 1
     },
     "near": [
@@ -8246,8 +8246,8 @@
         "text": "CT-USDT-SWAP → Stochastic: LONG K 90/D 84 belum cross dari zona ekstrem"
       },
       {
-        "depth": 5,
-        "text": "PEPE-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 44.0 di luar zona"
+        "depth": 6,
+        "text": "PONS-USDT-SWAP → Stochastic: LONG K 80/D 67 belum cross dari zona ekstrem"
       }
     ]
   }
