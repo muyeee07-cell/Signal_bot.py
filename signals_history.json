@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792014300000,
+  "last_scan_candle": 1792017000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1792003085.605254,
+  "last_report_ts": 1792017923.609664,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8213,44 +8213,42 @@
     }
   ],
   "scan_rej": {
-    "scans": 9,
-    "pairs": 900,
+    "scans": 1,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "Tren": 384,
-      "RSI": 59,
-      "MA4": 201,
-      "HTF": 173,
-      "MACD": 1,
-      "Pullback": 4,
-      "Stochastic": 19,
-      "Data": 58,
-      "Volume": 1
+      "HTF": 43,
+      "Tren": 40,
+      "RSI": 4,
+      "MA4": 4,
+      "Stochastic": 5,
+      "Volume": 3,
+      "Bollinger": 1
     },
     "near": [
       {
-        "depth": 8,
-        "text": "MAGIC-USDT-SWAP → Volume: SHORT volume 0.60x (min 1.00x)"
+        "depth": 11,
+        "text": "RESOLV-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
+      },
+      {
+        "depth": 10,
+        "text": "ADA-USDT-SWAP → Volume: SHORT volume 0.62x (min 1.00x)"
+      },
+      {
+        "depth": 10,
+        "text": "ANIME-USDT-SWAP → Volume: SHORT volume 0.66x (min 1.00x)"
+      },
+      {
+        "depth": 10,
+        "text": "XLM-USDT-SWAP → Volume: SHORT volume 0.98x (min 1.00x)"
       },
       {
         "depth": 8,
-        "text": "BILL-USDT-SWAP → Stochastic: SHORT K 26/D 26 belum cross dari zona ekstrem (dalam 3 candle)"
+        "text": "MAGIC-USDT-SWAP → Stochastic: SHORT K 18/D 30 belum cross dari zona ekstrem (dalam 3 candle)"
       },
       {
         "depth": 8,
-        "text": "OL-USDT-SWAP → Stochastic: LONG K 59/D 64 belum cross dari zona ekstrem (dalam 3 candle)"
-      },
-      {
-        "depth": 7,
-        "text": "SAHARA-USDT-SWAP → MACD: SHORT histogram MACD belum berbalik searah"
-      },
-      {
-        "depth": 7,
-        "text": "AKE-USDT-SWAP → RSI: LONG RSI ekstrem pullback 56.3 di luar zona"
-      },
-      {
-        "depth": 7,
-        "text": "CHIP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 40.8 di luar zona"
+        "text": "XDP-USDT-SWAP → Stochastic: SHORT K 17/D 15 belum cross dari zona ekstrem (dalam 3 candle)"
       }
     ]
   }
