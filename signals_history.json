@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791959400000,
+  "last_scan_candle": 1791961200000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -8213,14 +8213,14 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 50,
+    "scans": 2,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "HTF": 25,
-      "Tren": 9,
-      "MA4": 14,
-      "RSI": 2
+      "HTF": 48,
+      "Tren": 19,
+      "MA4": 26,
+      "RSI": 7
     },
     "near": [
       {
@@ -8232,20 +8232,20 @@
         "text": "SPACE-USDT-SWAP → RSI: LONG RSI ekstrem pullback 55.7 di luar zona"
       },
       {
-        "depth": 4,
-        "text": "W-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 5,
+        "text": "SHIB-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 43.0 di luar zona"
       },
       {
-        "depth": 4,
-        "text": "TRUTH-USDT-SWAP → MA4: LONG candle pemicu / MA4 belum berbalik searah"
+        "depth": 5,
+        "text": "BLUR-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 37.5 di luar zona"
       },
       {
-        "depth": 4,
-        "text": "STRK-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 5,
+        "text": "MAGIC-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 28.8 di luar zona"
       },
       {
-        "depth": 4,
-        "text": "BLUR-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 5,
+        "text": "WAL-USDT-SWAP → RSI: LONG RSI ekstrem pullback 77.2 di luar zona"
       }
     ]
   }
