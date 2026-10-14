@@ -34,8 +34,8 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          TOP_PAIRS: "50"
-          SMC_MAX_OPEN: "5"
+          TOP_PAIRS: "100"
+          SMC_MAX_OPEN: "10"
           SMC_MIN_RISK_PCT: "0.004"
           SMC_MIN_RISK_PCT_BTC: "0.0015"
         run: python signal_bot.py
