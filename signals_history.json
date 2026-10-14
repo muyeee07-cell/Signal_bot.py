@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1791999900000,
+  "last_scan_candle": 1792001700000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-14",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1791988399.7125707,
+  "last_report_ts": 1792003085.605254,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8213,42 +8213,42 @@
     }
   ],
   "scan_rej": {
-    "scans": 7,
-    "pairs": 700,
+    "scans": 1,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "MA4": 269,
-      "RSI": 51,
-      "Stochastic": 21,
-      "HTF": 66,
-      "Tren": 188,
-      "Pullback": 15,
-      "Data": 90
+      "Tren": 60,
+      "RSI": 13,
+      "MA4": 10,
+      "HTF": 14,
+      "MACD": 1,
+      "Pullback": 1,
+      "Stochastic": 1
     },
     "near": [
       {
-        "depth": 6,
-        "text": "PUMP-USDT-SWAP → Stochastic: SHORT K 9/D 20 belum cross dari zona ekstrem"
+        "depth": 7,
+        "text": "SAHARA-USDT-SWAP → MACD: SHORT histogram MACD belum berbalik searah"
       },
       {
         "depth": 6,
-        "text": "OL-USDT-SWAP → Stochastic: SHORT K 22/D 30 belum cross dari zona ekstrem"
+        "text": "RESOLV-USDT-SWAP → Stochastic: SHORT K 34/D 34 belum cross dari zona ekstrem"
       },
       {
-        "depth": 6,
-        "text": "XRP-USDT-SWAP → Stochastic: SHORT K 5/D 16 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "PUMP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 40.2 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "NIGHT-USDT-SWAP → Stochastic: SHORT K 17/D 27 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "BOME-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 37.5 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "CT-USDT-SWAP → Stochastic: LONG K 90/D 84 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "ONE-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 38.8 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "PONS-USDT-SWAP → Stochastic: LONG K 80/D 67 belum cross dari zona ekstrem"
+        "depth": 5,
+        "text": "STRK-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 38.4 di luar zona"
       }
     ]
   }
