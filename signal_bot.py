@@ -108,7 +108,7 @@ def parse_hours(spec):
         out.update(range(lo, hi + 1))
     return out
 
-SMC_BLOCK_HOURS = parse_hours(os.getenv("SMC_BLOCK_HOURS", "8-15"))   # UTC hours, signal candle
+SMC_BLOCK_HOURS = parse_hours(os.getenv("SMC_BLOCK_HOURS", "20-2"))   # UTC hours, signal candle
 ADAPT_WINDOW = int(os.getenv("ADAPT_WINDOW", "30"))                   # last N closed trades
 ADAPT_MIN_TRADES = int(os.getenv("ADAPT_MIN_TRADES", "20"))           # fewer -> stay NORMAL
 ADAPT_MIN_WR = float(os.getenv("ADAPT_MIN_WR", "0.40"))               # below -> DEFENSIVE
