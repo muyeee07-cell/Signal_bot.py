@@ -51,7 +51,7 @@ CHAT_ID = env_first("CHAT_ID", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT")
 # Based on John J. Murphy, "Technical Analysis of the Financial Markets":
 # MA 4-9-18 trend (ch. 9), Bollinger bands (ch. 9), RSI / Stochastic / MACD (ch. 10),
 # volume confirmation (ch. 7), trade with the major trend (ch. 10).
-SETUP_ID = "MURPHY_PULLBACK"
+SETUP_ID = "MURPHY_STRATEGY"
 
 
 def env_num(default, *names):
@@ -123,7 +123,7 @@ MAX_RISK_PCT = env_num(0.015, "MAX_RISK_PCT")
 MIN_RISK_PCT = env_num(0.004, "MIN_RISK_PCT", "SMC_MIN_RISK_PCT")      # 0 disables the cost gate
 # Separate cost gate for BTC only. Negative = use MIN_RISK_PCT.
 MIN_RISK_PCT_BTC = env_num(-1.0, "MIN_RISK_PCT_BTC", "SMC_MIN_RISK_PCT_BTC")
-MAX_OPEN = env_num(5, "MAX_OPEN", "SMC_MAX_OPEN")
+MAX_OPEN = env_num(10, "MAX_OPEN", "SMC_MAX_OPEN")
 COOLDOWN_HOURS = 4
 
 # ---- POSITION CROWDING (0 = no limit) ----
@@ -144,7 +144,7 @@ DEFENSIVE = [False]                                  # set by scan_murphy each c
 BT_MAX_HOLD = 200                                    # bars (50 h); older open trades are closed at the close
 
 # --- universe ---
-TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
+TOP_PAIRS = int(os.getenv("TOP_PAIRS", "100"))
 MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
@@ -178,7 +178,7 @@ S = requests.Session()
 S.headers.update({"User-Agent": "ALPHAQUANT-MURPHY"})
 TELEGRAM = bool(TOKEN and CHAT_ID)
 
-SETUP_NAME = {"MURPHY_PULLBACK": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
+SETUP_NAME = {"MURPHY_STRATEGY": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
 
 # ================= HELPERS =================
 
