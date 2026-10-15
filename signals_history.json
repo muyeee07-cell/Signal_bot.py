@@ -43,6 +43,48 @@
       "monitor_tf_ms": 900000,
       "entry_ts": 1792051440000,
       "entry_time": "2026-10-15T08:04:00+00:00"
+    },
+    {
+      "signal_id": "MOVE-USDT-SWAP|SHORT|1792056600000|PB",
+      "symbol": "MOVE-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PB",
+      "note": "PULLBACK_REVERSAL (retrace 42%) | 4H DOWN · 1H DOWN | RSI1H 34 | EMA25 searah | Band1H 2.62R",
+      "signal_candle_time": 1792056600000,
+      "signal_candle_iso": "2026-10-15T09:30:00+00:00",
+      "created_at": "2026-10-15T10:01:43.891425+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.007717,
+      "sl": 0.007782,
+      "tp": 0.007604,
+      "rr": 1.75,
+      "atr": 6.63638501014479e-05,
+      "sl_atr": 0.9794489002768363,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 33.571397082267865,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 2.62,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 3.81,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PULLBACK_REVERSAL",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "PENDING",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -91,7 +133,7 @@
       "entry_time": "2026-10-15T05:31:00+00:00"
     }
   ],
-  "last_scan_candle": 1792054800000,
+  "last_scan_candle": 1792056600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8303,41 +8345,42 @@
     }
   ],
   "scan_rej": {
-    "scans": 5,
-    "pairs": 497,
-    "signals": 1,
+    "scans": 6,
+    "pairs": 596,
+    "signals": 2,
     "stages": {
-      "RSI 1H": 80,
-      "Murphy 4H": 46,
-      "Setup": 191,
-      "Murphy 1H": 54,
-      "SL/RR": 15,
-      "Dominasi": 110
+      "RSI 1H": 85,
+      "Murphy 4H": 56,
+      "Setup": 232,
+      "Murphy 1H": 67,
+      "SL/RR": 17,
+      "Dominasi": 131,
+      "Diblokir": 6
     },
     "near": [
       {
-        "depth": 8,
-        "text": "W-USDT-SWAP → SL/RR: SHORT SL 3.04% terlalu jauh (maks 1.50%)"
+        "depth": 11,
+        "text": "BRETT-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       },
       {
-        "depth": 8,
-        "text": "ZK-USDT-SWAP → SL/RR: LONG SL 4.85% terlalu jauh (maks 1.50%)"
+        "depth": 11,
+        "text": "NEIRO-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       },
       {
-        "depth": 8,
-        "text": "W-USDT-SWAP → SL/RR: SHORT SL 2.07% terlalu jauh (maks 1.50%)"
+        "depth": 11,
+        "text": "HBAR-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       },
       {
-        "depth": 8,
-        "text": "CFX-USDT-SWAP → SL/RR: SHORT stop struktur 2.09 ATR (maks 2), terlalu lebar"
+        "depth": 11,
+        "text": "ONDO-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       },
       {
-        "depth": 8,
-        "text": "AEON-USDT-SWAP → SL/RR: SHORT SL 1.69% terlalu jauh (maks 1.50%)"
+        "depth": 11,
+        "text": "TRIA-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       },
       {
-        "depth": 8,
-        "text": "W-USDT-SWAP → SL/RR: SHORT stop struktur 3.31 ATR (maks 2), terlalu lebar"
+        "depth": 11,
+        "text": "MERL-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
       }
     ]
   }
