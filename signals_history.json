@@ -1,48 +1,5 @@
 {
-  "open": [
-    {
-      "signal_id": "APR-USDT-SWAP|SHORT|1792077300000|PB",
-      "symbol": "APR-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "MURPHY_VOLMAN",
-      "setup_tag": "PB",
-      "note": "PULLBACK_REVERSAL (retrace 45%) | 4H DOWN · 1H DOWN | RSI1H 42 | EMA25 searah | Band1H 1.64R",
-      "signal_candle_time": 1792077300000,
-      "signal_candle_iso": "2026-10-15T15:15:00+00:00",
-      "created_at": "2026-10-15T15:36:00.892525+00:00",
-      "order_type": "SELL STOP",
-      "entry": 0.0489,
-      "sl": 0.0495,
-      "tp": 0.0479,
-      "rr": 1.75,
-      "atr": 0.0007451278316475771,
-      "sl_atr": 0.8052309610732472,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 41.918539114877944,
-      "adx": 0.0,
-      "volume_ratio": 0.0,
-      "band_room_r": 1.64,
-      "htf": "DOWN",
-      "rsi_deadzone": false,
-      "quality": 3.32,
-      "mode": "NORMAL",
-      "regime": "DOWNTREND",
-      "structure": "PULLBACK_REVERSAL",
-      "bos": "NONE",
-      "pullback": 0.0,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "PENDING",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
-    }
-  ],
+  "open": [],
   "closed": [
     {
       "signal_id": "SOPH-USDT-SWAP|SHORT|1792041300000|PATTERN",
@@ -307,9 +264,53 @@
       "monitor_tf_ms": 900000,
       "entry_ts": 1792059660000,
       "entry_time": "2026-10-15T10:21:00+00:00"
+    },
+    {
+      "signal_id": "APR-USDT-SWAP|SHORT|1792077300000|PB",
+      "symbol": "APR-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PB",
+      "note": "PULLBACK_REVERSAL (retrace 45%) | 4H DOWN · 1H DOWN | RSI1H 42 | EMA25 searah | Band1H 1.64R",
+      "signal_candle_time": 1792077300000,
+      "signal_candle_iso": "2026-10-15T15:15:00+00:00",
+      "created_at": "2026-10-15T15:36:00.892525+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.0489,
+      "sl": 0.0495,
+      "tp": 0.0479,
+      "rr": 1.75,
+      "atr": 0.0007451278316475771,
+      "sl_atr": 0.8052309610732472,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 41.918539114877944,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 1.64,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 3.32,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PULLBACK_REVERSAL",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.0495,
+      "exit_time": "2026-10-15T15:38:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000,
+      "entry_ts": 1792078320000,
+      "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792077300000,
+  "last_scan_candle": 1792079100000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8521,14 +8522,14 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 199,
+    "scans": 3,
+    "pairs": 298,
     "signals": 1,
     "stages": {
-      "Murphy 1H": 139,
-      "Dominasi": 33,
-      "Murphy 4H": 22,
-      "Setup": 3,
+      "Murphy 1H": 212,
+      "Dominasi": 38,
+      "Murphy 4H": 39,
+      "Setup": 7,
       "SL/RR": 1
     },
     "near": [
@@ -8549,12 +8550,12 @@
         "text": "PYTH-USDT-SWAP → Setup: LONG PB: pullback terlalu panjang | PATTERN: cluster 6.4 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       },
       {
-        "depth": 6,
-        "text": "PUMP-USDT-SWAP → Dominasi: SHORT EMA25 5m tidak searah / harga di sisi salah"
+        "depth": 7,
+        "text": "ZK-USDT-SWAP → Setup: LONG PB: pullback terlalu panjang | PATTERN: cluster 3.6 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       },
       {
-        "depth": 6,
-        "text": "RSR-USDT-SWAP → Dominasi: SHORT EMA25 5m tidak searah / harga di sisi salah"
+        "depth": 7,
+        "text": "AKE-USDT-SWAP → Setup: LONG PB: pullback tidak harmonis (bar lebih besar dari leg) | PATTERN: cluster 2.9 ATR (maks 2.2) | COMBI: bar sesudah powerbar bukan inside bar"
       }
     ]
   },
