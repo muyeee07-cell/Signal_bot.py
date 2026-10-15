@@ -310,7 +310,7 @@
       "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792079100000,
+  "last_scan_candle": 1792080900000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8522,20 +8522,28 @@
     }
   ],
   "scan_rej": {
-    "scans": 3,
-    "pairs": 298,
+    "scans": 4,
+    "pairs": 398,
     "signals": 1,
     "stages": {
-      "Murphy 1H": 212,
-      "Dominasi": 38,
-      "Murphy 4H": 39,
-      "Setup": 7,
-      "SL/RR": 1
+      "Murphy 1H": 285,
+      "Dominasi": 41,
+      "Murphy 4H": 56,
+      "Setup": 12,
+      "SL/RR": 3
     },
     "near": [
       {
         "depth": 8,
         "text": "AKE-USDT-SWAP → SL/RR: LONG SL 3.76% terlalu jauh (maks 1.50%)"
+      },
+      {
+        "depth": 8,
+        "text": "AEON-USDT-SWAP → SL/RR: SHORT SL 3.02% terlalu jauh (maks 1.50%)"
+      },
+      {
+        "depth": 8,
+        "text": "APR-USDT-SWAP → SL/RR: SHORT SL 2.66% terlalu jauh (maks 1.50%)"
       },
       {
         "depth": 7,
@@ -8548,14 +8556,6 @@
       {
         "depth": 7,
         "text": "PYTH-USDT-SWAP → Setup: LONG PB: pullback terlalu panjang | PATTERN: cluster 6.4 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
-      },
-      {
-        "depth": 7,
-        "text": "ZK-USDT-SWAP → Setup: LONG PB: pullback terlalu panjang | PATTERN: cluster 3.6 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
-      },
-      {
-        "depth": 7,
-        "text": "AKE-USDT-SWAP → Setup: LONG PB: pullback tidak harmonis (bar lebih besar dari leg) | PATTERN: cluster 2.9 ATR (maks 2.2) | COMBI: bar sesudah powerbar bukan inside bar"
       }
     ]
   },
