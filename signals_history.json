@@ -46,7 +46,7 @@
       "entry_time": "2026-10-15T05:31:00+00:00"
     }
   ],
-  "last_scan_candle": 1792045800000,
+  "last_scan_candle": 1792048500000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8258,16 +8258,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 99,
+    "scans": 2,
+    "pairs": 199,
     "signals": 0,
     "stages": {
-      "RSI 1H": 49,
-      "Murphy 4H": 8,
-      "Setup": 26,
-      "Murphy 1H": 11,
-      "SL/RR": 1,
-      "Dominasi": 4
+      "RSI 1H": 63,
+      "Murphy 4H": 16,
+      "Setup": 84,
+      "Murphy 1H": 23,
+      "SL/RR": 5,
+      "Dominasi": 8
     },
     "near": [
       {
@@ -8275,24 +8275,24 @@
         "text": "W-USDT-SWAP → SL/RR: SHORT SL 3.04% terlalu jauh (maks 1.50%)"
       },
       {
+        "depth": 8,
+        "text": "ZK-USDT-SWAP → SL/RR: LONG SL 4.85% terlalu jauh (maks 1.50%)"
+      },
+      {
+        "depth": 8,
+        "text": "W-USDT-SWAP → SL/RR: SHORT SL 2.07% terlalu jauh (maks 1.50%)"
+      },
+      {
+        "depth": 8,
+        "text": "CFX-USDT-SWAP → SL/RR: SHORT stop struktur 2.09 ATR (maks 2), terlalu lebar"
+      },
+      {
+        "depth": 8,
+        "text": "AEON-USDT-SWAP → SL/RR: SHORT SL 1.69% terlalu jauh (maks 1.50%)"
+      },
+      {
         "depth": 7,
         "text": "SHIB-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PATTERN: cluster 2.3 ATR (maks 2.2) | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "ONE-USDT-SWAP → Setup: SHORT PB: pullback tidak harmonis (bar lebih besar dari leg) | PATTERN: cluster 2.3 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
-      },
-      {
-        "depth": 7,
-        "text": "MEME-USDT-SWAP → Setup: SHORT PB: belum sentuh EMA25 | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "PENGU-USDT-SWAP → Setup: SHORT PB: pullback tidak harmonis (bar lebih besar dari leg) | PATTERN: cluster 2.2 ATR (maks 2.2) | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "STRK-USDT-SWAP → Setup: SHORT PB: retrace 17% (min 40%) | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
       }
     ]
   }
