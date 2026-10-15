@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792031400000,
+  "last_scan_candle": 1792033200000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8213,40 +8213,43 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 100,
+    "scans": 2,
+    "pairs": 200,
     "signals": 0,
     "stages": {
-      "MA4": 71,
-      "HTF": 14,
-      "Tren": 9,
-      "Pullback": 5,
-      "RSI": 1
+      "MA4": 109,
+      "HTF": 23,
+      "Tren": 18,
+      "Pullback": 6,
+      "RSI": 10,
+      "Stochastic": 1,
+      "SL/RR": 1,
+      "Candle telat": 32
     },
     "near": [
+      {
+        "depth": 12,
+        "text": "OL-USDT-SWAP → SL/RR: SHORT SL 3.37 ATR (perlu 0.35-2.5)"
+      },
+      {
+        "depth": 8,
+        "text": "LINEA-USDT-SWAP → Stochastic: SHORT K 29/D 25 belum cross dari zona ekstrem (dalam 3 candle)"
+      },
       {
         "depth": 7,
         "text": "HUMA-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.6 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "SATS-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 7,
+        "text": "PUMP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.1 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "PEPE-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 7,
+        "text": "BOME-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 33.3 di luar zona"
       },
       {
-        "depth": 6,
-        "text": "SHIB-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
-      },
-      {
-        "depth": 6,
-        "text": "BONK-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
-      },
-      {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
+        "depth": 7,
+        "text": "ONE-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 42.0 di luar zona"
       }
     ]
   }
