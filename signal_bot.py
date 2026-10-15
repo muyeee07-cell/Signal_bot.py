@@ -1,31 +1,32 @@
 """
-ALPHAQUANT MURPHY V6.0
-Murphy Pullback Scalp 15m - Telegram signal engine (signal-only) for the top 50 OKX USDT perpetuals
+ALPHAQUANT MURPHY x VOLMAN V7.0
+Hybrid scalper for the top OKX USDT perpetuals (Telegram, signal-only).
 
-Strategy source: John J. Murphy, "Technical Analysis of the Financial Markets".
-The SMC engine of V5.x was replaced; the infrastructure (OKX data, Telegram, history file,
-TP/SL monitor, reports, crowding limits, adaptive mode) is unchanged.
+  HTF context  (John J. Murphy, "Technical Analysis of the Financial Markets"):
+      HTF trend + MTF trend (MA9/MA18), MTF RSI not extreme, room to the MTF Bollinger band.
+      Frames: entry 15m, MTF 1H, HTF 4H (env TF_MIN / MTF_MIN / HTF_MIN; 5 / 15 / 60 = old setup).
+  LTF entry    (Bob Volman, "Understanding Price Action", entry frame = 15m):
+      dominance = 25 EMA slope/side, then one of three setups on the entry chart:
+        PB       pullback reversal (40-80% retracement, reaches the 25 EMA, harmonic bars)
+        PATTERN  pattern break (tight buildup under a barrier, squeezed against the 25 EMA)
+        COMBI    pattern break combi (powerbar + inside bar)
+      Entry = stop order 1 tick beyond the signal bar; SL beyond the structure (tight);
+      TP = TARGET_RR x risk; never break straight into an obstruction.
 
-Rules (LONG; SHORT mirrors):
-  1. Trend      MA9 > MA18, MA18 rising, price above MA18, and the 1H trend agrees
-  2. Pullback   low touches MA9 within PULL_N bars, closes never break MA18
-  3. Trigger    bullish candle closes back above a rising MA4 (Murphy "buying alert")
-  4. RSI(14)    lowest RSI of the pullback is between 35 and 55
-  5. Stoch      (14,3,3) %K crosses above %D (within the last 3 candles) after being <= 40
-  6. MACD       (12,26,9) histogram rising
-  7. Volume     signal candle >= average volume
-  8. Bollinger  (20,2) no squeeze, opposite band at least 0.5R away
-  Entry = close of the signal candle, SL beyond the pullback extreme, TP at TARGET_RR (1.75).
+Orders are PENDING until price trades through the entry; they are cancelled after
+PENDING_BARS entry bars, or when the stop level is touched first. The scan must run
+on every entry candle (GitHub Actions cron every 15 minutes, +1 min).
 
 Modes
-  python signal_bot_murphy.py                      live scan (GitHub Actions: run every 15 min)
-  python signal_bot_murphy.py selftest             offline check on synthetic candles
-  python signal_bot_murphy.py backtest BTC-USDT-SWAP ETH-USDT-SWAP --bars 5000
-  python signal_bot_murphy.py ablation [PAIR ...] --bars 3000   matikan tiap filter bergantian, bandingkan
+  python signal_bot_murphy_volman.py                       live scan
+  python signal_bot_murphy_volman.py selftest              offline check on synthetic candles
+  python signal_bot_murphy_volman.py backtest BTC-USDT-SWAP ETH-USDT-SWAP --bars 8000
+  python signal_bot_murphy_volman.py ablation [PAIR ...] --bars 5000
 
-Backtest uses the exact same engine as live. Treat every signal as unproven until a
-backtest on the pairs you actually scan shows an edge after fees.
-Old SMC trades that are still open keep being monitored; once closed they go to h["archive"].
+Backtest uses the exact same engine as live (pending fill, cancel and time stop included).
+Treat every signal as unproven until a backtest on the pairs you scan shows an edge after fees.
+Old trades of other strategies that are still open keep being monitored; once closed they
+go to h["archive"].
 """
 
 from __future__ import annotations
@@ -48,11 +49,14 @@ def env_first(*names: str) -> str:
 TOKEN = env_first("TELEGRAM_TOKEN", "TELEGRAM_BOT_TOKEN", "BOT_TOKEN")
 CHAT_ID = env_first("CHAT_ID", "TELEGRAM_CHAT_ID", "TELEGRAM_CHAT")
 
-# --- Murphy pullback scalp ---
-# Based on John J. Murphy, "Technical Analysis of the Financial Markets":
-# MA 4-9-18 trend (ch. 9), Bollinger bands (ch. 9), RSI / Stochastic / MACD (ch. 10),
-# volume confirmation (ch. 7), trade with the major trend (ch. 10).
-SETUP_ID = "MURPHY_PULLBACK"
+# --- Murphy x Volman scalp ---
+# HTF context (Murphy, "Technical Analysis of the Financial Markets"):
+#   HTF (4H) and MTF (1H) trend (MA 9/18), MTF RSI guard, MTF Bollinger room.
+# LTF entry (Volman, "Understanding Price Action"), on the entry frame (15m):
+#   dominance via the 25 EMA, then ONE of three setups on the entry chart:
+#   pullback reversal, pattern break (buildup against a barrier), pattern break combi
+#   (powerbar + inside bar). Entry = stop order 1 tick beyond the signal bar.
+SETUP_ID = "MURPHY_VOLMAN"
 
 
 def env_num(default, *names):
@@ -80,71 +84,88 @@ def parse_hours(spec):
     return out
 
 
-TF = "15m"
-TF_MS = 15 * 60_000
-MONITOR_TF = "5m"                      # finer candles to resolve TP/SL of open scalps
-MONITOR_MS = 5 * 60_000
-REF_SYMBOL = "BTC-USDT-SWAP"           # reference symbol for the "new 15m candle" gate
-HISTORY_BARS = env_num(300, "HISTORY_BARS")
-MIN_BARS = 150
+def _lbl(m):
+    return f"{m // 60}H" if m % 60 == 0 else f"{m}m"
+
+TF_MIN = env_num(15, "TF_MIN")          # entry / signal frame in minutes (OKX bars: 1, 3, 5, 15, 30)
+MTF_MIN = env_num(60, "MTF_MIN")        # Murphy middle frame: trend, RSI, Bollinger
+HTF_MIN = env_num(240, "HTF_MIN")       # Murphy higher frame: trend filter
+if (TF_MIN not in (1, 3, 5, 15, 30) or MTF_MIN <= TF_MIN or HTF_MIN <= MTF_MIN
+        or MTF_MIN % TF_MIN or HTF_MIN % TF_MIN):
+    raise SystemExit(f"TF_MIN/MTF_MIN/HTF_MIN tidak valid: {TF_MIN}/{MTF_MIN}/{HTF_MIN} "
+                     "(TF_MIN harus 1/3/5/15/30; MTF dan HTF kelipatan TF_MIN, HTF > MTF > TF)")
+TF = f"{TF_MIN}m"                      # LTF: signal candle (Volman)
+TF_MS = TF_MIN * 60_000
+MTF_MS, HTF_MS = MTF_MIN * 60_000, HTF_MIN * 60_000
+MTF_PER, HTF_PER = MTF_MIN // TF_MIN, HTF_MIN // TF_MIN
+MTF_LBL, HTF_LBL = _lbl(MTF_MIN), _lbl(HTF_MIN)
+ST_HTF, ST_MTF, ST_RSI = f"Murphy {HTF_LBL}", f"Murphy {MTF_LBL}", f"RSI {MTF_LBL}"
+MONITOR_TF = "1m"                      # finer candles to resolve pending fills and TP/SL
+MONITOR_MS = 60_000
+REF_SYMBOL = "BTC-USDT-SWAP"           # reference symbol for the "new candle" gate
+# enough bars for 21 complete HTF bars (MA18 + slope) and 40 MTF bars
+MIN_BARS = max(252, 21 * HTF_PER + 4)
+HISTORY_BARS = env_num(MIN_BARS + 60, "HISTORY_BARS")
 
 # ---- CORE ----
-TARGET_RR = env_num(1.75, "TARGET_RR")
+TARGET_RR = env_num(1.75, "TARGET_RR")        # Volman's standard bracket is 1:2
 
-# ---- 1. trend: MA 4-9-18 (Murphy p.204-206) + 1H filter ----
-MA_FAST, MA_MID, MA_SLOW = 4, 9, 18
-HTF_FILTER = env_first("HTF_FILTER") != "0"          # 1H trend must agree (needs ~25 h of 15m data)
-HOLD_ATR = 0.5                                       # pullback may not close further than 0.5 ATR through MA18
-
-# ---- 2. pullback window / RSI zone (50 acts as support in pullbacks, p.245) ----
-PULL_N = env_num(6, "PULL_N")                        # bars in the pullback window
-RSI_PULL_HI = env_num(55.0, "RSI_PULL_HI")           # LONG: lowest RSI of the window must be <= this
-RSI_FLOOR = env_num(35.0, "RSI_FLOOR")               # ...and >= this (not a collapse). SHORT mirrors (100-x)
-
-# ---- 3. Stochastic (14,3,3) cross from the extreme zone (p.248-249) ----
-ST_N, ST_SMOOTH, ST_D = 14, 3, 3
-ST_OS = env_num(40.0, "ST_OS")                       # book uses 20/80; looser for pullbacks in a trend
-STOCH_LOOKBACK = max(1, env_num(3, "STOCH_LOOKBACK"))  # %K/%D cross may be up to this many candles old (1 = this candle only)
-
-# ---- 4. MACD 12-26-9 histogram turning with the trade (p.252-255) ----
-MACD_FAST, MACD_SLOW, MACD_SIG = 12, 26, 9
-
-# ---- 5. volume must confirm (p.174) ----
-MIN_VOLUME_RATIO = env_num(1.0, "MIN_VOLUME_RATIO")  # signal-candle volume / average of the last VOL_PERIOD
-
-# ---- 6. Bollinger 20/2: no squeeze, room to the opposite band (p.209-211) ----
+# ---- HTF context (Murphy) ----
+MA_MID, MA_SLOW = 9, 18
+HTF_FILTER = env_first("HTF_FILTER") != "0"   # HTF trend must agree (always on in DEFENSIVE mode)
+RSI15_MAX_LONG = env_num(72.0, "RSI15_MAX_LONG")    # do not buy when MTF RSI is above this
+RSI15_MIN_SHORT = env_num(28.0, "RSI15_MIN_SHORT")  # do not short when MTF RSI is below this
 BB_N, BB_K = 20, 2.0
-BW_LOOKBACK = 100
-BW_MIN_PCT = env_num(0.20, "BW_MIN_PCT")             # skip when band width is in the lowest 20%
-BB_MIN_R = env_num(0.5, "BB_MIN_R")                  # band must be >= this many R away from entry (0 = off)
+BB_MIN_R = env_num(0.5, "BB_MIN_R")           # MTF opposite band must be >= this many R away (0 = off)
 
-# ---- stop / cost gates ----
-MIN_SL_ATR = 0.35
-MAX_SL_ATR = 2.50
+# ---- LTF entry (Volman, 5m) ----
+EMA_N = 25                                    # the 25 EMA of the book
+DOM_SLOPE_BARS = 12                           # EMA slope window for "dominance"
+# pullback reversal (book: correct 50-60% of the swing, 40% in strong trends, reach the 25 EMA)
+LEG_LOOKBACK = 36
+LEG_MIN_ATR = env_num(2.5, "LEG_MIN_ATR")
+PB_MIN_BARS, PB_MAX_BARS = 3, 24
+PB_MIN_RETR = env_num(0.40, "PB_MIN_RETR")
+PB_MAX_RETR = env_num(0.80, "PB_MAX_RETR")
+PB_EMA_TOUCH_ATR = 0.10
+# pattern break (buildup squeezed between the 25 EMA and a barrier)
+CLUSTER_BARS = env_num(6, "CLUSTER_BARS")
+CLUSTER_MAX_ATR = env_num(2.2, "CLUSTER_MAX_ATR")
+BARRIER_TOUCHES = 2
+BARRIER_TOL_ATR = 0.15
+# combi: powerbar followed by an inside bar
+POWER_ATR = env_num(1.0, "POWER_ATR")
+# do not break straight into an obstruction (previous high/low) closer than this many R
+OBSTR_R = env_num(0.8, "OBSTR_R")
+OBSTR_LOOKBACK = 36
+
+# ---- stop / cost gates (Volman: tight stop, "no hope-and-pray") ----
+SL_MIN_ATR = env_num(0.8, "SL_MIN_ATR")       # stop never tighter than this (noise)
+MAX_SL_ATR = env_num(2.0, "MAX_SL_ATR")       # structure needs a wider stop than this -> skip
 MAX_RISK_PCT = env_num(0.015, "MAX_RISK_PCT")
 MIN_RISK_PCT = env_num(0.004, "MIN_RISK_PCT", "SMC_MIN_RISK_PCT")      # 0 disables the cost gate
 # Separate cost gate for BTC only. Negative = use MIN_RISK_PCT.
 MIN_RISK_PCT_BTC = env_num(-1.0, "MIN_RISK_PCT_BTC", "SMC_MIN_RISK_PCT_BTC")
 MAX_OPEN = env_num(5, "MAX_OPEN", "SMC_MAX_OPEN")
-COOLDOWN_HOURS = 4
+COOLDOWN_HOURS = env_num(1.0, "COOLDOWN_HOURS")
+
+# ---- pending stop order / holding time ----
+PENDING_BARS = env_num(2, "PENDING_BARS")     # cancel when not triggered within this many entry bars (2 x 15m = 30 min)
+MAX_HOLD_BARS = env_num(16, "MAX_HOLD_BARS")  # time stop after filling (16 x 15m = 4 h); 0 = off
 
 # ---- POSITION CROWDING (0 = no limit) ----
 MAX_ACTIVE_PER_DIRECTION = env_num(3, "MAX_ACTIVE_PER_DIRECTION", "MAX_ACTIVE_SMC_PER_DIRECTION")
 MAX_NEW_PER_CANDLE = env_num(1, "MAX_NEW_PER_CANDLE", "MAX_NEW_SMC_PER_CANDLE")
 
-# ---- session gate: UTC hours of the signal candle to skip (default none; was 8-15 for SMC) ----
+# ---- session gate: UTC hours of the signal candle to skip (default none) ----
 BLOCK_HOURS = parse_hours(env_first("BLOCK_HOURS", "SMC_BLOCK_HOURS"))
 
 # ---- adaptive gate: rolling win rate of the last ADAPT_WINDOW closed trades ----
 ADAPT_WINDOW = env_num(30, "ADAPT_WINDOW")
 ADAPT_MIN_TRADES = env_num(20, "ADAPT_MIN_TRADES")   # fewer -> stay NORMAL
 ADAPT_MIN_WR = env_num(0.40, "ADAPT_MIN_WR")         # below -> DEFENSIVE
-DEFENSIVE_EXTRA_VOLUME = env_num(0.25, "DEFENSIVE_EXTRA_VOLUME")  # DEFENSIVE: more volume + 1H filter forced on
-DEFENSIVE = [False]                                  # set by scan_murphy each candle
-
-# --- backtest mode ---
-BT_MAX_HOLD = 200                                    # bars (50 h); older open trades are closed at the close
-OFF = set()   # filters switched off (ablation only; live = empty): HTF PULLBACK MA4 RSI STOCH MACD VOLUME SQUEEZE BANDROOM MINRISK
+DEFENSIVE = [False]      # DEFENSIVE: HTF filter forced on and the MTF band room doubled
+OFF = set()   # filters switched off (ablation only; live = empty)
 
 # --- universe ---
 TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
@@ -181,7 +202,7 @@ S = requests.Session()
 S.headers.update({"User-Agent": "ALPHAQUANT-MURPHY"})
 TELEGRAM = bool(TOKEN and CHAT_ID)
 
-SETUP_NAME = {"MURPHY_PULLBACK": "Murphy Pullback", "SMC_SCALP": "SMC Scalp (lama)"}
+SETUP_NAME = {"MURPHY_VOLMAN": "Murphy × Volman", "MURPHY_PULLBACK": "Murphy Pullback (lama)", "SMC_SCALP": "SMC Scalp (lama)"}
 
 # ================= HELPERS =================
 
@@ -447,8 +468,8 @@ def tick_round(x, tick):
 # ================= REJECT TRACKING =================
 
 STAGES = [
-    "Data", "Candle sedikit", "Candle telat", "Tren", "HTF", "Pullback", "MA4", "RSI", "Stochastic",
-    "MACD", "Volume", "Bollinger", "SL/RR", "Diblokir"
+    "Data", "Candle sedikit", "Candle telat", ST_HTF, ST_MTF, ST_RSI,
+    "Dominasi", "Setup", "SL/RR", "Obstruksi", "Bollinger", "Diblokir"
 ]
 
 CUR_SETUP = SETUP_ID
@@ -471,16 +492,7 @@ def _rej(inst, stage, detail="", setup=None):
     REJECTS.setdefault(key, []).append((inst, _safe(detail)))
     return None
 
-# ================= MURPHY PULLBACK SCALP (15m) =================
-
-def _roll_mean(v, n):
-    out = [None] * len(v)
-    for i in range(n - 1, len(v)):
-        w = v[i - n + 1:i + 1]
-        if None in w:
-            continue
-        out[i] = sum(w) / n
-    return out
+# ================= MURPHY x VOLMAN SCALP (entry frame TF, MTF/HTF context) =================
 
 def sma_list(v, n):
     out = [None] * len(v)
@@ -513,251 +525,254 @@ def std_list(v, n):
         out[i] = math.sqrt(sum((x - m) ** 2 for x in w) / n)
     return out
 
-def _quantile(vals, q):
-    v = sorted(vals)
-    pos = q * (len(v) - 1)
-    lo = int(math.floor(pos))
-    hi = min(lo + 1, len(v) - 1)
-    return v[lo] + (v[hi] - v[lo]) * (pos - lo)
-
-def murphy_indicators(cs):
-    """All indicators of the strategy as lists aligned with `cs` (None = warm-up)."""
-    n = len(cs)
-    cl = [x[4] for x in cs]
-    ma_f, ma_m, ma_s = (sma_list(cl, p) for p in (MA_FAST, MA_MID, MA_SLOW))
-
-    mid = sma_list(cl, BB_N)
-    sd = std_list(cl, BB_N)
-    bb_up = [None if m is None else m + BB_K * s for m, s in zip(mid, sd)]
-    bb_lo = [None if m is None else m - BB_K * s for m, s in zip(mid, sd)]
-    bw = [None if (m is None or not m) else (u - l_) / m
-          for m, u, l_ in zip(mid, bb_up, bb_lo)]
-
-    raw = [None] * n
-    for i in range(ST_N - 1, n):
-        win = cs[i - ST_N + 1:i + 1]
-        hh, ll = max(x[2] for x in win), min(x[3] for x in win)
-        raw[i] = 100 * (cl[i] - ll) / (hh - ll) if hh > ll else None
-    k = _roll_mean(raw, ST_SMOOTH)
-    d = _roll_mean(k, ST_D)
-
-    e_f, e_s = ema_list(cl, MACD_FAST), ema_list(cl, MACD_SLOW)
-    macd = [a - b for a, b in zip(e_f, e_s)]
-    sig = ema_list(macd, MACD_SIG)
-    hist = [a - b for a, b in zip(macd, sig)]
-
-    return {
-        "ma_f": ma_f, "ma_m": ma_m, "ma_s": ma_s,
-        "bb_mid": mid, "bb_up": bb_up, "bb_lo": bb_lo, "bw": bw,
-        "rsi": rsi(cs, RSI_PERIOD), "atr": atr(cs, ATR_PERIOD),
-        "k": k, "d": d, "hist": hist,
-    }
-
-def htf_state(cs):
-    """
-    1H trend from COMPLETED hourly bars only (the hour of the signal candle is excluded).
-    UP   : MA9 > MA18 and last hourly close > MA18
-    DOWN : mirror. None : neutral or not enough data.
-    """
-    last_key = cs[-1][0] // 3_600_000
+def aggregate(cs, tf_ms, per):
+    """Resample candles to a higher frame. Only COMPLETE groups are returned (no lookahead)."""
     groups = {}
     for x in cs:
-        groups.setdefault(x[0] // 3_600_000, []).append(x)
-    keys = sorted(k for k, g in groups.items() if k < last_key and len(g) == 4)
-    closes = [groups[k][-1][4] for k in keys]
-    if len(closes) < MA_SLOW + 1:
-        return None
-    m = sum(closes[-MA_MID:]) / MA_MID
-    s = sum(closes[-MA_SLOW:]) / MA_SLOW
-    if m > s and closes[-1] > s:
-        return "UP"
-    if m < s and closes[-1] < s:
-        return "DOWN"
-    return None
+        groups.setdefault(x[0] // tf_ms, []).append(x)
+    out = []
+    for k in sorted(groups):
+        g = groups[k]
+        if len(g) == per:
+            out.append([k * tf_ms, g[0][1], max(x[2] for x in g), min(x[3] for x in g),
+                        g[-1][4], sum(x[5] for x in g)])
+    return out
 
-def _murphy_attempt(inst, cs, meta, ind, htf, side):
+def _mirror(cs):
+    """Flip prices so a SHORT can be evaluated with the LONG rules (and vice versa)."""
+    return [[x[0], -x[1], -x[3], -x[2], -x[4], x[5]] for x in cs]
+
+# ---------- Murphy layer: trend context from the MTF and HTF frames ----------
+
+def murphy_context(cs):
+    """HTF trend, MTF trend, MTF RSI and MTF Bollinger bands, built from the entry-frame series."""
+    ctx = {"ok": False, "htf": None, "mtf": None, "rsi_mtf": None, "bb_up": None, "bb_lo": None}
+    mtf = aggregate(cs, MTF_MS, MTF_PER)
+    htf = aggregate(cs, HTF_MS, HTF_PER)
+    if len(mtf) < 40 or len(htf) < MA_SLOW + 1:
+        return ctx
+
+    hc = [x[4] for x in htf]
+    hm, hs = sum(hc[-MA_MID:]) / MA_MID, sum(hc[-MA_SLOW:]) / MA_SLOW
+    ctx["htf"] = "UP" if (hm > hs and hc[-1] > hs) else "DOWN" if (hm < hs and hc[-1] < hs) else None
+
+    cm = [x[4] for x in mtf]
+    ma_m, ma_s = sma_list(cm, MA_MID), sma_list(cm, MA_SLOW)
+    if ma_m[-1] > ma_s[-1] and ma_s[-1] > ma_s[-4] and cm[-1] > ma_s[-1]:
+        ctx["mtf"] = "UP"
+    elif ma_m[-1] < ma_s[-1] and ma_s[-1] < ma_s[-4] and cm[-1] < ma_s[-1]:
+        ctx["mtf"] = "DOWN"
+
+    ctx["rsi_mtf"] = rsi(mtf, RSI_PERIOD)[-1]
+    mid, sd = sma_list(cm, BB_N)[-1], std_list(cm, BB_N)[-1]
+    if ctx["rsi_mtf"] is None or mid is None:
+        return ctx
+    ctx["bb_up"], ctx["bb_lo"] = mid + BB_K * sd, mid - BB_K * sd
+    ctx["ok"] = True
+    return ctx
+
+# ---------- Volman layer: the three entry-frame setups (long form) ----------
+# Each setup is evaluated on the signal bar cs[i] = the last closed entry bar.
+# Returns (tag, structural_stop, detail) or (None, reason).
+
+def _setup_pullback(cs, ema, a, i):
+    """Pullback reversal: 40-80% retracement of the last swing, reached the 25 EMA, harmonic bars."""
+    lo_i = max(0, i - LEG_LOOKBACK)
+    last_h = i - PB_MIN_BARS
+    if last_h <= lo_i + 3:
+        return None, "data kurang"
+    H = max(range(lo_i, last_h + 1), key=lambda j: cs[j][2])
+    if i - H > PB_MAX_BARS:
+        return None, "pullback terlalu panjang"
+    if H - lo_i < 3:
+        return None, "tidak ada leg sebelum swing high"
+    S = min(range(lo_i, H + 1), key=lambda j: cs[j][3])
+    leg = cs[H][2] - cs[S][3]
+    if leg < LEG_MIN_ATR * a:
+        return None, f"leg {leg / a:.1f} ATR terlalu kecil"
+    P = min(cs[j][3] for j in range(H + 1, i + 1))
+    retr = (cs[H][2] - P) / leg
+    if retr < PB_MIN_RETR:
+        return None, f"retrace {retr * 100:.0f}% (min {PB_MIN_RETR * 100:.0f}%)"
+    if retr > PB_MAX_RETR:
+        return None, f"retrace {retr * 100:.0f}% terlalu dalam"
+    if min(cs[j][3] - ema[j] for j in range(H + 1, i + 1)) > PB_EMA_TOUCH_ATR * a:
+        return None, f"belum sentuh EMA{EMA_N}"
+    pb_avg = sum(cs[j][2] - cs[j][3] for j in range(H + 1, i + 1)) / (i - H)
+    leg_avg = sum(cs[j][2] - cs[j][3] for j in range(S, H + 1)) / (H - S + 1)
+    if pb_avg > leg_avg:
+        return None, "pullback tidak harmonis (bar lebih besar dari leg)"
+    sg = cs[i]
+    if not sg[4] > sg[1]:
+        return None, "signal bar tidak searah"
+    return "PB", P - SL_ATR_BUFFER * a, f"retrace {retr * 100:.0f}%"
+
+def _setup_pattern(cs, ema, a, i):
+    """Pattern break: tight buildup under a barrier, squeezed against the 25 EMA."""
+    B = CLUSTER_BARS
+    seg = cs[i - B + 1:i + 1]
+    top, bot = max(x[2] for x in seg), min(x[3] for x in seg)
+    height = top - bot
+    if height > CLUSTER_MAX_ATR * a:
+        return None, f"cluster {height / a:.1f} ATR (maks {CLUSTER_MAX_ATR:g})"
+    touches = sum(1 for x in seg if x[2] >= top - BARRIER_TOL_ATR * a)
+    if touches < BARRIER_TOUCHES:
+        return None, f"barrier baru {touches}x tersentuh"
+    sg = cs[i]
+    if not sg[4] > sg[1]:
+        return None, "signal bar tidak searah"
+    if sg[2] < top - BARRIER_TOL_ATR * a:
+        return None, "signal bar tidak di barrier"
+    if sg[4] < bot + 0.7 * height:
+        return None, "close signal bar jauh dari barrier"
+    above = sum(1 for j in range(i - B + 1, i + 1) if cs[j][4] > ema[j])
+    if above < 0.7 * B:
+        return None, f"hanya {above}/{B} close di atas EMA{EMA_N}"
+    return "PATTERN", sg[3] - SL_ATR_BUFFER * a, f"cluster {height / a:.1f} ATR, barrier {touches}x"
+
+def _setup_combi(cs, ema, a, i):
+    """Pattern break combi: powerbar followed by an inside bar (the inside bar is the signal bar)."""
+    p, s = cs[i - 1], cs[i]
+    rng = p[2] - p[3]
+    if rng < POWER_ATR * a:
+        return None, "tidak ada powerbar"
+    body = p[4] - p[1]
+    if not (body > 0 and body >= 0.6 * rng and p[4] >= p[3] + 0.7 * rng):
+        return None, "powerbar tidak kuat searah"
+    if not (s[2] <= p[2] and s[3] >= p[3]):
+        return None, "bar sesudah powerbar bukan inside bar"
+    prior_high = max(x[2] for x in cs[i - 9:i - 1])
+    if not (p[4] > prior_high or p[3] <= ema[i - 1] + 0.3 * a):
+        return None, "combi tanpa lokasi (bukan breakout / bukan di EMA)"
+    return "COMBI", s[3] - SL_ATR_BUFFER * a, "powerbar + inside bar"
+
+VOLMAN_SETUPS = [("PB", _setup_pullback), ("PATTERN", _setup_pattern), ("COMBI", _setup_combi)]
+STRUCT_NAME = {"PB": "PULLBACK_REVERSAL", "PATTERN": "PATTERN_BREAK", "COMBI": "PATTERN_BREAK_COMBI"}
+SETUP_PRIORITY = {"PB": 1.5, "PATTERN": 1.0, "COMBI": 0.8}
+
+def _attempt(inst, cs, meta, ctx, ema, a, side):
     """
-    Evaluate ONE direction on the latest candle.
-    Returns a signal dict, or (stage, detail) describing the first filter that failed.
+    Evaluate ONE direction on the latest 5m bar.
+    Returns a signal dict, or (stage, detail) of the first filter that failed.
     """
     n = len(cs)
     i = n - 1
-    w = PULL_N
     up = side == "LONG"
-    close, opn = cs[i][4], cs[i][1]
-
-    def at(key, j=i):
-        return ind[key][j]
-
-    ma_f, ma_m, ma_s, a = at("ma_f"), at("ma_m"), at("ma_s"), at("atr")
-    rs, k, d, hist, bb_up, bb_lo, bw = (at(x) for x in ("rsi", "k", "d", "hist", "bb_up", "bb_lo", "bw"))
-    ma_s3, ma_f1 = at("ma_s", i - 3), at("ma_f", i - 1)
-    k1, d1, hist1 = at("k", i - 1), at("d", i - 1), at("hist", i - 1)
-    win = range(i - w + 1, i + 1)
-    ma_s_w = [ind["ma_s"][j] for j in win]
-    rsi_w = [ind["rsi"][j] for j in win]
-    k_w = [ind["k"][j] for j in win]
-
-    need = [ma_f, ma_m, ma_s, a, rs, k, d, hist, bb_up, bb_lo, bw, ma_s3, ma_f1, k1, d1, hist1]
-    if any(x is None for x in need) or any(x is None for x in ma_s_w + rsi_w + k_w) or not a or a <= 0:
-        return "Data", "indikator belum siap"
-
-    # --- 1. Trend: MA9 > MA18, MA18 rising, price above MA18 (Murphy p.204-206) ---
-    if up:
-        trend_ok = ma_m > ma_s and ma_s > ma_s3 and close > ma_s
-    else:
-        trend_ok = ma_m < ma_s and ma_s < ma_s3 and close < ma_s
-    if not trend_ok:
-        return "Tren", f"{side} MA{MA_MID}/MA{MA_SLOW} tidak searah"
-
     want = "UP" if up else "DOWN"
-    if "HTF" not in OFF and (HTF_FILTER or DEFENSIVE[0]) and htf != want:
-        return "HTF", f"{side} tren 1H {htf or 'netral'} (perlu {want})"
 
-    # --- 2. Pullback into MA9 that never breaks MA18 ---
-    lows = [cs[j][3] for j in win]
-    highs = [cs[j][2] for j in win]
-    closes_w = [cs[j][4] for j in win]
-    if up:
-        touched = min(lows) <= ma_m
-        hold = min(c - s for c, s in zip(closes_w, ma_s_w)) > -HOLD_ATR * a
-    else:
-        touched = max(highs) >= ma_m
-        hold = min(s - c for c, s in zip(closes_w, ma_s_w)) > -HOLD_ATR * a
-    if "PULLBACK" not in OFF and not touched:
-        return "Pullback", f"{side} belum pullback ke MA{MA_MID}"
-    if "PULLBACK" not in OFF and not hold:
-        return "Pullback", f"{side} close menembus MA{MA_SLOW} saat pullback"
+    # --- Murphy: HTF and MTF trend, MTF RSI ---
+    if "HTF" not in OFF and (HTF_FILTER or DEFENSIVE[0]) and ctx["htf"] != want:
+        return ST_HTF, f"{side} tren {HTF_LBL} {ctx['htf'] or 'netral'} (perlu {want})"
+    if "MTF" not in OFF and ctx["mtf"] != want:
+        return ST_MTF, f"{side} tren {MTF_LBL} {ctx['mtf'] or 'netral'} (perlu {want})"
+    rsi_m = ctx["rsi_mtf"]
+    if "RSIMTF" not in OFF:
+        if up and rsi_m > RSI15_MAX_LONG:
+            return ST_RSI, f"LONG RSI {MTF_LBL} {rsi_m:.0f} overbought (maks {RSI15_MAX_LONG:g})"
+        if not up and rsi_m < RSI15_MIN_SHORT:
+            return ST_RSI, f"SHORT RSI {MTF_LBL} {rsi_m:.0f} oversold (min {RSI15_MIN_SHORT:g})"
 
-    # --- 3. Trigger candle: MA4 turning back with the trend (Murphy "buying alert", p.205) ---
-    if up:
-        trig = close > ma_f and ma_f > ma_f1 and close > opn
-    else:
-        trig = close < ma_f and ma_f < ma_f1 and close < opn
-    if "MA4" not in OFF and not trig:
-        return "MA4", f"{side} candle pemicu / MA{MA_FAST} belum berbalik searah"
+    # --- evaluate with the long rules; SHORT = mirrored prices ---
+    v = cs if up else _mirror(cs)
+    ev = ema if up else [None if x is None else -x for x in ema]
 
-    # --- 4. RSI pulled back into the 35-55 zone (mirror for SHORT) and did not collapse ---
-    if up:
-        r_ext = min(rsi_w)
-        rsi_ok = RSI_FLOOR <= r_ext <= RSI_PULL_HI
-    else:
-        r_ext = max(rsi_w)
-        rsi_ok = 100 - RSI_PULL_HI <= r_ext <= 100 - RSI_FLOOR
-    if "RSI" not in OFF and not rsi_ok:
-        return "RSI", f"{side} RSI ekstrem pullback {r_ext:.1f} di luar zona"
+    # --- Volman: dominance = 25 EMA slopes with the trade and price is on the right side ---
+    dom = ev[i] > ev[i - DOM_SLOPE_BARS] and v[i][4] > ev[i]
+    if "DOMINANCE" not in OFF and not dom:
+        return "Dominasi", f"{side} EMA{EMA_N} 5m tidak searah / harga di sisi salah"
 
-    # --- 5. Stochastic %K crosses %D out of the oversold/overbought zone, within the last
-    #        STOCH_LOOKBACK candles (p.248-249) ---
-    def _crossed(j):
-        kj, dj, kp, dp = ind["k"][j], ind["d"][j], ind["k"][j - 1], ind["d"][j - 1]
-        if None in (kj, dj, kp, dp):
-            return False
-        return (kj > dj and kp <= dp) if up else (kj < dj and kp >= dp)
-
-    crossed = any(_crossed(j) for j in range(max(1, i - STOCH_LOOKBACK + 1), i + 1))
-    still = k > d if up else k < d                      # %K must still be on the trade side of %D
-    zone = min(k_w) <= ST_OS if up else max(k_w) >= 100 - ST_OS
-    st_ok = crossed and still and zone
-    if "STOCH" not in OFF and not st_ok:
-        return "Stochastic", (f"{side} K {k:.0f}/D {d:.0f} belum cross dari zona ekstrem "
-                              f"(dalam {STOCH_LOOKBACK} candle)")
-
-    # --- 6. MACD histogram turning with the trade (p.255) ---
-    if "MACD" not in OFF and ((up and not hist > hist1) or (not up and not hist < hist1)):
-        return "MACD", f"{side} histogram MACD belum berbalik searah"
-
-    # --- 7. Volume confirms (p.174) ---
-    vr = volume_ratio(cs, VOL_PERIOD) or 0.0
-    need_vol = MIN_VOLUME_RATIO + (DEFENSIVE_EXTRA_VOLUME if DEFENSIVE[0] else 0.0)
-    if "VOLUME" not in OFF and vr < need_vol:
-        return "Volume", f"{side} volume {vr:.2f}x (min {need_vol:.2f}x)"
-
-    # --- 8. Bollinger: not in a squeeze (p.211) ---
-    bw_hist = [x for x in ind["bw"][-BW_LOOKBACK:] if x is not None]
-    if "SQUEEZE" not in OFF and len(bw_hist) >= 20 and bw < _quantile(bw_hist, BW_MIN_PCT):
-        return "Bollinger", f"{side} band menyempit (squeeze), tunggu breakout"
+    # --- Volman: setups ---
+    found, reasons = None, []
+    for tag, fn in VOLMAN_SETUPS:
+        if f"SETUP_{tag}" in OFF:
+            continue
+        r = fn(v, ev, a, i)
+        if r[0]:
+            found = r
+            break
+        reasons.append(f"{tag}: {r[1]}")
+    if not found:
+        return "Setup", f"{side} " + " | ".join(reasons)
+    tag, sl_struct_v, extra = found
 
     sig_hour = datetime.fromisoformat(iso(cs[i][0])).hour
     if sig_hour in BLOCK_HOURS:
         return "Diblokir", f"{side} jam UTC {sig_hour} diblokir (BLOCK_HOURS)"
 
-    # --- stop beyond the pullback extreme, cost gates ---
+    # --- stop order 1 tick beyond the signal bar; stop beyond the structure ---
+    tick = meta.get(inst, {}).get("tick", 0.00000001)
+    entry_v = v[i][2] + tick
+    risk = max(entry_v - sl_struct_v, SL_MIN_ATR * a)
+    if risk > MAX_SL_ATR * a:
+        return "SL/RR", f"{side} stop struktur {risk / a:.2f} ATR (maks {MAX_SL_ATR:g}), terlalu lebar"
+    sl_v = entry_v - risk
+    tp_v = entry_v + TARGET_RR * risk
     if up:
-        sl_raw = min(lows) - SL_ATR_BUFFER * a
-        risk = close - sl_raw
+        entry, sl, tp = entry_v, sl_v, tp_v
     else:
-        sl_raw = max(highs) + SL_ATR_BUFFER * a
-        risk = sl_raw - close
+        entry, sl, tp = -entry_v, -sl_v, -tp_v
+    entry, sl, tp = tick_round(entry, tick), tick_round(sl, tick), tick_round(tp, tick)
+    risk = abs(entry - sl)
     if risk <= 0:
         return "SL/RR", f"{side} SL tidak valid"
-
-    sl_atr = risk / a
-    if not MIN_SL_ATR <= sl_atr <= MAX_SL_ATR:
-        return "SL/RR", f"{side} SL {sl_atr:.2f} ATR (perlu {MIN_SL_ATR}-{MAX_SL_ATR})"
-
-    risk_pct = risk / close
+    risk_pct = risk / entry
     min_risk = MIN_RISK_PCT_BTC if (inst == REF_SYMBOL and MIN_RISK_PCT_BTC >= 0) else MIN_RISK_PCT
     if "MINRISK" not in OFF and risk_pct < min_risk:
         return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% (min {min_risk * 100:.2f}%, fee memakan R)"
     if MAX_RISK_PCT > 0 and risk_pct > MAX_RISK_PCT:
         return "SL/RR", f"{side} SL {risk_pct * 100:.2f}% terlalu jauh (maks {MAX_RISK_PCT * 100:.2f}%)"
 
-    # --- Bollinger target: room toward the opposite band (p.210) ---
-    room_r = ((bb_up - close) if up else (close - bb_lo)) / risk
-    if "BANDROOM" not in OFF and BB_MIN_R > 0 and room_r < BB_MIN_R:
-        return "Bollinger", f"{side} band hanya {room_r:.2f}R dari entry (min {BB_MIN_R:g}R)"
+    # --- Volman: do not break straight into an obstruction ---
+    res = max(v[j][2] for j in range(i - OBSTR_LOOKBACK, i - 2))
+    if "OBSTRUCTION" not in OFF and res > entry_v and (res - entry_v) < OBSTR_R * risk:
+        return "Obstruksi", f"{side} high sebelumnya hanya {(res - entry_v) / risk:.2f}R dari entry"
 
-    tp_raw = close + TARGET_RR * risk if up else close - TARGET_RR * risk
-    tick = meta.get(inst, {}).get("tick", 0.00000001)
-    entry = tick_round(close, tick)
-    sl = tick_round(sl_raw, tick)
-    tp = tick_round(tp_raw, tick)
+    # --- Murphy: room to the opposite MTF Bollinger band ---
+    room_r = ((ctx["bb_up"] - entry) if up else (entry - ctx["bb_lo"])) / risk
+    need_room = BB_MIN_R * (2.0 if DEFENSIVE[0] else 1.0)
+    if "BBROOM" not in OFF and BB_MIN_R > 0 and room_r < need_room:
+        return "Bollinger", f"{side} band {MTF_LBL} hanya {room_r:.2f}R dari entry (min {need_room:g}R)"
 
-    note = (
-        f"Murphy pullback {'UPTREND' if up else 'DOWNTREND'} | "
-        f"MA{MA_MID}/{MA_SLOW} + 1H {htf or '-'} | RSI {rs:.1f} (pullback {r_ext:.1f}) | "
-        f"Stoch K{k:.0f}/D{d:.0f} | MACD hist {hist:+.3g} | "
-        f"Vol {vr:.2f}x | Band {room_r:.2f}R"
-    )
+    note = (f"{STRUCT_NAME[tag]} ({extra}) | {HTF_LBL} {ctx['htf'] or '-'} · {MTF_LBL} {ctx['mtf'] or '-'} | "
+            f"RSI{MTF_LBL} {rsi_m:.0f} | EMA{EMA_N} searah | Band{MTF_LBL} {room_r:.2f}R")
 
     return {
-        "signal_id": f"{inst}|{side}|{cs[i][0]}|MURPHY",
+        "signal_id": f"{inst}|{side}|{cs[i][0]}|{tag}",
         "symbol": inst,
         "direction": side,
         "timeframe": TF,
         "setup": SETUP_ID,
+        "setup_tag": tag,
         "note": note,
         "signal_candle_time": cs[i][0],
         "signal_candle_iso": iso(cs[i][0]),
         "created_at": now(),
+        "order_type": "BUY STOP" if up else "SELL STOP",
         "entry": entry,
         "sl": sl,
         "tp": tp,
         "rr": TARGET_RR,
         "atr": a,
-        "sl_atr": sl_atr,
+        "sl_atr": risk / a,
         "ema50": 0.0,
         "ema200": 0.0,
-        "rsi": rs,
+        "rsi": rsi_m,
         "adx": 0.0,
-        "volume_ratio": vr,
-        "stoch_k": k,
-        "stoch_d": d,
-        "macd_hist": hist,
+        "volume_ratio": 0.0,
         "band_room_r": round(room_r, 2),
-        "htf": htf,
+        "htf": ctx["htf"],
         "rsi_deadzone": False,
-        "quality": round(min(vr, 3.0) + 0.5 * min(room_r, 3.0) + (1.0 if htf == want else 0.0), 2),
+        "quality": round(SETUP_PRIORITY[tag] + 0.5 * min(room_r, 3.0)
+                         + (1.0 if ctx["htf"] == want else 0.0), 2),
         "mode": "DEFENSIVE" if DEFENSIVE[0] else "NORMAL",
         "regime": "UPTREND" if up else "DOWNTREND",
-        "structure": "PULLBACK",
+        "structure": STRUCT_NAME[tag],
         "bos": "NONE",
-        "pullback": round(r_ext, 1),
+        "pullback": 0.0,
         "score": None,
         "score_reasons": [],
         "risk_usdt": ACCOUNT_EQUITY * RISK_PER_TRADE,
-        "status": "OPEN",
+        "status": "PENDING",
         "exit_price": None,
         "exit_time": None,
         "result_r": None,
@@ -765,18 +780,12 @@ def _murphy_attempt(inst, cs, meta, ind, htf, side):
         "monitor_tf_ms": TF_MS,
     }
 
-def build_murphy_pullback(inst, cs, meta):
+def build_signal(inst, cs, meta):
     """
-    15m Murphy pullback scalp on the LAST candle of `cs`, both directions:
-      1. Trend      MA9 > MA18, MA18 rising, price above MA18 (+ 1H trend agrees)
-      2. Pullback   low touches MA9 within PULL_N bars, closes hold above MA18
-      3. Trigger    close back above a rising MA4 on a bullish candle
-      4. RSI        pullback low between 35 and 55
-      5. Stochastic %K crosses above %D (within STOCH_LOOKBACK candles) after being <= 40
-      6. MACD       histogram rising
-      7. Volume     >= average
-      8. Bollinger  no squeeze; opposite band at least BB_MIN_R away
-      Entry = close, SL beyond the pullback extreme, TP at TARGET_RR. SHORT mirrors.
+    Murphy x Volman on the LAST closed entry-frame bar of `cs` (both directions).
+      Murphy (HTF/MTF): HTF + MTF trend (MA9/MA18), MTF RSI not extreme, MTF band room.
+      Volman (LTF): EMA25 dominance, then pullback reversal / pattern break / combi.
+    Output is a PENDING stop order 1 tick beyond the signal bar.
     """
     global CUR_SETUP
     CUR_SETUP = SETUP_ID
@@ -784,31 +793,55 @@ def build_murphy_pullback(inst, cs, meta):
     if len(cs) < MIN_BARS:
         return _rej(inst, "Candle sedikit", f"hanya {len(cs)} candle (min {MIN_BARS})")
 
-    ind = murphy_indicators(cs)
-    if ind["atr"][-1] is None or ind["rsi"][-1] is None:
-        return _rej(inst, "Data", "indikator belum siap")
+    ctx = murphy_context(cs)
+    a = atr(cs, ATR_PERIOD)[-1]
+    if not ctx["ok"] or a is None or a <= 0:
+        return _rej(inst, "Data", f"konteks {MTF_LBL}/{HTF_LBL} atau ATR belum siap")
+    ema = ema_list([x[4] for x in cs], EMA_N)
 
-    htf = htf_state(cs)
     best = None
     for side in ("LONG", "SHORT"):
-        res = _murphy_attempt(inst, cs, meta, ind, htf, side)
+        res = _attempt(inst, cs, meta, ctx, ema, a, side)
         if isinstance(res, dict):
             return res
         stage, detail = res
         depth = STAGES.index(stage)
         if best is None or depth > best[0]:
             best = (depth, stage, detail)
-
     return _rej(inst, best[1], best[2])
 
 # ================= BACKTEST (same engine as live) =================
 
+BT = {"signals": 0, "cancel": 0}
+
 def _simulate(cs, k, s):
-    """Walk forward from candle k+1 exactly like monitor(): SL first when one bar touches both."""
+    """
+    Mirror of monitor() on entry-frame bars. Returns (end_index, kind, r) with kind in
+    WIN / LOSS / TIME / CANCEL, or None when the data ends before the trade resolves.
+    Conservative: a bar that triggers the entry AND touches the stop = loss; the TP is
+    never counted on the trigger bar; SL first when a bar touches both.
+    """
     entry, sl, tp = s["entry"], s["sl"], s["tp"]
     long_ = s["direction"] == "LONG"
-    end = min(len(cs), k + 1 + BT_MAX_HOLD)
-    for j in range(k + 1, end):
+    n = len(cs)
+    if k + PENDING_BARS >= n:
+        return None
+    fill = None
+    for j in range(k + 1, k + 1 + PENDING_BARS):
+        hi, lo = cs[j][2], cs[j][3]
+        trig = hi >= entry if long_ else lo <= entry
+        inval = lo <= sl if long_ else hi >= sl
+        if trig:
+            if inval:
+                return j, "LOSS", -1.0
+            fill = j
+            break
+        if inval:
+            return j, "CANCEL", 0.0
+    if fill is None:
+        return k + PENDING_BARS, "CANCEL", 0.0
+    end = n if MAX_HOLD_BARS <= 0 else min(n, fill + 1 + MAX_HOLD_BARS)
+    for j in range(fill + 1, end):
         hi, lo = cs[j][2], cs[j][3]
         hit_sl = lo <= sl if long_ else hi >= sl
         hit_tp = hi >= tp if long_ else lo <= tp
@@ -816,10 +849,10 @@ def _simulate(cs, k, s):
             return j, "LOSS", -1.0
         if hit_tp:
             return j, "WIN", float(s["rr"])
-    if end >= len(cs):
-        return None                      # still open at the end of the data
-    p = cs[end - 1][4]
-    return end - 1, ("WIN" if float_r(s, p) > 0 else "LOSS"), float_r(s, p)
+    if end >= n:
+        return None
+    r = float_r(s, cs[end - 1][4])
+    return end - 1, "TIME", r
 
 def backtest_series(inst, cs, meta=None):
     meta = meta or {}
@@ -830,16 +863,23 @@ def backtest_series(inst, cs, meta=None):
             k += 1
             continue
         window = cs[max(0, k - HISTORY_BARS + 1):k + 1]
-        s = build_murphy_pullback(inst, window, meta)
+        s = build_signal(inst, window, meta)
         if not s:
             k += 1
             continue
         res = _simulate(cs, k, s)
         if res is None:
             break
-        j, result, r = res
+        j, kind, r = res
+        BT["signals"] += 1
+        if kind == "CANCEL":
+            BT["cancel"] += 1
+            busy_until = j
+            k += 1
+            continue
         t = dict(s)
-        t.update({"status": "CLOSED", "exit_time": iso(cs[j][0]), "result": result, "result_r": r})
+        t.update({"status": "CLOSED", "exit_time": iso(cs[j][0]),
+                  "result": "WIN" if r > 0 else "LOSS", "result_r": r, "exit_kind": kind})
         trades.append(t)
         busy_until = j + cooldown_bars
         k += 1
@@ -863,29 +903,32 @@ def bt_report(name, trades):
     avg_rr = sum(float(t["rr"]) for t in trades) / len(trades)
     bep_net = 100 * (1 + sum(fees) / len(trades)) / (1 + avg_rr)
     longs = sum(1 for t in trades if t["direction"] == "LONG")
+    tags = {}
+    for t in trades:
+        tags[t["setup_tag"]] = tags.get(t["setup_tag"], 0) + 1
     print(
-        f"{name}: {len(trades)} trade ({longs} long / {len(trades) - longs} short) | "
+        f"{name}: {len(trades)} trade ({longs} long / {len(trades) - longs} short) {tags} | "
         f"WR {wins / len(trades) * 100:.1f}% (BEP net {bep_net:.1f}%) | "
         f"R gross {sum(r):+.2f} | net {net:+.2f} | avg net {net / len(trades):+.3f}R | "
         f"PF {gp / gl if gl else float('inf'):.2f} | MaxDD net -{dd:.2f}R"
     )
 
 def synthetic_candles(n=12000, seed=7):
-    """OKX-style candles [ts,o,h,l,c,v] with trend / range regimes, for offline selftest."""
+    """OKX-style 5m candles [ts,o,h,l,c,v] with trend / range regimes, for offline selftest."""
     import random
     rng = random.Random(seed)
     ts0 = int(datetime(2026, 1, 1, tzinfo=timezone.utc).timestamp() * 1000)
     drift, left, price, out = 0.0, 0, 100.0, []
     for i in range(n):
         if left <= 0:
-            left = rng.randint(150, 600)
-            drift = rng.choice([-1, 0, 1]) * 0.00025
+            left = rng.randint(200, 800)
+            drift = rng.choice([-1, 0, 1]) * 0.00012
         left -= 1
-        ret = drift + rng.gauss(0, 0.0025)
+        ret = drift + rng.gauss(0, 0.0015)
         o, c = price, price * math.exp(ret)
-        hi = max(o, c) + abs(rng.gauss(0, 0.0015)) * c
-        lo = min(o, c) - abs(rng.gauss(0, 0.0015)) * c
-        vol = rng.lognormvariate(5, 0.5) * (1 + 3 * abs(ret) / 0.0025)
+        hi = max(o, c) + abs(rng.gauss(0, 0.0009)) * c
+        lo = min(o, c) - abs(rng.gauss(0, 0.0009)) * c
+        vol = rng.lognormvariate(5, 0.5) * (1 + 3 * abs(ret) / 0.0015)
         out.append([ts0 + i * TF_MS, o, hi, lo, c, vol])
         price = c
     return out
@@ -899,13 +942,16 @@ def run_backtest(insts, bars):
         if len(cs) < MIN_BARS + 10:
             print(f"{inst}: data kurang ({len(cs)} candle)")
             continue
+        BT["signals"] = BT["cancel"] = 0
         t = backtest_series(inst, cs, meta)
         allt += t
         bt_report(f"{inst} [{iso(cs[0][0])[:10]} -> {iso(cs[-1][0])[:10]}]", t)
+        print(f"   sinyal {BT['signals']} | pending batal {BT['cancel']} | terisi {len(t)}")
     if len(insts) > 1:
         bt_report("GABUNGAN", allt)
 
-ABLATION_FILTERS = ["HTF", "PULLBACK", "MA4", "RSI", "STOCH", "MACD", "VOLUME", "SQUEEZE", "BANDROOM", "MINRISK"]
+ABLATION_FILTERS = ["HTF", "MTF", "RSIMTF", "DOMINANCE", "SETUP_PB", "SETUP_PATTERN",
+                    "SETUP_COMBI", "OBSTRUCTION", "BBROOM", "MINRISK"]
 
 def _ablation_job(args):
     name, off, data = args
@@ -929,7 +975,7 @@ def _abl_stats(rows):
     return n, wr, sum(net), sum(net) / n, (gp / gl if gl else float("inf"))
 
 def run_ablation(insts, bars, synthetic=False):
-    """Backtest with every filter switched off one at a time (all others stay on)."""
+    """Backtest with every filter / setup switched off one at a time (all others stay on)."""
     if synthetic:
         data = {f"SYN{sd}": synthetic_candles(bars, sd) for sd in (7, 11, 23)}
     else:
@@ -957,7 +1003,7 @@ def run_ablation(insts, bars, synthetic=False):
         results = dict(_ablation_job(x) for x in payload)
 
     base = _abl_stats(results[jobs[0][0]])
-    print(f"\nAblation: {len(data)} pair x {bars} candle 15m | fee {FEE_PER_SIDE * 100:.2f}%/sisi | RR 1:{TARGET_RR}")
+    print(f"\nAblation: {len(data)} pair x {bars} candle {TF} | fee {FEE_PER_SIDE * 100:.2f}%/sisi | RR 1:{TARGET_RR}")
     print(f"{'Konfigurasi':<24}{'Trade':>6}{'WR%':>7}{'Net R':>8}{'Avg R':>8}{'PF':>6}")
     reliable = base[0] >= 60
     for name, _ in jobs:
@@ -972,20 +1018,23 @@ def run_ablation(insts, bars, synthetic=False):
             else:
                 mark = "  <- beda tidak jelas"
         print(f"{name:<24}{n:>6}{wr:>7.1f}{tot:>+8.2f}{avg:>+8.3f}{pf_t:>6}{mark}")
+    print("\nCatatan: baris 'tanpa SETUP_x' = setup itu dimatikan; baris lain = filter dilonggarkan.")
     if not reliable:
-        print(f"\nPERINGATAN: baseline hanya {base[0]} trade (<60). Selisih antar baris masih noise, "
+        print(f"PERINGATAN: baseline hanya {base[0]} trade (<60). Selisih antar baris masih noise, "
               "jangan ambil keputusan. Tambah pair atau --bars.")
     else:
-        print("\nCatatan: tanda di kanan indikatif (ambang selisih 0,05R). Dengan <200 trade, "
+        print("Tanda di kanan indikatif (ambang selisih 0,05R). Dengan <200 trade, "
               "selisih sekecil itu masih bisa noise.")
 
 def run_selftest():
     QUIET[0] = True
     allt = []
     for seed in (7, 11, 23):
+        BT["signals"] = BT["cancel"] = 0
         t = backtest_series("SYNTH-USDT-SWAP", synthetic_candles(12000, seed))
         allt += t
         bt_report(f"synthetic seed {seed}", t)
+        print(f"   sinyal {BT['signals']} | pending batal {BT['cancel']} | terisi {len(t)}")
     bt_report("TOTAL", allt)
     print("Selftest selesai: kode jalan. Angka di atas dari data acak, BUKAN bukti edge.")
 
@@ -1017,9 +1066,20 @@ def n_open(h):
 
 # ================= MONITOR =================
 
+FILL_EVENTS = []   # pending orders that became OPEN during this run (announced by check_open)
+
 def monitor(trade):
-    # Entry = close of the signal candle: monitoring starts when that candle ENDS.
-    start = trade.get("signal_candle_time", 0) + TF_MS
+    """
+    Walk 1m candles after the signal bar.
+      PENDING : stop order 1 tick beyond the signal bar. Filled when price trades through it;
+                cancelled when not filled within PENDING_BARS signal bars, or when price
+                reaches the stop level first.
+      OPEN    : SL / TP (SL first when one candle touches both), time stop after MAX_HOLD_BARS.
+    A candle that fills the order AND touches the stop counts as a loss (conservative);
+    the TP is never counted on the fill candle.
+    """
+    tf_ms = trade.get("monitor_tf_ms", TF_MS)   # frame the signal was created on
+    start = trade.get("signal_candle_time", 0) + tf_ms
     mon_tf, mon_ms = MONITOR_TF, MONITOR_MS
 
     age_ms = max(0, int(time.time() * 1000) - start)
@@ -1036,47 +1096,71 @@ def monitor(trade):
     if not cs:
         return None
 
+    long_ = trade["direction"] == "LONG"
+    entry, sl, tp = trade["entry"], trade["sl"], trade["tp"]
+    pending = trade.get("status") == "PENDING"
+    expiry = start + PENDING_BARS * tf_ms
+
+    def finish(c, exit_price, r, result):
+        t = dict(trade)
+        t.update({"status": "CLOSED", "exit_price": exit_price, "exit_time": iso(c[0]),
+                  "result_r": r, "result": result})
+        return t
+
+    def cancel(c, why):
+        t = dict(trade)
+        t.update({"status": "CANCELLED", "exit_price": None, "exit_time": iso(c[0]),
+                  "result_r": 0.0, "result": why})
+        return t
+
     for c in [x for x in cs if x[0] >= start]:
         hi, lo = c[2], c[3]
-        sl, tp = trade["sl"], trade["tp"]
 
-        if trade["direction"] == "LONG":
-            hit_sl, hit_tp = lo <= sl, hi >= tp
-        else:
-            hit_sl, hit_tp = hi >= sl, lo <= tp
-
-        # Same monitor candle touches both: conservative SL first.
-        if hit_sl and hit_tp:
-            exit_price, r, result = sl, -1.0, "LOSS"
-        elif hit_tp:
-            exit_price, r, result = tp, float(trade.get("rr", RR)), "WIN"
-        elif hit_sl:
-            exit_price, r, result = sl, -1.0, "LOSS"
-        else:
+        if pending:
+            if c[0] >= expiry:
+                return cancel(c, "EXPIRED")
+            trig = hi >= entry if long_ else lo <= entry
+            inval = lo <= sl if long_ else hi >= sl
+            if trig:
+                trade["status"] = "OPEN"
+                trade["entry_ts"] = c[0]
+                trade["entry_time"] = iso(c[0])
+                pending = False
+                FILL_EVENTS.append(dict(trade))
+                if inval:                      # filled and stopped inside the same candle
+                    return finish(c, sl, -1.0, "LOSS")
+                continue
+            if inval:
+                return cancel(c, "INVALID")
             continue
 
-        t = dict(trade)
-        t.update({
-            "status": "CLOSED",
-            "exit_price": exit_price,
-            "exit_time": iso(c[0]),
-            "result_r": r,
-            "result": result
-        })
-        return t
+        hit_sl = lo <= sl if long_ else hi >= sl
+        hit_tp = hi >= tp if long_ else lo <= tp
+        if hit_sl and hit_tp:
+            return finish(c, sl, -1.0, "LOSS")
+        if hit_tp:
+            return finish(c, tp, float(trade.get("rr", RR)), "WIN")
+        if hit_sl:
+            return finish(c, sl, -1.0, "LOSS")
+
+        ets = trade.get("entry_ts")
+        if ets and MAX_HOLD_BARS > 0 and c[0] + mon_ms >= ets + MAX_HOLD_BARS * tf_ms:
+            r = float_r(trade, c[4])
+            return finish(c, c[4], r, "WIN" if r > 0 else "LOSS")
     return None
 
 def check_open(h):
     if not h["open"]:
         return 0
 
-    remain, closed = [], []
+    FILL_EVENTS.clear()
+    remain, closed, cancelled = [], [], []
 
     for t in h["open"]:
         try:
             result = monitor(t)
             if result:
-                closed.append(result)
+                (cancelled if result.get("status") == "CANCELLED" else closed).append(result)
             else:
                 remain.append(t)
         except Exception as e:
@@ -1089,7 +1173,25 @@ def check_open(h):
         legacy = [x for x in closed if x.get("setup") != SETUP_ID]
         if legacy:
             h.setdefault("archive", []).extend(dict(x, archived_from="open") for x in legacy)
+    if cancelled:
+        h["cancelled"] = (h.get("cancelled", []) + cancelled)[-300:]
+    if closed or cancelled or FILL_EVENTS:
         save_history(h)
+
+    for t in FILL_EVENTS:
+        tg(
+            f"<b>🔔 ORDER TERISI</b>\n"
+            f"<b>{t['symbol']}</b> {t['direction']} @ <code>{t['entry']}</code>\n"
+            f"SL <code>{t['sl']}</code> | TP <code>{t['tp']}</code>"
+        )
+
+    for t in cancelled:
+        why = "tidak terisi dalam batas waktu" if t["result"] == "EXPIRED" else "SL tersentuh sebelum terisi"
+        tg(
+            f"<b>❎ ORDER BATAL</b>\n"
+            f"<b>{t['symbol']}</b> {t['direction']} @ <code>{t['entry']}</code>\n"
+            f"Alasan: {why}"
+        )
 
     for t in closed:
         emoji = "✅" if t["result"] == "WIN" else "❌"
@@ -1117,12 +1219,14 @@ def float_r(t, p):
             else (t["entry"]-p)/risk)
 
 def running_report(h):
-    if not h["open"]:
+    live = [t for t in h["open"] if t.get("status") != "PENDING"]
+    n_pend = len(h["open"]) - len(live)
+    if not live:
         return
 
     blocks, rs = [], []
 
-    for t in h["open"]:
+    for t in live:
         p = price(t["symbol"])
         if p is None:
             continue
@@ -1147,15 +1251,15 @@ def running_report(h):
         "━━━━━━━━━━━━━━━━━━\n\n" +
         "\n\n".join(blocks) +
         "\n\n━━━━━━━━━━━━━━━━━━\n"
-        f"Open Positions : {len(h['open'])}\n"
+        f"Open Positions : {len(live)} (+{n_pend} pending)\n"
         f"Profitable     : {sum(x > 0 for x in rs)}\n"
         f"Negative       : {sum(x < 0 for x in rs)}\n"
         f"Floating R     : <b>{total:+.2f}R</b>\n"
         f"Average Float  : {avg:+.2f}R\n"
         f"Best           : {max(rs):+.2f}R\n"
         f"Worst          : {min(rs):+.2f}R\n\n"
-        f"TP Potential   : +{sum(float(x.get('rr', RR)) for x in h['open']):.2f}R\n"
-        f"SL Exposure    : -{len(h['open']):.2f}R\n\n"
+        f"TP Potential   : +{sum(float(x.get('rr', RR)) for x in live):.2f}R\n"
+        f"SL Exposure    : -{len(live):.2f}R\n\n"
         "⚠️ Floating R is unrealized."
     )
 
@@ -1224,24 +1328,25 @@ def signal_message(s):
     risk_pct = (risk / s["entry"] * 100) if s["entry"] else 0.0
 
     head = (
-        f"{s['timeframe']} | <b>{SETUP_NAME.get(setup, setup)}</b>\n"
-        f"Structure: {s.get('structure', '-')} · Regime: {s.get('regime', '-')}\n"
+        f"{s['timeframe']} | <b>{SETUP_NAME.get(setup, setup)}</b> · {s.get('structure', '-')}\n"
         f"{_safe(s.get('note', ''))}\n\n"
     )
 
     return (
-        "<b>🚨 ALPHAQUANT MURPHY V6.0 SIGNAL</b>\n"
+        "<b>🚨 ALPHAQUANT MURPHY x VOLMAN V7.0 SIGNAL</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"<b>{s['symbol']}</b> · <b>{s['direction']}</b>\n" +
         head +
         "<b>TRADE PLAN</b>\n"
-        f"Entry: <code>{s['entry']}</code>\n"
+        f"Order: <b>{s.get('order_type', 'MARKET')}</b> @ <code>{s['entry']}</code>\n"
         f"SL: <code>{s['sl']}</code>\n"
         f"TP: <code>{s['tp']}</code>\n"
         f"RR: <b>1:{float(s.get('rr', RR)):.2f}</b>\n"
         f"SL: {s['sl_atr']:.2f} ATR · {risk_pct:.2f}% harga\n"
         f"Fee ≈ {fee_r:.2f}R (taker {FEE_PER_SIDE * 100:.2f}%/sisi)\n\n"
-        f"RSI: {s['rsi']:.2f} | Volume: {s['volume_ratio']:.2f}x\n"
+        f"Batal bila belum terisi dalam {PENDING_BARS} candle {TF}, atau SL tersentuh lebih dulu.\n"
+        f"Time stop {MAX_HOLD_BARS * TF_MIN / 60:g} jam setelah terisi.\n\n"
+        f"RSI {MTF_LBL}: {s['rsi']:.0f} | {HTF_LBL}: {s.get('htf') or '-'}\n"
         f"Risk: {s['risk_usdt']:.2f} USDT\n"
         "━━━━━━━━━━━━━━━━━━\n"
         "⚠️ SIGNAL ONLY — NO AUTO EXECUTION\n"
@@ -1261,7 +1366,7 @@ def _tally(h, scanned, created, rows):
 
     for (_, stage), items in rows.items():
         d["stages"][stage] = d["stages"].get(stage, 0) + len(items)
-        if stage in STAGES and stage not in ("Data", "Candle sedikit", "Candle telat", "Tren", "HTF"):
+        if stage in STAGES and stage not in ("Data", "Candle sedikit", "Candle telat", ST_HTF, ST_MTF, ST_RSI):
             depth = STAGES.index(stage)
             for inst, detail in items:
                 d["near"].append({"depth": depth, "text": f"{inst} → {stage}: {detail}"})
@@ -1275,9 +1380,9 @@ def scan_report_text(h):
         return ""
     parts_ = [f"{st} {d['stages'][st]}" for st in STAGES + ["Error"] if d["stages"].get(st)]
     text = (
-        "<b>⚡ MURPHY PULLBACK · SCAN REPORT</b>\n"
+        "<b>⚡ MURPHY x VOLMAN · SCAN REPORT</b>\n"
         "━━━━━━━━━━━━━━━━━━\n"
-        f"Scan         : {d['scans']} candle 15m\n"
+        f"Scan         : {d['scans']} candle {TF}\n"
         f"Pair dicek   : {d['pairs']}\n"
         f"Sinyal baru  : {d['signals']}\n\n"
         "<b>Gugur di filter</b> (filter pertama yang gagal)\n" +
@@ -1299,7 +1404,7 @@ def market_mode(h):
 
 def scan_murphy(h):
     """
-    Scan the top pairs for a Murphy pullback scalp on every NEW 15m candle.
+    Scan the top pairs for a Murphy x Volman scalp on every NEW 5m candle.
     Returns the number of new signals.
     """
     global CUR_SETUP
@@ -1360,12 +1465,16 @@ def scan_murphy(h):
                 _rej(inst, "Candle sedikit", f"hanya {len(cs)} candle (min {MIN_BARS})")
                 continue
 
+            # A slow scan can straddle a candle boundary: pairs fetched after it already have a
+            # newer candle. Cut every pair back to the reference candle so all use the same bar.
+            if ref is not None:
+                cs = [x for x in cs if x[0] <= ref]
             # Stale data (no trades in the latest bar): never signal on an old candle.
-            if ref is not None and cs[-1][0] != ref:
+            if not cs or (ref is not None and cs[-1][0] != ref):
                 _rej(inst, "Candle telat", "candle terakhir tidak sinkron dengan acuan BTC")
                 continue
 
-            s = build_murphy_pullback(inst, cs, meta)
+            s = build_signal(inst, cs, meta)
             if not s:
                 continue
 
@@ -1420,7 +1529,7 @@ def main():
     global TELEGRAM
 
     log.info("==========================================")
-    log.info("ALPHAQUANT MURPHY V6.0 STARTING")
+    log.info("ALPHAQUANT MURPHY x VOLMAN V7.0 STARTING")
     log.info("==========================================")
 
     if not TOKEN or not CHAT_ID:
@@ -1455,20 +1564,20 @@ def main():
     )
 
     log.info(
-        "Build MURPHY-6.0b | STOCH_LOOKBACK=%s | HTF=%s | BB_MIN_R=%s | VOL>=%.2fx | "
-        "BLOCK_HOURS=%s | PULL_N=%s",
-        STOCH_LOOKBACK, "ON" if HTF_FILTER else "OFF", BB_MIN_R, MIN_VOLUME_RATIO,
-        sorted(BLOCK_HOURS) or "-", PULL_N
+        "Build MURPHY-VOLMAN-7.0 | HTF=%s | PB retr %.0f-%.0f%% | cluster<=%.1fATR | "
+        "PENDING_BARS=%s | MAX_HOLD_BARS=%s | MaxSL=%.1fATR | BB_MIN_R=%s",
+        "ON" if HTF_FILTER else "OFF", PB_MIN_RETR * 100, PB_MAX_RETR * 100, CLUSTER_MAX_ATR,
+        PENDING_BARS, MAX_HOLD_BARS, MAX_SL_ATR, BB_MIN_R
     )
 
     today = datetime.now(timezone.utc).date().isoformat()
     if TELEGRAM and h.get("last_online_day") != today:
         h["last_online_day"] = today
         tg(
-            "<b>🟢 ALPHAQUANT MURPHY V6.0 ONLINE</b>\n"
+            "<b>🟢 ALPHAQUANT MURPHY x VOLMAN V7.0 ONLINE</b>\n"
             "━━━━━━━━━━━━━━━━━━\n"
-            f"Murphy Pullback 15m · top {TOP_PAIRS} pair\n"
-            "MA 4-9-18 · RSI · Stochastic · MACD · Bollinger · Volume\n"
+            f"Murphy x Volman {TF} · top {TOP_PAIRS} pair\n"
+            f"{HTF_LBL}/{MTF_LBL} trend (Murphy) · {TF} pullback reversal / pattern break / combi (Volman)\n"
             f"Maks {MAX_OPEN} posisi ({MAX_ACTIVE_PER_DIRECTION} per arah, "
             f"{MAX_NEW_PER_CANDLE} baru per candle) · SL min {MIN_RISK_PCT * 100:.2f}% harga\n"
             "Signal-only"
@@ -1540,5 +1649,3 @@ if __name__ == "__main__":
         run_backtest(args or [REF_SYMBOL], bars)
     else:
         main()
-
-
