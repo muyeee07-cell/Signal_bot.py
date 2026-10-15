@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792104300000,
+  "last_scan_candle": 1792106100000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1792092279.545777,
+  "last_report_ts": 1792107579.0006573,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8618,36 +8618,21 @@
     }
   ],
   "scan_rej": {
-    "scans": 9,
-    "pairs": 896,
-    "signals": 2,
+    "scans": 1,
+    "pairs": 100,
+    "signals": 0,
     "stages": {
-      "Murphy 1H": 575,
-      "Murphy 4H": 225,
-      "Dominasi": 16,
-      "Setup": 44,
-      "RSI 1H": 2,
-      "Obstruksi": 4,
-      "SL/RR": 3,
-      "Murphy 15m": 22,
-      "RSI15": 3
+      "Murphy 1H": 63,
+      "Murphy 4H": 27,
+      "Murphy 15m": 6,
+      "Obstruksi": 1,
+      "RSI15": 1,
+      "Setup": 2
     },
     "near": [
       {
         "depth": 13,
-        "text": "SOPH-USDT-SWAP → Obstruksi: SHORT swing high hanya 0.08R di depan entry"
-      },
-      {
-        "depth": 13,
-        "text": "APR-USDT-SWAP → Obstruksi: SHORT level bulat hanya 0.62R di depan entry"
-      },
-      {
-        "depth": 13,
-        "text": "SOPH-USDT-SWAP → Obstruksi: SHORT level bulat hanya 0.50R di depan entry"
-      },
-      {
-        "depth": 12,
-        "text": "SOPH-USDT-SWAP → SL/RR: SHORT stop struktur 2.51 ATR (maks 2), terlalu lebar"
+        "text": "BLUR-USDT-SWAP → Obstruksi: SHORT swing high hanya 0.08R di depan entry"
       },
       {
         "depth": 10,
@@ -8655,7 +8640,7 @@
       },
       {
         "depth": 10,
-        "text": "PYTH-USDT-SWAP → Setup: LONG PB: tanpa technical test (EMA / S-R / level bulat) | PBP: retest gagal (close kembali ke dalam pattern) | FLAG: pole kecil | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
+        "text": "APR-USDT-SWAP → Setup: SHORT PB: retrace 11% (min 33%) | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 4.5 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       }
     ]
   },
