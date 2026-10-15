@@ -1,5 +1,48 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "CORE-USDT-SWAP|SHORT|1792050300000|PB",
+      "symbol": "CORE-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PB",
+      "note": "PULLBACK_REVERSAL (retrace 69%) | 4H DOWN · 1H DOWN | RSI1H 37 | EMA25 searah | Band1H 0.86R",
+      "signal_candle_time": 1792050300000,
+      "signal_candle_iso": "2026-10-15T07:45:00+00:00",
+      "created_at": "2026-10-15T08:15:02.233493+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.01787,
+      "sl": 0.01812,
+      "tp": 0.01742,
+      "rr": 1.75,
+      "atr": 0.00014766914514801563,
+      "sl_atr": 1.6929738419587492,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 36.85389107419541,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 0.86,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 2.93,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PULLBACK_REVERSAL",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "PENDING",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "SOPH-USDT-SWAP|SHORT|1792041300000|PATTERN",
@@ -46,7 +89,7 @@
       "entry_time": "2026-10-15T05:31:00+00:00"
     }
   ],
-  "last_scan_candle": 1792048500000,
+  "last_scan_candle": 1792050300000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8258,16 +8301,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 199,
-    "signals": 0,
+    "scans": 3,
+    "pairs": 299,
+    "signals": 1,
     "stages": {
-      "RSI 1H": 63,
-      "Murphy 4H": 16,
-      "Setup": 84,
-      "Murphy 1H": 23,
-      "SL/RR": 5,
-      "Dominasi": 8
+      "RSI 1H": 69,
+      "Murphy 4H": 26,
+      "Setup": 136,
+      "Murphy 1H": 32,
+      "SL/RR": 11,
+      "Dominasi": 24
     },
     "near": [
       {
@@ -8291,8 +8334,8 @@
         "text": "AEON-USDT-SWAP → SL/RR: SHORT SL 1.69% terlalu jauh (maks 1.50%)"
       },
       {
-        "depth": 7,
-        "text": "SHIB-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PATTERN: cluster 2.3 ATR (maks 2.2) | COMBI: tidak ada powerbar"
+        "depth": 8,
+        "text": "W-USDT-SWAP → SL/RR: SHORT stop struktur 3.31 ATR (maks 2), terlalu lebar"
       }
     ]
   }
