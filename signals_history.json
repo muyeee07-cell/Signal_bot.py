@@ -267,7 +267,7 @@
       "entry_time": "2026-10-15T12:08:00+00:00"
     }
   ],
-  "last_scan_candle": 1792069200000,
+  "last_scan_candle": 1792071000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8479,16 +8479,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 5,
-    "pairs": 484,
+    "scans": 6,
+    "pairs": 583,
     "signals": 3,
     "stages": {
-      "Setup": 204,
-      "RSI 1H": 28,
-      "Murphy 1H": 73,
-      "Dominasi": 118,
+      "Setup": 253,
+      "RSI 1H": 33,
+      "Murphy 1H": 86,
+      "Dominasi": 140,
       "SL/RR": 7,
-      "Murphy 4H": 49,
+      "Murphy 4H": 59,
       "Bollinger": 1,
       "Diblokir": 1
     },
