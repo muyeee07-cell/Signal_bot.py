@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792035900000,
+  "last_scan_candle": 1792038600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8213,16 +8213,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 3,
-    "pairs": 300,
+    "scans": 4,
+    "pairs": 400,
     "signals": 0,
     "stages": {
-      "MA4": 180,
-      "HTF": 35,
-      "Tren": 24,
-      "Pullback": 9,
-      "RSI": 17,
-      "Stochastic": 2,
+      "MA4": 235,
+      "HTF": 39,
+      "Tren": 62,
+      "Pullback": 10,
+      "RSI": 18,
+      "Stochastic": 3,
       "SL/RR": 1,
       "Candle telat": 32
     },
@@ -8240,16 +8240,16 @@
         "text": "BASED-USDT-SWAP → Stochastic: SHORT K 54/D 56 belum cross dari zona ekstrem (dalam 3 candle)"
       },
       {
+        "depth": 8,
+        "text": "ZK-USDT-SWAP → Stochastic: LONG K 92/D 83 belum cross dari zona ekstrem (dalam 3 candle)"
+      },
+      {
         "depth": 7,
         "text": "HUMA-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.6 di luar zona"
       },
       {
         "depth": 7,
         "text": "PUMP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.1 di luar zona"
-      },
-      {
-        "depth": 7,
-        "text": "BOME-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 33.3 di luar zona"
       }
     ]
   }
