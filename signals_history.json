@@ -35,12 +35,14 @@
       "score": null,
       "score_reasons": [],
       "risk_usdt": 4.0,
-      "status": "PENDING",
+      "status": "OPEN",
       "exit_price": null,
       "exit_time": null,
       "result_r": null,
       "result": null,
-      "monitor_tf_ms": 900000
+      "monitor_tf_ms": 900000,
+      "entry_ts": 1792093920000,
+      "entry_time": "2026-10-15T19:52:00+00:00"
     }
   ],
   "closed": [
@@ -353,7 +355,7 @@
       "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792092600000,
+  "last_scan_candle": 1792094400000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8565,17 +8567,17 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 200,
+    "scans": 3,
+    "pairs": 299,
     "signals": 1,
     "stages": {
-      "Murphy 1H": 139,
-      "Murphy 4H": 35,
-      "Dominasi": 9,
-      "Setup": 12,
+      "Murphy 1H": 202,
+      "Murphy 4H": 61,
+      "Dominasi": 11,
+      "Setup": 19,
       "RSI 1H": 2,
       "Obstruksi": 1,
-      "SL/RR": 1
+      "SL/RR": 2
     },
     "near": [
       {
@@ -8585,6 +8587,10 @@
       {
         "depth": 8,
         "text": "PYTH-USDT-SWAP → SL/RR: LONG stop struktur 2.25 ATR (maks 2), terlalu lebar"
+      },
+      {
+        "depth": 8,
+        "text": "PYTH-USDT-SWAP → SL/RR: LONG stop struktur 2.04 ATR (maks 2), terlalu lebar"
       },
       {
         "depth": 7,
@@ -8597,10 +8603,6 @@
       {
         "depth": 7,
         "text": "SOPH-USDT-SWAP → Setup: SHORT PB: retrace 83% terlalu dalam | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "MUBARAK-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
       }
     ]
   },
