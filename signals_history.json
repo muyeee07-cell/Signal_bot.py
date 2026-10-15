@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792026900000,
+  "last_scan_candle": 1792028700000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8213,18 +8213,18 @@
     }
   ],
   "scan_rej": {
-    "scans": 6,
-    "pairs": 600,
+    "scans": 7,
+    "pairs": 700,
     "signals": 0,
     "stages": {
-      "HTF": 256,
-      "Tren": 228,
-      "RSI": 18,
-      "MA4": 41,
-      "Stochastic": 41,
+      "HTF": 274,
+      "Tren": 249,
+      "RSI": 43,
+      "MA4": 47,
+      "Stochastic": 69,
       "Volume": 4,
-      "Bollinger": 3,
-      "Pullback": 9
+      "Bollinger": 4,
+      "Pullback": 10
     },
     "near": [
       {
@@ -8240,16 +8240,16 @@
         "text": "SPACE-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
       },
       {
+        "depth": 11,
+        "text": "XPL-USDT-SWAP → Bollinger: SHORT band hanya -0.14R dari entry (min 0.5R)"
+      },
+      {
         "depth": 10,
         "text": "ADA-USDT-SWAP → Volume: SHORT volume 0.62x (min 1.00x)"
       },
       {
         "depth": 10,
         "text": "ANIME-USDT-SWAP → Volume: SHORT volume 0.66x (min 1.00x)"
-      },
-      {
-        "depth": 10,
-        "text": "XLM-USDT-SWAP → Volume: SHORT volume 0.98x (min 1.00x)"
       }
     ]
   }
