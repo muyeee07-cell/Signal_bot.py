@@ -1,7 +1,50 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "SOPH-USDT-SWAP|SHORT|1792041300000|PATTERN",
+      "symbol": "SOPH-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PATTERN",
+      "note": "PATTERN_BREAK (cluster 2.2 ATR, barrier 2x) | 4H DOWN · 1H DOWN | RSI1H 34 | EMA25 searah | Band1H 2.98R",
+      "signal_candle_time": 1792041300000,
+      "signal_candle_iso": "2026-10-15T05:15:00+00:00",
+      "created_at": "2026-10-15T05:32:22.923977+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.002804,
+      "sl": 0.00283,
+      "tp": 0.002758,
+      "rr": 1.75,
+      "atr": 3.099559465786962e-05,
+      "sl_atr": 0.8388288815552283,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 33.991077626539536,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 2.98,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 3.49,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PATTERN_BREAK",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "PENDING",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [],
-  "last_scan_candle": 1792040400000,
+  "last_scan_candle": 1792041300000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8213,9 +8256,9 @@
     }
   ],
   "scan_rej": {
-    "scans": 5,
-    "pairs": 500,
-    "signals": 0,
+    "scans": 6,
+    "pairs": 600,
+    "signals": 1,
     "stages": {
       "MA4": 293,
       "HTF": 47,
@@ -8223,9 +8266,15 @@
       "Pullback": 14,
       "RSI": 25,
       "Stochastic": 8,
-      "SL/RR": 1,
+      "SL/RR": 9,
       "Candle telat": 37,
-      "Volume": 4
+      "Volume": 4,
+      "Setup": 42,
+      "Murphy 4H": 8,
+      "Bollinger": 12,
+      "RSI 1H": 13,
+      "Murphy 1H": 13,
+      "Dominasi": 3
     },
     "near": [
       {
@@ -8249,8 +8298,8 @@
         "text": "SENT-USDT-SWAP → Volume: SHORT volume 0.17x (min 1.00x)"
       },
       {
-        "depth": 8,
-        "text": "LINEA-USDT-SWAP → Stochastic: SHORT K 29/D 25 belum cross dari zona ekstrem (dalam 3 candle)"
+        "depth": 10,
+        "text": "SHIB-USDT-SWAP → Bollinger: SHORT band 1H hanya -0.13R dari entry (min 0.5R)"
       }
     ]
   }
