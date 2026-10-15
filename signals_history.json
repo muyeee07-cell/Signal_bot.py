@@ -91,7 +91,7 @@
       "entry_time": "2026-10-15T05:31:00+00:00"
     }
   ],
-  "last_scan_candle": 1792053000000,
+  "last_scan_candle": 1792054800000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8303,16 +8303,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 4,
-    "pairs": 398,
+    "scans": 5,
+    "pairs": 497,
     "signals": 1,
     "stages": {
-      "RSI 1H": 75,
-      "Murphy 4H": 36,
-      "Setup": 172,
-      "Murphy 1H": 41,
-      "SL/RR": 13,
-      "Dominasi": 60
+      "RSI 1H": 80,
+      "Murphy 4H": 46,
+      "Setup": 191,
+      "Murphy 1H": 54,
+      "SL/RR": 15,
+      "Dominasi": 110
     },
     "near": [
       {
