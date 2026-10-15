@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792099800000,
+  "last_scan_candle": 1792101600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8618,18 +8618,18 @@
     }
   ],
   "scan_rej": {
-    "scans": 6,
-    "pairs": 596,
+    "scans": 7,
+    "pairs": 696,
     "signals": 2,
     "stages": {
-      "Murphy 1H": 390,
-      "Murphy 4H": 142,
+      "Murphy 1H": 452,
+      "Murphy 4H": 169,
       "Dominasi": 16,
-      "Setup": 34,
+      "Setup": 38,
       "RSI 1H": 2,
-      "Obstruksi": 3,
+      "Obstruksi": 4,
       "SL/RR": 2,
-      "Murphy 15m": 5
+      "Murphy 15m": 11
     },
     "near": [
       {
@@ -8639,6 +8639,10 @@
       {
         "depth": 13,
         "text": "APR-USDT-SWAP → Obstruksi: SHORT level bulat hanya 0.62R di depan entry"
+      },
+      {
+        "depth": 13,
+        "text": "SOPH-USDT-SWAP → Obstruksi: SHORT level bulat hanya 0.50R di depan entry"
       },
       {
         "depth": 10,
@@ -8651,10 +8655,6 @@
       {
         "depth": 10,
         "text": "CASHCAT-USDT-SWAP → Setup: LONG PB: retrace 24% (min 33%) | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: cluster 2.3 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
-      },
-      {
-        "depth": 9,
-        "text": "MEGA-USDT-SWAP → Obstruksi: LONG high sebelumnya hanya 0.59R dari entry"
       }
     ]
   },
