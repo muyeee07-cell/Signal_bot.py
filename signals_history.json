@@ -266,7 +266,7 @@
       "entry_time": "2026-10-15T10:21:00+00:00"
     }
   ],
-  "last_scan_candle": 1792072800000,
+  "last_scan_candle": 1792075500000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -307,7 +307,7 @@
       }
     ]
   },
-  "last_report_ts": 1792061980.958261,
+  "last_report_ts": 1792076424.3328059,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8478,43 +8478,39 @@
     }
   ],
   "scan_rej": {
-    "scans": 7,
-    "pairs": 682,
-    "signals": 3,
+    "scans": 1,
+    "pairs": 99,
+    "signals": 0,
     "stages": {
-      "Setup": 260,
-      "RSI 1H": 44,
-      "Murphy 1H": 101,
-      "Dominasi": 195,
-      "SL/RR": 7,
-      "Murphy 4H": 70,
-      "Bollinger": 1,
-      "Diblokir": 1
+      "Murphy 1H": 69,
+      "Dominasi": 17,
+      "Murphy 4H": 11,
+      "Setup": 2
     },
     "near": [
       {
-        "depth": 11,
-        "text": "ARB-USDT-SWAP → Diblokir: SHORT kalah kualitas (maks 1/candle)"
+        "depth": 7,
+        "text": "APR-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PATTERN: cluster 2.8 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       },
       {
-        "depth": 10,
-        "text": "MERL-USDT-SWAP → Bollinger: SHORT band 1H hanya -0.67R dari entry (min 0.5R)"
+        "depth": 7,
+        "text": "OFC-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PATTERN: cluster 3.2 ATR (maks 2.2) | COMBI: tidak ada powerbar"
       },
       {
-        "depth": 8,
-        "text": "ZK-USDT-SWAP → SL/RR: LONG SL 4.25% terlalu jauh (maks 1.50%)"
+        "depth": 6,
+        "text": "PUMP-USDT-SWAP → Dominasi: SHORT EMA25 5m tidak searah / harga di sisi salah"
       },
       {
-        "depth": 8,
-        "text": "SOPH-USDT-SWAP → SL/RR: SHORT stop struktur 3.53 ATR (maks 2), terlalu lebar"
+        "depth": 6,
+        "text": "RSR-USDT-SWAP → Dominasi: SHORT EMA25 5m tidak searah / harga di sisi salah"
       },
       {
-        "depth": 8,
-        "text": "ZIL-USDT-SWAP → SL/RR: SHORT stop struktur 2.79 ATR (maks 2), terlalu lebar"
+        "depth": 6,
+        "text": "DOGE-USDT-SWAP → Dominasi: SHORT EMA25 5m tidak searah / harga di sisi salah"
       },
       {
-        "depth": 8,
-        "text": "MEGA-USDT-SWAP → SL/RR: LONG SL 2.99% terlalu jauh (maks 1.50%)"
+        "depth": 6,
+        "text": "ZK-USDT-SWAP → Dominasi: LONG EMA25 5m tidak searah / harga di sisi salah"
       }
     ]
   },
