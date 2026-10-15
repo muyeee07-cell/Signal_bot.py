@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792038600000,
+  "last_scan_candle": 1792040400000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8213,18 +8213,19 @@
     }
   ],
   "scan_rej": {
-    "scans": 4,
-    "pairs": 400,
+    "scans": 5,
+    "pairs": 500,
     "signals": 0,
     "stages": {
-      "MA4": 235,
-      "HTF": 39,
-      "Tren": 62,
-      "Pullback": 10,
-      "RSI": 18,
-      "Stochastic": 3,
+      "MA4": 293,
+      "HTF": 47,
+      "Tren": 71,
+      "Pullback": 14,
+      "RSI": 25,
+      "Stochastic": 8,
       "SL/RR": 1,
-      "Candle telat": 32
+      "Candle telat": 37,
+      "Volume": 4
     },
     "near": [
       {
@@ -8232,24 +8233,24 @@
         "text": "OL-USDT-SWAP → SL/RR: SHORT SL 3.37 ATR (perlu 0.35-2.5)"
       },
       {
+        "depth": 10,
+        "text": "PEPE-USDT-SWAP → Volume: SHORT volume 0.67x (min 1.00x)"
+      },
+      {
+        "depth": 10,
+        "text": "BICO-USDT-SWAP → Volume: SHORT volume 0.45x (min 1.00x)"
+      },
+      {
+        "depth": 10,
+        "text": "MERL-USDT-SWAP → Volume: SHORT volume 0.16x (min 1.00x)"
+      },
+      {
+        "depth": 10,
+        "text": "SENT-USDT-SWAP → Volume: SHORT volume 0.17x (min 1.00x)"
+      },
+      {
         "depth": 8,
         "text": "LINEA-USDT-SWAP → Stochastic: SHORT K 29/D 25 belum cross dari zona ekstrem (dalam 3 candle)"
-      },
-      {
-        "depth": 8,
-        "text": "BASED-USDT-SWAP → Stochastic: SHORT K 54/D 56 belum cross dari zona ekstrem (dalam 3 candle)"
-      },
-      {
-        "depth": 8,
-        "text": "ZK-USDT-SWAP → Stochastic: LONG K 92/D 83 belum cross dari zona ekstrem (dalam 3 candle)"
-      },
-      {
-        "depth": 7,
-        "text": "HUMA-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.6 di luar zona"
-      },
-      {
-        "depth": 7,
-        "text": "PUMP-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.1 di luar zona"
       }
     ]
   }
