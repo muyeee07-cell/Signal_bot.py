@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792028700000,
+  "last_scan_candle": 1792031400000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1792017923.609664,
+  "last_report_ts": 1792032531.5175238,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8213,43 +8213,40 @@
     }
   ],
   "scan_rej": {
-    "scans": 7,
-    "pairs": 700,
+    "scans": 1,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "HTF": 274,
-      "Tren": 249,
-      "RSI": 43,
-      "MA4": 47,
-      "Stochastic": 69,
-      "Volume": 4,
-      "Bollinger": 4,
-      "Pullback": 10
+      "MA4": 71,
+      "HTF": 14,
+      "Tren": 9,
+      "Pullback": 5,
+      "RSI": 1
     },
     "near": [
       {
-        "depth": 11,
-        "text": "RESOLV-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
+        "depth": 7,
+        "text": "HUMA-USDT-SWAP → RSI: SHORT RSI ekstrem pullback 39.6 di luar zona"
       },
       {
-        "depth": 11,
-        "text": "XLM-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
+        "depth": 6,
+        "text": "SATS-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       },
       {
-        "depth": 11,
-        "text": "SPACE-USDT-SWAP → Bollinger: SHORT band menyempit (squeeze), tunggu breakout"
+        "depth": 6,
+        "text": "PEPE-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       },
       {
-        "depth": 11,
-        "text": "XPL-USDT-SWAP → Bollinger: SHORT band hanya -0.14R dari entry (min 0.5R)"
+        "depth": 6,
+        "text": "SHIB-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       },
       {
-        "depth": 10,
-        "text": "ADA-USDT-SWAP → Volume: SHORT volume 0.62x (min 1.00x)"
+        "depth": 6,
+        "text": "BONK-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       },
       {
-        "depth": 10,
-        "text": "ANIME-USDT-SWAP → Volume: SHORT volume 0.66x (min 1.00x)"
+        "depth": 6,
+        "text": "FLOKI-USDT-SWAP → MA4: SHORT candle pemicu / MA4 belum berbalik searah"
       }
     ]
   }
