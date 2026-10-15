@@ -310,7 +310,7 @@
       "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792089000000,
+  "last_scan_candle": 1792090800000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -351,7 +351,7 @@
       }
     ]
   },
-  "last_report_ts": 1792076424.3328059,
+  "last_report_ts": 1792092279.545777,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8522,40 +8522,41 @@
     }
   ],
   "scan_rej": {
-    "scans": 8,
-    "pairs": 798,
-    "signals": 1,
+    "scans": 1,
+    "pairs": 100,
+    "signals": 0,
     "stages": {
-      "Murphy 1H": 570,
-      "Dominasi": 62,
-      "Murphy 4H": 125,
-      "Setup": 35,
-      "SL/RR": 5
+      "Murphy 1H": 69,
+      "Murphy 4H": 18,
+      "Dominasi": 4,
+      "Setup": 7,
+      "RSI 1H": 1,
+      "Obstruksi": 1
     },
     "near": [
       {
-        "depth": 8,
-        "text": "AKE-USDT-SWAP → SL/RR: LONG SL 3.76% terlalu jauh (maks 1.50%)"
-      },
-      {
-        "depth": 8,
-        "text": "AEON-USDT-SWAP → SL/RR: SHORT SL 3.02% terlalu jauh (maks 1.50%)"
-      },
-      {
-        "depth": 8,
-        "text": "APR-USDT-SWAP → SL/RR: SHORT SL 2.66% terlalu jauh (maks 1.50%)"
-      },
-      {
-        "depth": 8,
-        "text": "PYTH-USDT-SWAP → SL/RR: LONG SL 1.85% terlalu jauh (maks 1.50%)"
-      },
-      {
-        "depth": 8,
-        "text": "APR-USDT-SWAP → SL/RR: SHORT SL 1.69% terlalu jauh (maks 1.50%)"
+        "depth": 9,
+        "text": "MEGA-USDT-SWAP → Obstruksi: LONG high sebelumnya hanya 0.59R dari entry"
       },
       {
         "depth": 7,
-        "text": "APR-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PATTERN: cluster 2.8 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
+        "text": "ZK-USDT-SWAP → Setup: LONG PB: signal bar tidak searah | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
+      },
+      {
+        "depth": 7,
+        "text": "AKE-USDT-SWAP → Setup: LONG PB: retrace 29% (min 40%) | PATTERN: barrier baru 1x tersentuh | COMBI: powerbar tidak kuat searah"
+      },
+      {
+        "depth": 7,
+        "text": "SOPH-USDT-SWAP → Setup: SHORT PB: retrace 83% terlalu dalam | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
+      },
+      {
+        "depth": 7,
+        "text": "MUBARAK-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
+      },
+      {
+        "depth": 7,
+        "text": "PYTH-USDT-SWAP → Setup: LONG PB: signal bar tidak searah | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
       }
     ]
   },
