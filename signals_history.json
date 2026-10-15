@@ -310,7 +310,7 @@
       "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792086300000,
+  "last_scan_candle": 1792089000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8522,15 +8522,15 @@
     }
   ],
   "scan_rej": {
-    "scans": 7,
-    "pairs": 698,
+    "scans": 8,
+    "pairs": 798,
     "signals": 1,
     "stages": {
-      "Murphy 1H": 500,
-      "Dominasi": 59,
-      "Murphy 4H": 107,
-      "Setup": 28,
-      "SL/RR": 3
+      "Murphy 1H": 570,
+      "Dominasi": 62,
+      "Murphy 4H": 125,
+      "Setup": 35,
+      "SL/RR": 5
     },
     "near": [
       {
@@ -8546,16 +8546,16 @@
         "text": "APR-USDT-SWAP → SL/RR: SHORT SL 2.66% terlalu jauh (maks 1.50%)"
       },
       {
+        "depth": 8,
+        "text": "PYTH-USDT-SWAP → SL/RR: LONG SL 1.85% terlalu jauh (maks 1.50%)"
+      },
+      {
+        "depth": 8,
+        "text": "APR-USDT-SWAP → SL/RR: SHORT SL 1.69% terlalu jauh (maks 1.50%)"
+      },
+      {
         "depth": 7,
         "text": "APR-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PATTERN: cluster 2.8 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
-      },
-      {
-        "depth": 7,
-        "text": "OFC-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PATTERN: cluster 3.2 ATR (maks 2.2) | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "PYTH-USDT-SWAP → Setup: LONG PB: pullback terlalu panjang | PATTERN: cluster 6.4 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       }
     ]
   },
