@@ -1,5 +1,6 @@
 {
-  "open": [
+  "open": [],
+  "closed": [
     {
       "signal_id": "SOPH-USDT-SWAP|SHORT|1792041300000|PATTERN",
       "symbol": "SOPH-USDT-SWAP",
@@ -35,16 +36,17 @@
       "score": null,
       "score_reasons": [],
       "risk_usdt": 4.0,
-      "status": "PENDING",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
+      "status": "CLOSED",
+      "exit_price": 0.002758,
+      "exit_time": "2026-10-15T05:53:00+00:00",
+      "result_r": 1.75,
+      "result": "WIN",
+      "monitor_tf_ms": 900000,
+      "entry_ts": 1792042260000,
+      "entry_time": "2026-10-15T05:31:00+00:00"
     }
   ],
-  "closed": [],
-  "last_scan_candle": 1792041300000,
+  "last_scan_candle": 1792043100000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8256,8 +8258,8 @@
     }
   ],
   "scan_rej": {
-    "scans": 6,
-    "pairs": 600,
+    "scans": 7,
+    "pairs": 699,
     "signals": 1,
     "stages": {
       "MA4": 293,
@@ -8266,15 +8268,15 @@
       "Pullback": 14,
       "RSI": 25,
       "Stochastic": 8,
-      "SL/RR": 9,
+      "SL/RR": 18,
       "Candle telat": 37,
       "Volume": 4,
-      "Setup": 42,
-      "Murphy 4H": 8,
+      "Setup": 62,
+      "Murphy 4H": 16,
       "Bollinger": 12,
-      "RSI 1H": 13,
-      "Murphy 1H": 13,
-      "Dominasi": 3
+      "RSI 1H": 62,
+      "Murphy 1H": 24,
+      "Dominasi": 5
     },
     "near": [
       {
