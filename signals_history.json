@@ -43,48 +43,6 @@
       "monitor_tf_ms": 900000,
       "entry_ts": 1792059660000,
       "entry_time": "2026-10-15T10:21:00+00:00"
-    },
-    {
-      "signal_id": "XPL-USDT-SWAP|SHORT|1792065600000|PATTERN",
-      "symbol": "XPL-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "MURPHY_VOLMAN",
-      "setup_tag": "PATTERN",
-      "note": "PATTERN_BREAK (cluster 1.7 ATR, barrier 2x) | 4H DOWN · 1H DOWN | RSI1H 41 | EMA25 searah | Band1H 1.57R",
-      "signal_candle_time": 1792065600000,
-      "signal_candle_iso": "2026-10-15T12:00:00+00:00",
-      "created_at": "2026-10-15T12:30:36.290831+00:00",
-      "order_type": "SELL STOP",
-      "entry": 0.07731,
-      "sl": 0.07789,
-      "tp": 0.07629,
-      "rr": 1.75,
-      "atr": 0.0006148598429438316,
-      "sl_atr": 0.9433044077542417,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 40.554221106220574,
-      "adx": 0.0,
-      "volume_ratio": 0.0,
-      "band_room_r": 1.57,
-      "htf": "DOWN",
-      "rsi_deadzone": false,
-      "quality": 2.78,
-      "mode": "NORMAL",
-      "regime": "DOWNTREND",
-      "structure": "PATTERN_BREAK",
-      "bos": "NONE",
-      "pullback": 0.0,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "PENDING",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000
     }
   ],
   "closed": [
@@ -309,7 +267,7 @@
       "entry_time": "2026-10-15T12:08:00+00:00"
     }
   ],
-  "last_scan_candle": 1792065600000,
+  "last_scan_candle": 1792069200000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8521,16 +8479,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 4,
-    "pairs": 386,
+    "scans": 5,
+    "pairs": 484,
     "signals": 3,
     "stages": {
-      "Setup": 154,
-      "RSI 1H": 23,
-      "Murphy 1H": 60,
-      "Dominasi": 99,
-      "SL/RR": 6,
-      "Murphy 4H": 39,
+      "Setup": 204,
+      "RSI 1H": 28,
+      "Murphy 1H": 73,
+      "Dominasi": 118,
+      "SL/RR": 7,
+      "Murphy 4H": 49,
       "Bollinger": 1,
       "Diblokir": 1
     },
@@ -8560,5 +8518,49 @@
         "text": "MEGA-USDT-SWAP → SL/RR: LONG SL 2.99% terlalu jauh (maks 1.50%)"
       }
     ]
-  }
+  },
+  "cancelled": [
+    {
+      "signal_id": "XPL-USDT-SWAP|SHORT|1792065600000|PATTERN",
+      "symbol": "XPL-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PATTERN",
+      "note": "PATTERN_BREAK (cluster 1.7 ATR, barrier 2x) | 4H DOWN · 1H DOWN | RSI1H 41 | EMA25 searah | Band1H 1.57R",
+      "signal_candle_time": 1792065600000,
+      "signal_candle_iso": "2026-10-15T12:00:00+00:00",
+      "created_at": "2026-10-15T12:30:36.290831+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.07731,
+      "sl": 0.07789,
+      "tp": 0.07629,
+      "rr": 1.75,
+      "atr": 0.0006148598429438316,
+      "sl_atr": 0.9433044077542417,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 40.554221106220574,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 1.57,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 2.78,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PATTERN_BREAK",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CANCELLED",
+      "exit_price": null,
+      "exit_time": "2026-10-15T12:25:00+00:00",
+      "result_r": 0.0,
+      "result": "INVALID",
+      "monitor_tf_ms": 900000
+    }
+  ]
 }
