@@ -1,5 +1,48 @@
 {
-  "open": [],
+  "open": [
+    {
+      "signal_id": "SOPH-USDT-SWAP|SHORT|1792092600000|PATTERN",
+      "symbol": "SOPH-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "MURPHY_VOLMAN",
+      "setup_tag": "PATTERN",
+      "note": "PATTERN_BREAK (cluster 0.8 ATR, barrier 5x) | 4H DOWN · 1H DOWN | RSI1H 34 | EMA25 searah | Band1H 8.11R",
+      "signal_candle_time": 1792092600000,
+      "signal_candle_iso": "2026-10-15T19:30:00+00:00",
+      "created_at": "2026-10-15T19:55:56.478857+00:00",
+      "order_type": "SELL STOP",
+      "entry": 0.00248,
+      "sl": 0.002504,
+      "tp": 0.002439,
+      "rr": 1.75,
+      "atr": 2.9607969723023695e-05,
+      "sl_atr": 0.8105925608717883,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 33.79054395822136,
+      "adx": 0.0,
+      "volume_ratio": 0.0,
+      "band_room_r": 8.11,
+      "htf": "DOWN",
+      "rsi_deadzone": false,
+      "quality": 3.5,
+      "mode": "NORMAL",
+      "regime": "DOWNTREND",
+      "structure": "PATTERN_BREAK",
+      "bos": "NONE",
+      "pullback": 0.0,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "PENDING",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000
+    }
+  ],
   "closed": [
     {
       "signal_id": "SOPH-USDT-SWAP|SHORT|1792041300000|PATTERN",
@@ -310,7 +353,7 @@
       "entry_time": "2026-10-15T15:32:00+00:00"
     }
   ],
-  "last_scan_candle": 1792090800000,
+  "last_scan_candle": 1792092600000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8522,21 +8565,26 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 100,
-    "signals": 0,
+    "scans": 2,
+    "pairs": 200,
+    "signals": 1,
     "stages": {
-      "Murphy 1H": 69,
-      "Murphy 4H": 18,
-      "Dominasi": 4,
-      "Setup": 7,
-      "RSI 1H": 1,
-      "Obstruksi": 1
+      "Murphy 1H": 139,
+      "Murphy 4H": 35,
+      "Dominasi": 9,
+      "Setup": 12,
+      "RSI 1H": 2,
+      "Obstruksi": 1,
+      "SL/RR": 1
     },
     "near": [
       {
         "depth": 9,
         "text": "MEGA-USDT-SWAP → Obstruksi: LONG high sebelumnya hanya 0.59R dari entry"
+      },
+      {
+        "depth": 8,
+        "text": "PYTH-USDT-SWAP → SL/RR: LONG stop struktur 2.25 ATR (maks 2), terlalu lebar"
       },
       {
         "depth": 7,
@@ -8553,10 +8601,6 @@
       {
         "depth": 7,
         "text": "MUBARAK-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 7,
-        "text": "PYTH-USDT-SWAP → Setup: LONG PB: signal bar tidak searah | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
       }
     ]
   },
