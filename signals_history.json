@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792101600000,
+  "last_scan_candle": 1792103400000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8618,18 +8618,19 @@
     }
   ],
   "scan_rej": {
-    "scans": 7,
-    "pairs": 696,
+    "scans": 8,
+    "pairs": 796,
     "signals": 2,
     "stages": {
-      "Murphy 1H": 452,
-      "Murphy 4H": 169,
+      "Murphy 1H": 513,
+      "Murphy 4H": 197,
       "Dominasi": 16,
-      "Setup": 38,
+      "Setup": 42,
       "RSI 1H": 2,
       "Obstruksi": 4,
-      "SL/RR": 2,
-      "Murphy 15m": 11
+      "SL/RR": 3,
+      "Murphy 15m": 16,
+      "RSI15": 1
     },
     "near": [
       {
@@ -8645,16 +8646,16 @@
         "text": "SOPH-USDT-SWAP → Obstruksi: SHORT level bulat hanya 0.50R di depan entry"
       },
       {
+        "depth": 12,
+        "text": "SOPH-USDT-SWAP → SL/RR: SHORT stop struktur 2.51 ATR (maks 2), terlalu lebar"
+      },
+      {
         "depth": 10,
         "text": "BILL-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
       },
       {
         "depth": 10,
         "text": "PYTH-USDT-SWAP → Setup: LONG PB: tanpa technical test (EMA / S-R / level bulat) | PBP: retest gagal (close kembali ke dalam pattern) | FLAG: pole kecil | PATTERN: signal bar tidak searah | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 10,
-        "text": "CASHCAT-USDT-SWAP → Setup: LONG PB: retrace 24% (min 33%) | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: cluster 2.3 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       }
     ]
   },
