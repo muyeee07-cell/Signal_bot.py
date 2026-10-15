@@ -123,12 +123,14 @@
       "score": null,
       "score_reasons": [],
       "risk_usdt": 4.0,
-      "status": "PENDING",
+      "status": "OPEN",
       "exit_price": null,
       "exit_time": null,
       "result_r": null,
       "result": null,
-      "monitor_tf_ms": 900000
+      "monitor_tf_ms": 900000,
+      "entry_ts": 1792061100000,
+      "entry_time": "2026-10-15T10:45:00+00:00"
     }
   ],
   "closed": [
@@ -221,7 +223,7 @@
       "entry_time": "2026-10-15T08:04:00+00:00"
     }
   ],
-  "last_scan_candle": 1792060200000,
+  "last_scan_candle": 1792062000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8433,16 +8435,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 97,
+    "scans": 2,
+    "pairs": 193,
     "signals": 1,
     "stages": {
-      "Setup": 46,
-      "RSI 1H": 4,
-      "Murphy 1H": 17,
-      "Dominasi": 16,
+      "Setup": 88,
+      "RSI 1H": 11,
+      "Murphy 1H": 32,
+      "Dominasi": 38,
       "SL/RR": 1,
-      "Murphy 4H": 10,
+      "Murphy 4H": 20,
       "Bollinger": 1,
       "Diblokir": 1
     },
