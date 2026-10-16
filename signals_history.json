@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792108800000,
+  "last_scan_candle": 1792111500000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
@@ -8618,22 +8618,27 @@
     }
   ],
   "scan_rej": {
-    "scans": 3,
-    "pairs": 300,
+    "scans": 4,
+    "pairs": 400,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 192,
-      "Murphy 4H": 76,
-      "Murphy 15m": 19,
+      "Murphy 1H": 260,
+      "Murphy 4H": 97,
+      "Murphy 15m": 25,
       "Obstruksi": 1,
       "RSI15": 3,
-      "Setup": 8,
-      "Dominasi": 1
+      "Setup": 12,
+      "Dominasi": 1,
+      "SL/RR": 1
     },
     "near": [
       {
         "depth": 13,
         "text": "BLUR-USDT-SWAP → Obstruksi: SHORT swing high hanya 0.08R di depan entry"
+      },
+      {
+        "depth": 12,
+        "text": "SOPH-USDT-SWAP → SL/RR: SHORT stop struktur 2.24 ATR (maks 2), terlalu lebar"
       },
       {
         "depth": 10,
@@ -8650,10 +8655,6 @@
       {
         "depth": 10,
         "text": "BILL-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
-      },
-      {
-        "depth": 10,
-        "text": "APR-USDT-SWAP → Setup: SHORT PB: retrace 21% (min 33%) | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 4.6 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       }
     ]
   },
