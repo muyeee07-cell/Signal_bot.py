@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792122300000,
+  "last_scan_candle": 1792125000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
@@ -8618,18 +8618,24 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 100,
+    "scans": 2,
+    "pairs": 200,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 61,
-      "Murphy 4H": 25,
+      "Murphy 1H": 123,
+      "Murphy 4H": 49,
       "Setup": 2,
-      "Murphy 15m": 9,
-      "Dominasi": 2,
-      "RSI15": 1
+      "Murphy 15m": 19,
+      "Dominasi": 3,
+      "RSI15": 2,
+      "Obstruksi": 1,
+      "Ranging": 1
     },
     "near": [
+      {
+        "depth": 13,
+        "text": "RSR-USDT-SWAP → Obstruksi: SHORT swing high hanya 0.32R di depan entry"
+      },
       {
         "depth": 10,
         "text": "RSR-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: signal bar tidak searah | FLAG: pole kecil | PATTERN: cluster 2.5 ATR (maks 2.2) | COMBI: tidak ada powerbar"
@@ -8637,6 +8643,10 @@
       {
         "depth": 10,
         "text": "RLS-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: signal bar tidak searah | FLAG: pole kecil | PATTERN: cluster 2.2 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
+      },
+      {
+        "depth": 8,
+        "text": "MUBARAK-USDT-SWAP → Ranging: SHORT harga memotong EMA25 4x dalam 20 bar (choppy)"
       },
       {
         "depth": 7,
