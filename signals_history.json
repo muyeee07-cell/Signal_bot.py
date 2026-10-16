@@ -110,6 +110,43 @@
       "result": null,
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "WAL-USDT-SWAP|LONG|1792164600000|SMC",
+      "symbol": "WAL-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BULL | Sweep low @ 0.04546 | OB [0.04535-0.04594] | Disp bar 193 | RSI 45.4 | Vol 0.87x",
+      "signal_candle_time": 1792164600000,
+      "signal_candle_iso": "2026-10-16T15:30:00+00:00",
+      "created_at": "2026-10-16T15:59:10.032035+00:00",
+      "entry": 0.04569,
+      "sl": 0.04515,
+      "tp": 0.04664,
+      "rr": 1.75,
+      "atr": 0.0006734979420144153,
+      "sl_atr": 0.8048270808119622,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 45.36935177415144,
+      "adx": 0.0,
+      "volume_ratio": 0.8654296125478618,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "closed": [
@@ -633,22 +670,22 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792162800000,
+  "last_smc_candle": 1792164600000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 487,
-    "signals": 5,
+    "scans": 6,
+    "pairs": 628,
+    "signals": 6,
     "stages": {
-      "Retest": 102,
+      "Retest": 143,
       "Volume": 6,
-      "Konfirmasi": 139,
-      "Sweep": 27,
-      "Struktur": 77,
-      "Displacement": 52,
-      "Data": 74,
+      "Konfirmasi": 163,
+      "Sweep": 33,
+      "Struktur": 96,
+      "Displacement": 70,
+      "Data": 105,
       "Diblokir": 2,
-      "SL/RR": 3
+      "SL/RR": 4
     },
     "near": [
       {
@@ -672,8 +709,8 @@
         "text": "CFX-USDT-SWAP → SL/RR: SHORT SL 2.77 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 8,
-        "text": "BONK-USDT-SWAP → Volume: SHORT CHOCH volume 0.46x (min 0.75x)"
+        "depth": 9,
+        "text": "XDP-USDT-SWAP → SL/RR: SHORT SL 2.93 ATR (perlu 0.35-2.5)"
       }
     ]
   },
