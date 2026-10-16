@@ -929,20 +929,20 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792188000000,
+  "last_smc_candle": 1792189800000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 432,
+    "scans": 4,
+    "pairs": 576,
     "signals": 2,
     "stages": {
-      "Displacement": 107,
-      "Konfirmasi": 73,
-      "Sweep": 81,
-      "Struktur": 107,
-      "Retest": 55,
-      "Data": 3,
-      "Volume": 4
+      "Displacement": 140,
+      "Konfirmasi": 94,
+      "Sweep": 108,
+      "Struktur": 136,
+      "Retest": 87,
+      "Data": 4,
+      "Volume": 5
     },
     "near": [
       {
@@ -962,12 +962,12 @@
         "text": "FOGO-USDT-SWAP → Volume: LONG CHOCH volume 0.21x (min 0.75x)"
       },
       {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+        "depth": 8,
+        "text": "IOST-USDT-SWAP → Volume: SHORT CHOCH volume 0.14x (min 1.00x, RSI 47.3 di deadzone +0.25)"
       },
       {
         "depth": 6,
-        "text": "DOGE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (4 bar lalu)"
+        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
