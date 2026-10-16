@@ -110,6 +110,43 @@
       "result": null,
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "LAB-USDT-SWAP|SHORT|1792169100000|SMC",
+      "symbol": "LAB-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep high @ 0.04566 | OB [0.04508-0.04629] | Disp bar 197 | RSI 50.9 | Vol 0.86x",
+      "signal_candle_time": 1792169100000,
+      "signal_candle_iso": "2026-10-16T16:45:00+00:00",
+      "created_at": "2026-10-16T17:04:18.052358+00:00",
+      "entry": 0.04536,
+      "sl": 0.04649,
+      "tp": 0.04338,
+      "rr": 1.75,
+      "atr": 0.00047556685575079284,
+      "sl_atr": 2.381726234762643,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 50.88292230314797,
+      "adx": 0.0,
+      "volume_ratio": 0.8577299081023697,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "closed": [
@@ -670,51 +707,49 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792166400000,
+  "last_smc_candle": 1792169100000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 767,
-    "signals": 6,
+    "scans": 1,
+    "pairs": 142,
+    "signals": 1,
     "stages": {
-      "Retest": 146,
-      "Volume": 6,
-      "Konfirmasi": 164,
-      "Sweep": 34,
-      "Struktur": 97,
-      "Displacement": 70,
-      "Data": 238,
-      "Diblokir": 2,
-      "SL/RR": 4
+      "Displacement": 35,
+      "Struktur": 32,
+      "Sweep": 13,
+      "Retest": 34,
+      "Konfirmasi": 25,
+      "Data": 1,
+      "SL/RR": 1
     },
     "near": [
       {
-        "depth": 10,
-        "text": "APT-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 10,
-        "text": "PONS-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
-      },
-      {
         "depth": 9,
-        "text": "MEW-USDT-SWAP → SL/RR: SHORT SL 2.53 ATR (perlu 0.35-2.5)"
+        "text": "SENT-USDT-SWAP → SL/RR: SHORT SL 3.51 ATR (perlu 0.35-2.5)"
       },
       {
-        "depth": 9,
-        "text": "BLUR-USDT-SWAP → SL/RR: SHORT SL 3.07 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "W-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
       },
       {
-        "depth": 9,
-        "text": "CFX-USDT-SWAP → SL/RR: SHORT SL 2.77 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "BLUR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 9,
-        "text": "XDP-USDT-SWAP → SL/RR: SHORT SL 2.93 ATR (perlu 0.35-2.5)"
+        "depth": 6,
+        "text": "ONE-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "MEME-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
+      },
+      {
+        "depth": 6,
+        "text": "RLS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (6 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1792155315.88874,
+  "last_report_ts": 1792170199.6845207,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
