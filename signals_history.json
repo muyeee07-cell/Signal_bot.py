@@ -1,9 +1,9 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792107000000,
+  "last_scan_candle": 1792108800000,
   "last_smc_candle": 1791958500000,
-  "last_online_day": "2026-10-15",
+  "last_online_day": "2026-10-16",
   "smc_rej": {
     "scans": 2,
     "pairs": 100,
@@ -8618,16 +8618,17 @@
     }
   ],
   "scan_rej": {
-    "scans": 2,
-    "pairs": 200,
+    "scans": 3,
+    "pairs": 300,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 125,
-      "Murphy 4H": 55,
-      "Murphy 15m": 12,
+      "Murphy 1H": 192,
+      "Murphy 4H": 76,
+      "Murphy 15m": 19,
       "Obstruksi": 1,
-      "RSI15": 2,
-      "Setup": 5
+      "RSI15": 3,
+      "Setup": 8,
+      "Dominasi": 1
     },
     "near": [
       {
