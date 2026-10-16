@@ -147,6 +147,80 @@
       "result": null,
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "MAGIC-USDT-SWAP|LONG|1792180800000|SMC",
+      "symbol": "MAGIC-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.10825 | OB [0.10639-0.10727] | Disp bar 197 | RSI 47.9 | Vol 1.24x",
+      "signal_candle_time": 1792180800000,
+      "signal_candle_iso": "2026-10-16T20:00:00+00:00",
+      "created_at": "2026-10-16T20:18:32.574161+00:00",
+      "entry": 0.10853,
+      "sl": 0.10604,
+      "tp": 0.11289,
+      "rr": 1.75,
+      "atr": 0.0011659460625342431,
+      "sl_atr": 2.1354193806775292,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 47.862571816135606,
+      "adx": 0.0,
+      "volume_ratio": 1.24042983618708,
+      "rsi_deadzone": true,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "SEI-USDT-SWAP|LONG|1792180800000|SMC",
+      "symbol": "SEI-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC CHOCH BEAR | Sweep low @ 0.06483 | OB [0.06465-0.06565] | Disp bar 198 | RSI 61.0 | Vol 1.49x",
+      "signal_candle_time": 1792180800000,
+      "signal_candle_iso": "2026-10-16T20:00:00+00:00",
+      "created_at": "2026-10-16T20:18:47.250578+00:00",
+      "entry": 0.06614,
+      "sl": 0.06442,
+      "tp": 0.06915,
+      "rr": 1.75,
+      "atr": 0.000770996839952215,
+      "sl_atr": 2.2325630440876494,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 61.03986895378484,
+      "adx": 0.0,
+      "volume_ratio": 1.4856501980773136,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "CHOCH",
+      "bos": "CHOCH",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "closed": [
@@ -781,21 +855,21 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792179000000,
+  "last_smc_candle": 1792180800000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 6,
-    "pairs": 853,
-    "signals": 3,
+    "scans": 7,
+    "pairs": 922,
+    "signals": 5,
     "stages": {
-      "Displacement": 120,
-      "Struktur": 296,
-      "Sweep": 130,
-      "Retest": 169,
-      "Konfirmasi": 125,
-      "Data": 6,
+      "Displacement": 128,
+      "Struktur": 319,
+      "Sweep": 143,
+      "Retest": 177,
+      "Konfirmasi": 136,
+      "Data": 7,
       "SL/RR": 1,
-      "Volume": 3
+      "Volume": 6
     },
     "near": [
       {
@@ -815,12 +889,12 @@
         "text": "CT-USDT-SWAP → Volume: SHORT CHOCH volume 0.41x (min 1.00x, RSI 49.4 di deadzone +0.25)"
       },
       {
-        "depth": 6,
-        "text": "W-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (1 bar lalu)"
+        "depth": 8,
+        "text": "DOGE-USDT-SWAP → Volume: LONG CHOCH volume 0.48x (min 0.75x)"
       },
       {
-        "depth": 6,
-        "text": "BLUR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
+        "depth": 8,
+        "text": "PEOPLE-USDT-SWAP → Volume: LONG CHOCH volume 0.27x (min 1.00x, RSI 47.6 di deadzone +0.25)"
       }
     ]
   },
