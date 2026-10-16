@@ -2,9 +2,9 @@ name: scan
 
 on:
   schedule:
-    # Tiap 15 menit, digeser +1 menit setelah candle 15m close (menit 01,16,31,46),
-    # supaya candle yang baru close sudah terkonfirmasi di OKX.
-    - cron: "1-59/15 * * * *"
+    # Tiap 15 menit, digeser +1 menit setelah candle 15m close (UTC):
+    # menit 01, 16, 31, 46. Candle yang baru close sudah terkonfirmasi di OKX.
+    - cron: "1,16,31,46 * * * *"
   workflow_dispatch:
 
 # Hanya satu scan berjalan pada satu waktu (history JSON tidak boleh ditulis dua proses).
@@ -18,7 +18,7 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -42,12 +42,13 @@ jobs:
           MAX_OPEN: "10"
           SMC_MIN_RISK_PCT_BTC: "0.0015"
           # --- opsional (default ada di kode) ---
-          # TF_MIN: "15"          # frame entry; MTF_MIN "60" (1H), HTF_MIN "240" (4H)
           # TARGET_RR: "1.75"
           # MIN_RISK_PCT: "0.004"
+          # HTF4_FILTER: "1"        # 0 = matikan filter tren 4H
+          # HTF_FILTER: "1"         # 0 = matikan filter tren 1H
           # PENDING_BARS: "2"
-          # MAX_HOLD_BARS: "16"
-          # HTF_FILTER: "1"
+          # MAX_HOLD_BARS: "24"
+          # BREAKOUT_VOL_MULT: "1.0"
         run: python signal_bot.py
 
       - name: Commit history
@@ -67,3 +68,4 @@ jobs:
           done
           echo "Push gagal setelah 3 percobaan"
           exit 1
+
