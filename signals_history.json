@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792118700000,
+  "last_scan_candle": 1792122300000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
@@ -42,7 +42,7 @@
       }
     ]
   },
-  "last_report_ts": 1792107579.0006573,
+  "last_report_ts": 1792124003.0512314,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
@@ -8618,45 +8618,33 @@
     }
   ],
   "scan_rej": {
-    "scans": 8,
-    "pairs": 800,
+    "scans": 1,
+    "pairs": 100,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 532,
-      "Murphy 4H": 184,
-      "Murphy 15m": 47,
-      "Obstruksi": 1,
-      "RSI15": 6,
-      "Setup": 20,
+      "Murphy 1H": 61,
+      "Murphy 4H": 25,
+      "Setup": 2,
+      "Murphy 15m": 9,
       "Dominasi": 2,
-      "SL/RR": 2,
-      "Ranging": 5,
-      "Extended": 1
+      "RSI15": 1
     },
     "near": [
       {
-        "depth": 13,
-        "text": "BLUR-USDT-SWAP → Obstruksi: SHORT swing high hanya 0.08R di depan entry"
-      },
-      {
-        "depth": 12,
-        "text": "SOPH-USDT-SWAP → SL/RR: SHORT stop struktur 2.24 ATR (maks 2), terlalu lebar"
-      },
-      {
-        "depth": 12,
-        "text": "BLUR-USDT-SWAP → SL/RR: SHORT stop struktur 2.12 ATR (maks 2), terlalu lebar"
-      },
-      {
-        "depth": 11,
-        "text": "RSR-USDT-SWAP → Extended: SHORT entry 2.8 ATR dari EMA25 (maks 2.5)"
+        "depth": 10,
+        "text": "RSR-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: signal bar tidak searah | FLAG: pole kecil | PATTERN: cluster 2.5 ATR (maks 2.2) | COMBI: tidak ada powerbar"
       },
       {
         "depth": 10,
-        "text": "BILL-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
+        "text": "RLS-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: signal bar tidak searah | FLAG: pole kecil | PATTERN: cluster 2.2 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       },
       {
-        "depth": 10,
-        "text": "APR-USDT-SWAP → Setup: SHORT PB: retrace 11% (min 33%) | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 4.5 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
+        "depth": 7,
+        "text": "PYTH-USDT-SWAP → Dominasi: LONG EMA25 slope +0.03 ATR (min 0.3) / harga di sisi salah"
+      },
+      {
+        "depth": 7,
+        "text": "MUBARAK-USDT-SWAP → Dominasi: SHORT EMA25 slope +0.26 ATR (min 0.3) / harga di sisi salah"
       }
     ]
   },
