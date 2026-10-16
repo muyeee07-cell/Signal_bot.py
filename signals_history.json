@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792106100000,
+  "last_scan_candle": 1792107000000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-15",
   "smc_rej": {
@@ -8618,16 +8618,16 @@
     }
   ],
   "scan_rej": {
-    "scans": 1,
-    "pairs": 100,
+    "scans": 2,
+    "pairs": 200,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 63,
-      "Murphy 4H": 27,
-      "Murphy 15m": 6,
+      "Murphy 1H": 125,
+      "Murphy 4H": 55,
+      "Murphy 15m": 12,
       "Obstruksi": 1,
-      "RSI15": 1,
-      "Setup": 2
+      "RSI15": 2,
+      "Setup": 5
     },
     "near": [
       {
@@ -8641,6 +8641,18 @@
       {
         "depth": 10,
         "text": "APR-USDT-SWAP → Setup: SHORT PB: retrace 11% (min 33%) | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 4.5 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
+      },
+      {
+        "depth": 10,
+        "text": "BLUR-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 2.6 ATR (maks 2.2) | COMBI: tidak ada powerbar"
+      },
+      {
+        "depth": 10,
+        "text": "BILL-USDT-SWAP → Setup: SHORT PB: pullback terlalu panjang | PBP: tidak ada break + retest | FLAG: pole kecil | PATTERN: barrier baru 1x tersentuh | COMBI: tidak ada powerbar"
+      },
+      {
+        "depth": 10,
+        "text": "APR-USDT-SWAP → Setup: SHORT PB: retrace 21% (min 33%) | PBP: break belum di-retest | FLAG: pole kecil | PATTERN: cluster 4.6 ATR (maks 2.2) | COMBI: powerbar tidak kuat searah"
       }
     ]
   },
