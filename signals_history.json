@@ -184,6 +184,43 @@
       "result": null,
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "ROBO-USDT-SWAP|SHORT|1792191600000|SMC",
+      "symbol": "ROBO-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.007054 | OB [0.007031-0.007076] | Disp bar 194 | RSI 50.2 | Vol 0.66x",
+      "signal_candle_time": 1792191600000,
+      "signal_candle_iso": "2026-10-16T23:00:00+00:00",
+      "created_at": "2026-10-16T23:18:12.930316+00:00",
+      "entry": 0.007019,
+      "sl": 0.00709,
+      "tp": 0.006895,
+      "rr": 1.75,
+      "atr": 4.687694963436519e-05,
+      "sl_atr": 1.5159494259885427,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 50.19246065870211,
+      "adx": 0.0,
+      "volume_ratio": 0.6604322437458252,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "closed": [
@@ -929,22 +966,27 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792189800000,
+  "last_smc_candle": 1792191600000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 4,
-    "pairs": 576,
-    "signals": 2,
+    "scans": 5,
+    "pairs": 647,
+    "signals": 3,
     "stages": {
-      "Displacement": 140,
-      "Konfirmasi": 94,
-      "Sweep": 108,
-      "Struktur": 136,
-      "Retest": 87,
-      "Data": 4,
-      "Volume": 5
+      "Displacement": 155,
+      "Konfirmasi": 101,
+      "Sweep": 123,
+      "Struktur": 148,
+      "Retest": 105,
+      "Data": 5,
+      "Volume": 6,
+      "Diblokir": 1
     },
     "near": [
+      {
+        "depth": 10,
+        "text": "LINEA-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+      },
       {
         "depth": 8,
         "text": "CC-USDT-SWAP → Volume: LONG CHOCH volume 0.50x (min 1.00x, RSI 49.0 di deadzone +0.25)"
@@ -964,10 +1006,6 @@
       {
         "depth": 8,
         "text": "IOST-USDT-SWAP → Volume: SHORT CHOCH volume 0.14x (min 1.00x, RSI 47.3 di deadzone +0.25)"
-      },
-      {
-        "depth": 6,
-        "text": "FLOKI-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
