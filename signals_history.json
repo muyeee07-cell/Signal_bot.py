@@ -73,6 +73,80 @@
       "result": null,
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "AIXBT-USDT-SWAP|LONG|1792139400000|SMC",
+      "symbol": "AIXBT-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.01962 | OB [0.01959-0.0197] | Disp bar 198 | RSI 54.5 | Vol 0.58x",
+      "signal_candle_time": 1792139400000,
+      "signal_candle_iso": "2026-10-16T08:30:00+00:00",
+      "created_at": "2026-10-16T08:50:24.613750+00:00",
+      "entry": 0.01972,
+      "sl": 0.01954,
+      "tp": 0.02003,
+      "rr": 1.75,
+      "atr": 9.96309516256273e-05,
+      "sl_atr": 1.8055562307950148,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 54.50690194427799,
+      "adx": 0.0,
+      "volume_ratio": 0.5784169737948107,
+      "rsi_deadzone": false,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "WCT-USDT-SWAP|LONG|1792139400000|SMC",
+      "symbol": "WCT-USDT-SWAP",
+      "direction": "LONG",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BULL | Sweep low @ 0.03814 | OB [0.03802-0.03823] | Disp bar 198 | RSI 49.2 | Vol 1.15x",
+      "signal_candle_time": 1792139400000,
+      "signal_candle_iso": "2026-10-16T08:30:00+00:00",
+      "created_at": "2026-10-16T08:50:37.377499+00:00",
+      "entry": 0.03824,
+      "sl": 0.03795,
+      "tp": 0.03875,
+      "rr": 1.75,
+      "atr": 0.00020712880704970828,
+      "sl_atr": 1.410420145203678,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 49.21471930489767,
+      "adx": 0.0,
+      "volume_ratio": 1.1545770264071815,
+      "rsi_deadzone": true,
+      "regime": "BULL",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "OPEN",
+      "exit_price": null,
+      "exit_time": null,
+      "result_r": null,
+      "result": null,
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "closed": [
@@ -115,48 +189,47 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792136700000,
+  "last_smc_candle": 1792139400000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 547,
-    "signals": 3,
+    "scans": 1,
+    "pairs": 137,
+    "signals": 2,
     "stages": {
-      "Konfirmasi": 167,
-      "Sweep": 51,
-      "Retest": 144,
-      "Struktur": 80,
-      "Displacement": 88,
-      "Volume": 14
+      "Retest": 42,
+      "Konfirmasi": 41,
+      "Struktur": 15,
+      "Displacement": 23,
+      "Sweep": 14
     },
     "near": [
       {
-        "depth": 8,
-        "text": "KAT-USDT-SWAP → Volume: LONG CHOCH volume 0.58x (min 0.75x)"
+        "depth": 6,
+        "text": "PEPE-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "SPACE-USDT-SWAP → Volume: SHORT CHOCH volume 0.73x (min 0.75x)"
+        "depth": 6,
+        "text": "SHIB-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "SENT-USDT-SWAP → Volume: LONG CHOCH volume 0.55x (min 0.75x)"
+        "depth": 6,
+        "text": "BOME-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "SOPH-USDT-SWAP → Volume: SHORT CHOCH volume 0.31x (min 0.75x)"
+        "depth": 6,
+        "text": "BLUR-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "CHIP-USDT-SWAP → Volume: SHORT CHOCH volume 0.59x (min 0.75x)"
+        "depth": 6,
+        "text": "PENGU-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (3 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "SPACE-USDT-SWAP → Volume: SHORT CHOCH volume 0.38x (min 0.75x)"
+        "depth": 6,
+        "text": "GALA-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (7 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1792124003.0512314,
+  "last_report_ts": 1792140548.7951202,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
