@@ -448,50 +448,16 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792151100000,
+  "last_smc_candle": 1792153800000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 642,
-    "signals": 9,
-    "stages": {
-      "Retest": 167,
-      "Konfirmasi": 145,
-      "Struktur": 123,
-      "Displacement": 117,
-      "Sweep": 65,
-      "Volume": 9,
-      "SL/RR": 2,
-      "Diblokir": 5
-    },
-    "near": [
-      {
-        "depth": 10,
-        "text": "BEAT-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 10,
-        "text": "BRETT-USDT-SWAP → Diblokir: SHORT sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 10,
-        "text": "GMT-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 10,
-        "text": "SLX-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 10,
-        "text": "UNI-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
-      },
-      {
-        "depth": 9,
-        "text": "FIL-USDT-SWAP → SL/RR: LONG SL 2.85 ATR (perlu 0.35-2.5)"
-      }
-    ]
+    "scans": 1,
+    "pairs": 0,
+    "signals": 0,
+    "stages": {},
+    "near": []
   },
-  "last_report_ts": 1792140548.7951202,
+  "last_report_ts": 1792155315.88874,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
