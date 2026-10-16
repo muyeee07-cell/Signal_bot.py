@@ -2,18 +2,16 @@ name: scan
 
 on:
   schedule:
-    # Tiap 15 menit, digeser +1 menit setelah candle 15m close (UTC):
-    # menit 01, 16, 31, 46. Candle yang baru close sudah terkonfirmasi di OKX.
-    - cron: "1,16,31,46 * * * *"
-  workflow_dispatch:
+    - cron: "*/20 * * * *"     # tiap 20 menit, 24 jam penuh
+  workflow_dispatch:           # tombol "Run workflow" manual
 
-# Hanya satu scan berjalan pada satu waktu (history JSON tidak boleh ditulis dua proses).
+# Dua run tidak boleh jalan bersamaan
 concurrency:
-  group: alphaquant-scan
+  group: scan
   cancel-in-progress: false
 
 permissions:
-  contents: write   # perlu untuk commit signals_history.json
+  contents: write
 
 jobs:
   scan:
@@ -21,51 +19,42 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: pip install requests
+      - run: pip install requests
 
-      - name: Run ALPHAQUANT
+      - name: Run bot
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
-          RUN_FOREVER: "0"
-          # --- sesuaikan dengan setting Anda ---
-          TOP_PAIRS: "100"
-          MAX_OPEN: "10"
-          SMC_MIN_RISK_PCT_BTC: "0.0015"
-          # --- opsional (default ada di kode) ---
-          # TARGET_RR: "1.75"
-          # MIN_RISK_PCT: "0.004"
-          # HTF4_FILTER: "1"        # 0 = matikan filter tren 4H
-          # HTF_FILTER: "1"         # 0 = matikan filter tren 1H
-          # PENDING_BARS: "2"
-          # MAX_HOLD_BARS: "24"
-          # BREAKOUT_VOL_MULT: "1.0"
+          TOP_PAIRS: "150"
+          SMC_MAX_OPEN: "25"
+          SMC_MIN_RISK_PCT: "0.004"
+          MAX_ACTIVE_SMC_PER_DIRECTION: "3"
+          MAX_NEW_SMC_PER_CANDLE: "2"
+          # --- BingX auto-execution ---
+          # BINGX_API_KEY: ${{ secrets.BINGX_API_KEY }}
+          # BINGX_API_SECRET: ${{ secrets.BINGX_API_SECRET }}
+          # BINGX_RISK_USDT: "0.30"
+          # BINGX_LEVERAGE: "20"
         run: python signal_bot.py
 
-      - name: Commit history
+      - name: Commit signal history
         if: always()
         run: |
-          git config user.name "alphaquant-bot"
-          git config user.email "alphaquant-bot@users.noreply.github.com"
-          git add signals_history.json || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f signals_history.json ]; then git add signals_history.json; fi
           if git diff --cached --quiet; then
-            echo "Tidak ada perubahan history."
-            exit 0
+            echo "Tidak ada perubahan riwayat."
+          else
+            git commit -m "Update signal history"
+            git pull --rebase --autostash origin "${{ github.ref_name }}"
+            git push origin "HEAD:${{ github.ref_name }}"
           fi
-          git commit -m "update signals history [skip ci]"
-          for i in 1 2 3; do
-            git pull --rebase --autostash && git push && exit 0
-            sleep 5
-          done
-          echo "Push gagal setelah 3 percobaan"
-          exit 1
+
 
