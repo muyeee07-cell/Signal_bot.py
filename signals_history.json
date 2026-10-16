@@ -149,43 +149,6 @@
       "binance_exec": "SKIP"
     },
     {
-      "signal_id": "MINA-USDT-SWAP|SHORT|1792188000000|SMC",
-      "symbol": "MINA-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.0747 | OB [0.07559-0.07687] | Disp bar 198 | RSI 59.0 | Vol 1.78x",
-      "signal_candle_time": 1792188000000,
-      "signal_candle_iso": "2026-10-16T22:00:00+00:00",
-      "created_at": "2026-10-16T22:23:01.510369+00:00",
-      "entry": 0.07534,
-      "sl": 0.07709,
-      "tp": 0.07227,
-      "rr": 1.75,
-      "atr": 0.000748640132963406,
-      "sl_atr": 2.3437055570927745,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 58.984240952925326,
-      "adx": 0.0,
-      "volume_ratio": 1.7846779267113824,
-      "rsi_deadzone": false,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000,
-      "binance_exec": "SKIP"
-    },
-    {
       "signal_id": "ROBO-USDT-SWAP|SHORT|1792191600000|SMC",
       "symbol": "ROBO-USDT-SWAP",
       "direction": "SHORT",
@@ -963,29 +926,70 @@
       "result": "LOSS",
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "MINA-USDT-SWAP|SHORT|1792188000000|SMC",
+      "symbol": "MINA-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.0747 | OB [0.07559-0.07687] | Disp bar 198 | RSI 59.0 | Vol 1.78x",
+      "signal_candle_time": 1792188000000,
+      "signal_candle_iso": "2026-10-16T22:00:00+00:00",
+      "created_at": "2026-10-16T22:23:01.510369+00:00",
+      "entry": 0.07534,
+      "sl": 0.07709,
+      "tp": 0.07227,
+      "rr": 1.75,
+      "atr": 0.000748640132963406,
+      "sl_atr": 2.3437055570927745,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 58.984240952925326,
+      "adx": 0.0,
+      "volume_ratio": 1.7846779267113824,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.07709,
+      "exit_time": "2026-10-16T23:30:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792191600000,
+  "last_smc_candle": 1792193400000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
-    "scans": 5,
-    "pairs": 647,
+    "scans": 6,
+    "pairs": 790,
     "signals": 3,
     "stages": {
-      "Displacement": 155,
-      "Konfirmasi": 101,
-      "Sweep": 123,
-      "Struktur": 148,
-      "Retest": 105,
-      "Data": 5,
-      "Volume": 6,
-      "Diblokir": 1
+      "Displacement": 190,
+      "Konfirmasi": 116,
+      "Sweep": 160,
+      "Struktur": 164,
+      "Retest": 142,
+      "Data": 6,
+      "Volume": 7,
+      "Diblokir": 2
     },
     "near": [
       {
         "depth": 10,
         "text": "LINEA-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 10,
+        "text": "ONDO-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
       },
       {
         "depth": 8,
@@ -1002,10 +1006,6 @@
       {
         "depth": 8,
         "text": "FOGO-USDT-SWAP → Volume: LONG CHOCH volume 0.21x (min 0.75x)"
-      },
-      {
-        "depth": 8,
-        "text": "IOST-USDT-SWAP → Volume: SHORT CHOCH volume 0.14x (min 1.00x, RSI 47.3 di deadzone +0.25)"
       }
     ]
   },
