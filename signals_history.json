@@ -1,7 +1,7 @@
 {
   "open": [],
   "closed": [],
-  "last_scan_candle": 1792126800000,
+  "last_scan_candle": 1792129500000,
   "last_smc_candle": 1791958500000,
   "last_online_day": "2026-10-16",
   "smc_rej": {
@@ -8618,18 +8618,18 @@
     }
   ],
   "scan_rej": {
-    "scans": 3,
-    "pairs": 300,
+    "scans": 4,
+    "pairs": 400,
     "signals": 0,
     "stages": {
-      "Murphy 1H": 184,
-      "Murphy 4H": 73,
-      "Setup": 3,
-      "Murphy 15m": 28,
-      "Dominasi": 5,
-      "RSI15": 3,
+      "Murphy 1H": 244,
+      "Murphy 4H": 97,
+      "Setup": 5,
+      "Murphy 15m": 37,
+      "Dominasi": 7,
+      "RSI15": 4,
       "Obstruksi": 1,
-      "Ranging": 3
+      "Ranging": 5
     },
     "near": [
       {
@@ -8649,12 +8649,12 @@
         "text": "ONE-USDT-SWAP → Setup: SHORT PB: pullback tidak harmonis | PBP: retest gagal (close kembali ke dalam pattern) | FLAG: pole kecil | PATTERN: cluster 2.7 ATR (maks 2.2) | COMBI: tidak ada powerbar"
       },
       {
-        "depth": 8,
-        "text": "MUBARAK-USDT-SWAP → Ranging: SHORT harga memotong EMA25 4x dalam 20 bar (choppy)"
+        "depth": 10,
+        "text": "ONE-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: retest gagal (close kembali ke dalam pattern) | FLAG: pole kecil | PATTERN: cluster 2.4 ATR (maks 2.2) | COMBI: tidak ada powerbar"
       },
       {
-        "depth": 8,
-        "text": "MUBARAK-USDT-SWAP → Ranging: SHORT harga memotong EMA25 4x dalam 20 bar (choppy)"
+        "depth": 10,
+        "text": "AEON-USDT-SWAP → Setup: SHORT PB: signal bar tidak searah | PBP: signal bar tidak searah | FLAG: pole tidak berakhir di atas | PATTERN: cluster 3.5 ATR (maks 2.2) | COMBI: tidak ada powerbar"
       }
     ]
   },
