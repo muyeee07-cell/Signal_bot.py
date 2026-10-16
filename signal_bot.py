@@ -153,7 +153,7 @@ MAX_RISK_PCT = env_num(0.02, "MAX_RISK_PCT")
 MIN_RISK_PCT = env_num(0.004, "MIN_RISK_PCT", "SMC_MIN_RISK_PCT")      # 0 disables the cost gate
 # Separate cost gate for BTC only. Negative = use MIN_RISK_PCT.
 MIN_RISK_PCT_BTC = env_num(-1.0, "MIN_RISK_PCT_BTC", "SMC_MIN_RISK_PCT_BTC")
-MAX_OPEN = env_num(5, "MAX_OPEN", "SMC_MAX_OPEN")
+MAX_OPEN = env_num(15, "MAX_OPEN", "SMC_MAX_OPEN")
 COOLDOWN_HOURS = env_num(2.0, "COOLDOWN_HOURS")
 
 # ---- pending stop order / holding time ----
@@ -175,7 +175,7 @@ DEFENSIVE = [False]      # DEFENSIVE: 1H filter forced on and the Bollinger room
 OFF = set()   # filters switched off (ablation only; live = empty)
 
 # --- universe ---
-TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
+TOP_PAIRS = int(os.getenv("TOP_PAIRS", "150"))
 MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
