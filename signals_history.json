@@ -1,43 +1,6 @@
 {
   "open": [
     {
-      "signal_id": "BEAT-USDT-SWAP|SHORT|1792162800000|SMC",
-      "symbol": "BEAT-USDT-SWAP",
-      "direction": "SHORT",
-      "timeframe": "15m",
-      "setup": "SMC_SCALP",
-      "note": "SMC BOS BEAR | Sweep high @ 0.0769 | OB [0.07681-0.07734] | Disp bar 198 | RSI 37.8 | Vol 2.57x",
-      "signal_candle_time": 1792162800000,
-      "signal_candle_iso": "2026-10-16T15:00:00+00:00",
-      "created_at": "2026-10-16T15:22:58.578006+00:00",
-      "entry": 0.0763,
-      "sl": 0.07749,
-      "tp": 0.07422,
-      "rr": 1.75,
-      "atr": 0.0004870006543069034,
-      "sl_atr": 2.435520744792687,
-      "ema50": 0.0,
-      "ema200": 0.0,
-      "rsi": 37.8042786779381,
-      "adx": 0.0,
-      "volume_ratio": 2.571844671077191,
-      "rsi_deadzone": false,
-      "regime": "BEAR",
-      "structure": "BOS",
-      "bos": "BOS",
-      "pullback": null,
-      "score": null,
-      "score_reasons": [],
-      "risk_usdt": 4.0,
-      "status": "OPEN",
-      "exit_price": null,
-      "exit_time": null,
-      "result_r": null,
-      "result": null,
-      "monitor_tf_ms": 900000,
-      "binance_exec": "SKIP"
-    },
-    {
       "signal_id": "MAGIC-USDT-SWAP|LONG|1792180800000|SMC",
       "symbol": "MAGIC-USDT-SWAP",
       "direction": "LONG",
@@ -1000,23 +963,60 @@
       "result": "WIN",
       "monitor_tf_ms": 900000,
       "binance_exec": "SKIP"
+    },
+    {
+      "signal_id": "BEAT-USDT-SWAP|SHORT|1792162800000|SMC",
+      "symbol": "BEAT-USDT-SWAP",
+      "direction": "SHORT",
+      "timeframe": "15m",
+      "setup": "SMC_SCALP",
+      "note": "SMC BOS BEAR | Sweep high @ 0.0769 | OB [0.07681-0.07734] | Disp bar 198 | RSI 37.8 | Vol 2.57x",
+      "signal_candle_time": 1792162800000,
+      "signal_candle_iso": "2026-10-16T15:00:00+00:00",
+      "created_at": "2026-10-16T15:22:58.578006+00:00",
+      "entry": 0.0763,
+      "sl": 0.07749,
+      "tp": 0.07422,
+      "rr": 1.75,
+      "atr": 0.0004870006543069034,
+      "sl_atr": 2.435520744792687,
+      "ema50": 0.0,
+      "ema200": 0.0,
+      "rsi": 37.8042786779381,
+      "adx": 0.0,
+      "volume_ratio": 2.571844671077191,
+      "rsi_deadzone": false,
+      "regime": "BEAR",
+      "structure": "BOS",
+      "bos": "BOS",
+      "pullback": null,
+      "score": null,
+      "score_reasons": [],
+      "risk_usdt": 4.0,
+      "status": "CLOSED",
+      "exit_price": 0.07749,
+      "exit_time": "2026-10-17T06:50:00+00:00",
+      "result_r": -1.0,
+      "result": "LOSS",
+      "monitor_tf_ms": 900000,
+      "binance_exec": "SKIP"
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792217700000,
+  "last_smc_candle": 1792220400000,
   "last_online_day": "2026-10-17",
   "smc_rej": {
-    "scans": 2,
-    "pairs": 295,
+    "scans": 3,
+    "pairs": 443,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 46,
-      "Sweep": 20,
-      "Struktur": 100,
-      "Retest": 35,
-      "Displacement": 38,
-      "Data": 52,
-      "RSI": 4
+      "Konfirmasi": 71,
+      "Sweep": 30,
+      "Struktur": 159,
+      "Retest": 54,
+      "Displacement": 71,
+      "Data": 53,
+      "RSI": 5
     },
     "near": [
       {
@@ -1036,12 +1036,12 @@
         "text": "MON-USDT-SWAP → RSI: SHORT RSI 49.2 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
       },
       {
-        "depth": 6,
-        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "depth": 7,
+        "text": "TRUTH-USDT-SWAP → RSI: LONG RSI 51.6 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
       },
       {
         "depth": 6,
-        "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
+        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
