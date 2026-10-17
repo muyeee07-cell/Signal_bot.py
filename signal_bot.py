@@ -111,10 +111,10 @@ SMC_MIN_RISK_PCT = float(os.getenv("SMC_MIN_RISK_PCT", "0.004"))   # 0 disables 
 # Separate cost gate for BTC only (BTC moves little relative to its price, so the
 # global 0.4% gate rejects almost every BTC signal). Negative = use SMC_MIN_RISK_PCT.
 SMC_MIN_RISK_PCT_BTC = float(os.getenv("SMC_MIN_RISK_PCT_BTC", "-1"))
-SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "5"))
+SMC_MAX_OPEN = int(os.getenv("SMC_MAX_OPEN", "20"))
 
 # --- universe ---
-TOP_PAIRS = int(os.getenv("TOP_PAIRS", "50"))
+TOP_PAIRS = int(os.getenv("TOP_PAIRS", "100"))
 MIN_VOLUME_USDT = float(os.getenv("MIN_VOLUME_USDT", "3000000"))
 
 # --- indicators ---
