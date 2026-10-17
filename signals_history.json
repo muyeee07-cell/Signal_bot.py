@@ -1003,21 +1003,21 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792195200000,
+  "last_smc_candle": 1792197900000,
   "last_online_day": "2026-10-17",
   "smc_rej": {
-    "scans": 7,
-    "pairs": 933,
+    "scans": 8,
+    "pairs": 1076,
     "signals": 4,
     "stages": {
-      "Displacement": 221,
-      "Konfirmasi": 131,
-      "Sweep": 197,
-      "Struktur": 182,
-      "Retest": 182,
-      "Data": 7,
-      "Volume": 7,
-      "Diblokir": 2
+      "Displacement": 251,
+      "Konfirmasi": 151,
+      "Sweep": 234,
+      "Struktur": 197,
+      "Retest": 219,
+      "Data": 8,
+      "Volume": 9,
+      "Diblokir": 3
     },
     "near": [
       {
@@ -1027,6 +1027,10 @@
       {
         "depth": 10,
         "text": "ONDO-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+      },
+      {
+        "depth": 10,
+        "text": "MERL-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
       },
       {
         "depth": 8,
@@ -1039,10 +1043,6 @@
       {
         "depth": 8,
         "text": "BILL-USDT-SWAP → Volume: LONG BOS volume 0.29x (min 0.50x)"
-      },
-      {
-        "depth": 8,
-        "text": "FOGO-USDT-SWAP → Volume: LONG CHOCH volume 0.21x (min 0.75x)"
       }
     ]
   },
