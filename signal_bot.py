@@ -124,7 +124,7 @@ SL_ATR_BUFFER = 0.30
 RISK_PER_TRADE = float(os.getenv("RISK_PER_TRADE", "0.004"))
 ACCOUNT_EQUITY = float(os.getenv("ACCOUNT_EQUITY", "1000"))
 FEE_PER_SIDE = float(os.getenv("FEE_PER_SIDE", "0.0005"))          # taker 0.05%, for the fee estimate
-REPORT_EVERY_HOURS = float(os.getenv("REPORT_EVERY_HOURS", "4"))
+REPORT_EVERY_HOURS = float(os.getenv("REPORT_EVERY_HOURS", "1"))
 
 
 MONITOR_MAX_BARS = 1400
