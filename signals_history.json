@@ -1003,22 +1003,27 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792220400000,
+  "last_smc_candle": 1792222200000,
   "last_online_day": "2026-10-17",
   "smc_rej": {
-    "scans": 3,
-    "pairs": 443,
+    "scans": 4,
+    "pairs": 591,
     "signals": 0,
     "stages": {
-      "Konfirmasi": 71,
-      "Sweep": 30,
-      "Struktur": 159,
-      "Retest": 54,
-      "Displacement": 71,
-      "Data": 53,
-      "RSI": 5
+      "Konfirmasi": 83,
+      "Sweep": 44,
+      "Struktur": 216,
+      "Retest": 77,
+      "Displacement": 110,
+      "Data": 54,
+      "RSI": 6,
+      "Volume": 1
     },
     "near": [
+      {
+        "depth": 8,
+        "text": "RSR-USDT-SWAP → Volume: SHORT BOS volume 1.79x (wajib 0.75–1.00x)"
+      },
       {
         "depth": 7,
         "text": "ACT-USDT-SWAP → RSI: LONG RSI 52.0 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
@@ -1038,10 +1043,6 @@
       {
         "depth": 7,
         "text": "TRUTH-USDT-SWAP → RSI: LONG RSI 51.6 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
-      },
-      {
-        "depth": 6,
-        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       }
     ]
   },
