@@ -1003,51 +1003,49 @@
     }
   ],
   "last_scan_candle": 1792129500000,
-  "last_smc_candle": 1792214100000,
+  "last_smc_candle": 1792215900000,
   "last_online_day": "2026-10-17",
   "smc_rej": {
-    "scans": 9,
-    "pairs": 1307,
+    "scans": 1,
+    "pairs": 147,
     "signals": 0,
     "stages": {
-      "Displacement": 265,
-      "Sweep": 175,
-      "Retest": 226,
-      "Konfirmasi": 194,
-      "Diblokir": 2,
-      "Struktur": 407,
-      "Data": 9,
-      "Volume": 9,
-      "RSI": 20
+      "Konfirmasi": 31,
+      "Sweep": 10,
+      "Struktur": 59,
+      "Retest": 22,
+      "Displacement": 21,
+      "Data": 1,
+      "RSI": 3
     },
     "near": [
       {
-        "depth": 10,
-        "text": "STRK-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+        "depth": 7,
+        "text": "ACT-USDT-SWAP → RSI: LONG RSI 52.0 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
       },
       {
-        "depth": 10,
-        "text": "WAL-USDT-SWAP → Diblokir: LONG sudah 3 posisi aktif (maks 3)"
+        "depth": 7,
+        "text": "MERL-USDT-SWAP → RSI: SHORT RSI 47.4 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
       },
       {
-        "depth": 8,
-        "text": "MON-USDT-SWAP → Volume: SHORT CHOCH volume 0.37x (min 0.75x)"
+        "depth": 7,
+        "text": "TRUMP-USDT-SWAP → RSI: LONG RSI 51.7 di zona netral (45-55) — butuh RSI &lt; 45 atau &gt; 55"
       },
       {
-        "depth": 8,
-        "text": "NEAR-USDT-SWAP → Volume: SHORT CHOCH volume 0.73x (min 1.00x, RSI 48.7 di deadzone +0.25)"
+        "depth": 6,
+        "text": "SATS-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "APE-USDT-SWAP → Volume: SHORT CHOCH volume 0.45x (min 1.00x, RSI 47.1 di deadzone +0.25)"
+        "depth": 6,
+        "text": "BONK-USDT-SWAP → Konfirmasi: SHORT konfirmasi terlalu lama (2 bar lalu)"
       },
       {
-        "depth": 8,
-        "text": "IOST-USDT-SWAP → Volume: SHORT CHOCH volume 0.13x (wajib 0.75–1.00x)"
+        "depth": 6,
+        "text": "NEIRO-USDT-SWAP → Konfirmasi: LONG konfirmasi terlalu lama (3 bar lalu)"
       }
     ]
   },
-  "last_report_ts": 1792201140.3023267,
+  "last_report_ts": 1792217030.0043695,
   "archive": [
     {
       "signal_id": "RLS-USDT-SWAP|LONG|1790726400000",
