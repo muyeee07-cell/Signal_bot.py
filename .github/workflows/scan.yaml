@@ -1,0 +1,74 @@
+name: scan
+
+# Jadwal cron GitHub tiap 15 menit (sejajar dengan candle 15m) + bisa dijalankan manual.
+# Kalau cron-job.org masih aktif, matikan agar tidak jalan dobel.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+# Satu run pada satu waktu supaya signals_history.json tidak bentrok.
+concurrency:
+  group: scan
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run signal bot
+        env:
+          # Telegram (isi lewat Settings > Secrets and variables > Actions)
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Mode: satu siklus per run (loop dilakukan oleh cron-job.org)
+          RUN_FOREVER: "0"
+          SIGNAL_HISTORY_FILE: signals_history.json
+          # Strategi (nilai sama dengan default di signal_bot.py)
+          TARGET_RR: "1.75"
+          SMC_MIN_RISK_PCT: "0.004"
+          RSI_LOW: "45"
+          RSI_HIGH: "55"
+          MIN_VOLUME_RATIO: "0.75"
+          MAX_VOLUME_RATIO: "1.00"
+          # Universe & batas posisi
+          TOP_PAIRS: "150"
+          SMC_MAX_OPEN: "20"
+          MAX_ACTIVE_SMC_PER_DIRECTION: "3"
+          MAX_NEW_SMC_PER_CANDLE: "2"
+          # Laporan & estimasi fee
+          FEE_PER_SIDE: "0.0005"
+          REPORT_EVERY_HOURS: "4"
+        run: python signal_bot.py
+
+      - name: Commit history
+        if: always()
+        run: |
+          [ -f signals_history.json ] || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add signals_history.json
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan history."
+          else
+            git commit -m "update signals history [skip ci]"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
